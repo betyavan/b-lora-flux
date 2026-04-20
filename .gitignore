@@ -10,8 +10,7 @@ build/
 .ruff_cache/
 
 # DVC — raw data tracked via DVC, not git
-data/wikiart/
-data/best_artworks/
+data/styles/
 data/coco_val2017/
 data/artbench10/
 

@@ -4,13 +4,8 @@ defaults:
 
 # Which datasets to download (set to false to skip)
 download:
-  wikiart: true
-  best_artworks: true
   coco_val2017: true
   artbench10: true
-
-# Number of parallel download workers
-num_workers: 4
 
 # Whether to verify checksums after download
 verify: true
