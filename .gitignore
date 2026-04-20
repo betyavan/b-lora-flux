@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+dist/
+build/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# DVC — raw data tracked via DVC, not git
+data/wikiart/
+data/best_artworks/
+data/coco_val2017/
+data/artbench10/
+
+# Hydra outputs
+outputs/
+multirun/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.pdf
+
+# OS
+.DS_Store

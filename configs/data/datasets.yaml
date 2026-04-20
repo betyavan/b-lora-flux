@@ -1,0 +1,28 @@
+# Dataset paths and download configuration
+data_root: ${oc.env:DATA_ROOT,data}
+
+wikiart:
+  hf_id: huggan/wikiart
+  dir: ${data_root}/wikiart
+  split: train
+  max_samples: null  # null = all (~80k images)
+  image_column: image
+
+best_artworks:
+  hf_id: huggan/wikiart  # fallback; primary is Kaggle ikarus777/best-artworks-of-all-time
+  kaggle_id: ikarus777/best-artworks-of-all-time
+  dir: ${data_root}/best_artworks
+  split: train
+  image_column: image
+
+coco_val2017:
+  url: http://images.cocodataset.org/zips/val2017.zip
+  annotations_url: http://images.cocodataset.org/annotations/annotations_trainval2017.zip
+  dir: ${data_root}/coco_val2017
+  expected_size: 5000  # number of images
+
+artbench10:
+  hf_id: Doub7e/ArtBench-10
+  dir: ${data_root}/artbench10
+  split: train
+  image_column: image
