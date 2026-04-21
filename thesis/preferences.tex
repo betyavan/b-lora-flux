@@ -1,0 +1,79 @@
+% настройки polyglossia
+\setdefaultlanguage{russian}
+\setotherlanguage{english}
+
+% локализация
+\addto\captionsrussian{
+  \renewcommand{\figurename}{Рисунок}%
+  \renewcommand{\partname}{Глава}
+  \renewcommand{\contentsname}{\centerline{Содержание}}
+  \renewcommand{\listingscaption}{Листинг}
+}
+
+% основной шрифт документа
+\setmainfont{CMU Serif}
+
+% перечень использованных источников
+
+
+\usepackage{soul} % Модификаторы начертания
+\usepackage{hyperref}
+\usepackage[usenames,dvipsnames,svgnames,table,rgb]{xcolor}
+\hypersetup{				% Гиперссылки
+    unicode=true,           % русские буквы в раздела PDF
+    colorlinks=true,       	% false: ссылки в рамках; true: цветные ссылки
+    linkcolor=black,          % внутренние ссылки
+    citecolor=black,        % на библиографию
+    filecolor=magenta,      % на файлы
+    urlcolor=blue           % на URL
+}
+% настройка подсветки кода и окружения для листингов
+\usemintedstyle{colorful}
+\newenvironment{code}{\captionsetup{type=listing}}{}
+
+% шрифт для листингов с лигатурами
+\setmonofont{FiraCode-Regular.otf}[
+    Path = templates/,
+    Contextuals=Alternate
+]
+
+% оформления подписи рисунка
+\captionsetup[figure]{labelsep = period}
+
+% подпись таблицы
+\DeclareCaptionFormat{hfillstart}{\hfill#1#2#3\par}
+\captionsetup[table]{format=hfillstart,labelsep=newline,justification=centering,skip=-10pt,textfont=bf}
+
+% путь к каталогу с рисунками
+\graphicspath{{fig/}}
+
+% Внесение titlepage в учёт счётчика страниц
+\makeatletter
+\renewenvironment{titlepage} {
+ \thispagestyle{empty}
+}
+\makeatother
+
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+
+\titlelabel{\thetitle.\quad}
+
+% для удобного конспектирования математики
+\theoremstyle{plain}
+\newtheorem{theorem}{Теорема}[section]
+\newtheorem{proposition}[theorem]{Утверждение}
+\theoremstyle{definition}
+\newtheorem{corollary}{Следствие}[theorem]
+\newtheorem{problem}{Задача}[section]
+\theoremstyle{remark}
+\newtheorem*{nonum}{Решение}
+
+% настоящее матожидание
+\newcommand{\MExpect}{\mathsf{M}}
+
+% объявили оператор!
+\DeclareMathOperator{\sgn}{\mathop{sgn}}
+
+% перенос знаков в формулах (по Львовскому)
+\newcommand*{\hm}[1]{#1\nobreak\discretionary{} {\hbox{$\mathsurround=0pt #1$}}{}} 

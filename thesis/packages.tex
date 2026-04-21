@@ -1,0 +1,53 @@
+% настройка кодировки, шрифтов и русского языка
+\usepackage{fontspec}
+\usepackage{polyglossia}
+
+% рабочие ссылки в документе
+\usepackage{hyperref}
+%\usepackage{cite}
+
+\usepackage[style=numeric, backend=bibtex, dashed=true]{biblatex}
+\addbibresource{phys-bib.bib}
+
+\usepackage{csquotes}
+
+%%% Работа с картинками
+\usepackage{graphicx} % Для вставки рисунков
+\setlength\fboxsep{3pt} % Отступ рамки \fbox{} от рисунка
+\setlength\fboxrule{1pt} % Толщина линий рамки \fbox{}
+\usepackage{wrapfig} % Обтекание рисунков текстом
+
+% поворот страницы
+\usepackage{pdflscape}
+
+% качественные листинги кода
+\usepackage{minted}
+\usepackage{listings}
+\usepackage{lstfiracode}
+
+% отключение копирования номеров строк из листинга, работает не во всех просмотрщиках (в Adobe Reader работает)
+\usepackage{accsupp}
+\newcommand\emptyaccsupp[1]{\BeginAccSupp{ActualText={}}#1\EndAccSupp{}}
+\let\theHFancyVerbLine\theFancyVerbLine
+\def\theFancyVerbLine{\rmfamily\tiny\emptyaccsupp{\arabic{FancyVerbLine}}}
+
+\usepackage{multicol} 
+\usepackage{tabularx}
+
+\usepackage{extsizes}
+\usepackage[left=25mm,right=25mm,
+top=30mm,bottom=30 mm,bindingoffset=0cm]{geometry}
+
+% дополнительные команды для таблиц
+\usepackage{booktabs}
+
+% для заголовков
+\usepackage{caption} 
+\usepackage{titlesec}
+\usepackage[dotinlabels]{titletoc}
+
+% разное для математики
+\usepackage{amsmath, amsfonts, amssymb, amsthm, mathtools}
+
+% водяной знак на документе, см. main.tex
+\usepackage[printwatermark]{xwatermark} 
