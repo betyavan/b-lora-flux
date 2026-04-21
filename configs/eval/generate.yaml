@@ -1,0 +1,25 @@
+# Hydra config for generate_images.py
+# Override any field from CLI: python scripts/eval/generate_images.py lora_path=... prompt_file=...
+
+generate:
+  lora_path: ???                          # required: path to .safetensors LoRA adapter
+  prompt_file: "data/coco_prompts.txt"    # one prompt per line, 100 lines for main eval
+  output_dir: "output/generated"          # images saved as {exp_name}/{idx:04d}.png
+  exp_name: "unnamed"                     # used as sub-folder and ClearML task name
+
+model:
+  name_or_path: "black-forest-labs/FLUX.1-dev"
+  lora_scale: 1.0                         # LoRA weight α/r applied at inference
+
+sampling:
+  seed: 42
+  steps: 28
+  guidance_scale: 3.5
+  width: 1024
+  height: 1024
+  batch_size: 1                           # increase if VRAM allows
+
+clearml:
+  enabled: true
+  project: "blora-flux-eval"
+  task_prefix: "generate"
