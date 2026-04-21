@@ -5,7 +5,7 @@ Usage (single style reference):
         metrics.generated_dir=output/generated/e01_blora_flux_van_gogh_img1 \\
         metrics.style_ref=data/styles/van_gogh/img1/reference.jpg \\
         metrics.prompt_file=data/coco_prompts.txt \\
-        metrics.artbench_dir=data/artbench10/van_gogh \\
+        metrics.artbench_dir=data/artbench10 \\
         metrics.exp_name=e01_blora_flux_van_gogh_img1
 
 Usage (multiple style references — averaged):

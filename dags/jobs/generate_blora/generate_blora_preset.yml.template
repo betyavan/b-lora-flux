@@ -1,0 +1,61 @@
+job:
+  generate_name: b-lora-generate
+  description: 'B-LoRA FLUX image generation job'
+  time_limit: 2h
+
+  jobtracker:
+    print_timestamps: true
+
+  flavor: h100-1x
+  region: ${CORP_RUNNER_REGION}
+  image: ${CORP_DOCKER_IMAGE}
+
+  env:
+    AWS_ACCESS_KEY_ID: ${CORP_VAULT_PATH}#access_key
+    AWS_SECRET_ACCESS_KEY: ${CORP_VAULT_PATH}#secret_key
+    PIP_INDEX_URL: ${CORP_PIP_INDEX_URL}
+    HF_HOME: /models
+    CLEARML_ENABLED: "0"
+    # EXPERIMENT_NAME, TRAIN_OUTPUT_S3_PATH, GENERATED_OUTPUT_S3_PATH — injected by Airflow
+
+  entrypoint: /bin/sh
+  args:
+    - -c
+    - >-
+      git clone ${CORP_GITHUB_REPO} /root/b-lora-flux;
+      cd /root/b-lora-flux;
+      poetry install;
+      bash /root/generate_job_script.sh;
+  work_dir: /root
+
+  input:
+    - name: S3_Input_dataset
+      type: s3msk
+      bucket: ${CORP_S3_BUCKET_DATA}
+      src: ${CORP_S3_DATA_PATH}
+      dst: /my_datasets
+
+    - name: S3_Input_flux_model
+      type: s3msk
+      bucket: ${CORP_S3_BUCKET_MODELS}
+      src: /flux/models/flux-dev/
+      dst: /models/flux-dev
+
+    - type: model_registry
+      name: S3_Input_sdxl_model
+      src: ${CORP_SDXL_MODEL_SRC}
+      version: ${CORP_SDXL_MODEL_VERSION}
+      dst: /models/sdxl
+
+    - type: files
+      name: script
+      src: ./files/generate_job_script.sh
+      dst: /root/generate_job_script.sh
+
+  container_ports:
+    - name: http
+      port: 8000
+    - name: grpc
+      port: 8001
+    - name: prometheus
+      port: 8002

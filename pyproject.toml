@@ -128,7 +128,5 @@ markers = [
     "slow: slow tests (model loading, dataset download)",
 ]
 
-[[tool.poetry.source]]
-name = "tinkoff_pypi"
-url = "https://artifactory.tcsbank.ru/artifactory/api/pypi/python-all/simple/"
-priority = "primary"
+# Corporate PyPI mirror: configure via PIP_INDEX_URL env var or pip.conf.
+# See infra.env.template → CORP_PIP_INDEX_URL.

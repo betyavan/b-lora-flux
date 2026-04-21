@@ -1,0 +1,48 @@
+job:
+  generate_name: b-lora-metrics
+  description: 'B-LoRA FLUX metrics computation job'
+  time_limit: 1h
+
+  jobtracker:
+    print_timestamps: true
+
+  flavor: h100-1x
+  region: ${CORP_RUNNER_REGION}
+  image: ${CORP_DOCKER_IMAGE}
+
+  env:
+    AWS_ACCESS_KEY_ID: ${CORP_VAULT_PATH}#access_key
+    AWS_SECRET_ACCESS_KEY: ${CORP_VAULT_PATH}#secret_key
+    PIP_INDEX_URL: ${CORP_PIP_INDEX_URL}
+    CLEARML_ENABLED: "0"
+    # EXPERIMENT_NAME, GENERATED_OUTPUT_S3_PATH, METRICS_OUTPUT_S3_PATH — injected by Airflow
+
+  entrypoint: /bin/sh
+  args:
+    - -c
+    - >-
+      git clone ${CORP_GITHUB_REPO} /root/b-lora-flux;
+      cd /root/b-lora-flux;
+      poetry install;
+      bash /root/metrics_job_script.sh;
+  work_dir: /root
+
+  input:
+    - name: S3_Input_dataset
+      type: s3msk
+      bucket: ${CORP_S3_BUCKET_DATA}
+      src: ${CORP_S3_DATA_PATH}
+      dst: /my_datasets
+
+    - type: files
+      name: script
+      src: ./files/metrics_job_script.sh
+      dst: /root/metrics_job_script.sh
+
+  container_ports:
+    - name: http
+      port: 8000
+    - name: grpc
+      port: 8001
+    - name: prometheus
+      port: 8002
