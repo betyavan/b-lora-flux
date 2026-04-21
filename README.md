@@ -16,7 +16,7 @@ DIPLOMA/
 │   ├── eval/
 │   │   ├── generate.yaml           # инференс
 │   │   └── metrics.yaml            # оценка качества
-│   └── experiments/                # 17 конфигов ai-toolkit
+│   └── experiments/                # 32 конфига ai-toolkit
 │       ├── base_flux_lora.yaml     # базовый шаблон
 │       ├── e01_blora_flux_*.yaml   # группа E: B-LoRA-FLUX
 │       ├── e02_full_lora_flux_*.yaml
@@ -24,6 +24,14 @@ DIPLOMA/
 │       ├── a0{1-4}_blocks_*.yaml   # аблация A: диапазон блоков
 │       ├── b0{1-4}_rank_*.yaml     # аблация B: ранг r
 │       └── c0{1-4}_steps_*.yaml    # аблация C: число шагов
+├── dags/
+│   ├── blora_flux_pipeline.py         # одиночный эксперимент
+│   ├── blora_flux_group_pipeline.py   # параллельный запуск группы
+│   ├── plugins/job_runner_wrapper.py  # обёртка оператора
+│   └── jobs/                          # train / generate / metrics
+│       ├── train_blora/
+│       ├── generate_blora/
+│       └── metrics_blora/
 ├── data/
 │   ├── styles/                     # стилевые изображения (DVC)
 │   │   ├── van_gogh/img{1-4}/
@@ -42,6 +50,7 @@ DIPLOMA/
 ├── src/
 │   └── ai-toolkit/                 # git submodule (ostris/ai-toolkit)
 ├── thesis/                         # LaTeX-исходники ВКР
+├── infra.env.template
 └── pyproject.toml
 ```
 
@@ -55,22 +64,45 @@ cd DIPLOMA
 # зависимости
 pip install poetry && poetry install
 
+# настроить корпоративные переменные
+cp infra.env.template infra.env
+# отредактировать infra.env, затем:
+make configure    # рендерит preset YAML из шаблонов
+
 # данные (требует dvc remote)
 dvc pull
 ```
 
 ## Быстрый старт
 
-### 1. Обучить LoRA-адаптер
+### Запуск через Airflow (основной способ)
+
+```bash
+# Один эксперимент
+make run EXP=e01_blora_flux_van_gogh_img1
+
+# Группа экспериментов (параллельно)
+make run-group GROUP=ablation_a
+
+# Статус и результаты
+make status
+make pull-results EXP=e01_blora_flux_van_gogh_img1
+```
+
+### Локальный запуск (без Airflow)
+
+Используется для разработки и отладки.
+
+#### 1. Обучить LoRA-адаптер
 
 ```bash
 cd src/ai-toolkit
-python run.py ../../configs/experiments/e01_blora_flux_van_gogh.yaml
+python run.py ../../configs/experiments/e01_blora_flux_van_gogh_img1.yaml
 ```
 
 Адаптер сохраняется в `output/e01_blora_flux_van_gogh_img1/`.
 
-### 2. Сгенерировать изображения
+#### 2. Сгенерировать изображения
 
 ```bash
 python scripts/eval/generate_images.py \
@@ -80,7 +112,7 @@ python scripts/eval/generate_images.py \
 
 Изображения сохраняются в `output/generated/e01_blora_flux_van_gogh_img1/`.
 
-### 3. Вычислить метрики
+#### 3. Вычислить метрики
 
 ```bash
 python scripts/eval/compute_metrics.py \
@@ -93,7 +125,7 @@ python scripts/eval/compute_metrics.py \
 
 Результаты печатаются в консоль и логируются в ClearML.
 
-### 4. Обновить таблицу прогресса
+#### 4. Обновить таблицу прогресса
 
 ```bash
 python scripts/update_exp_plan.py
@@ -117,7 +149,6 @@ python scripts/update_exp_plan.py
 |-------|--------|------------|
 | **B-LoRA-FLUX** | `e01_blora_flux_*` | предлагаемый метод |
 | Full-LoRA-FLUX | `e02_full_lora_flux_*` | baseline без блочного разделения |
-| IP-Adapter-FLUX | — | inference-only, без обучения |
 | B-LoRA-SDXL | `e04_blora_sdxl_*` | оригинальный B-LoRA на SDXL |
 
 ### Метрики
