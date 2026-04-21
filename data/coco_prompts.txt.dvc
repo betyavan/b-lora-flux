@@ -1,0 +1,5 @@
+outs:
+- md5: 2949782c280eebba56f4c9fdc3e1f921
+  size: 5250
+  hash: md5
+  path: coco_prompts.txt

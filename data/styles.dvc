@@ -1,6 +1,6 @@
 outs:
-- md5: 8d21ac7241ba3d82f518e9e793ae1f88.dir
-  size: 748782
-  nfiles: 10
+- md5: c694396d20230d1e242104e55030f966.dir
+  size: 749257
+  nfiles: 18
   hash: md5
   path: styles
