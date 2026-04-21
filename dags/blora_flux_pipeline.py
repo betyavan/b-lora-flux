@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -48,7 +50,7 @@ with DAG(
 ) as dag:
 
     @task
-    def prepare_paths(**context):
+    def prepare_paths(**context) -> dict[str, str]:
         """Build all S3 paths used by downstream jobs."""
         params = context["params"]
         base = params["S3_BASE_PATH"].rstrip("/")
@@ -61,14 +63,14 @@ with DAG(
         }
 
     @task
-    def prepare_train_env(paths, **context):
+    def prepare_train_env(paths, **context) -> dict[str, str]:
         return {
             "EXPERIMENT_NAME": paths["EXPERIMENT_NAME"],
             "TRAIN_OUTPUT_S3_PATH": paths["TRAIN_OUTPUT_S3_PATH"],
         }
 
     @task
-    def prepare_generate_env(paths, **context):
+    def prepare_generate_env(paths, **context) -> dict[str, str]:
         return {
             "EXPERIMENT_NAME": paths["EXPERIMENT_NAME"],
             "TRAIN_OUTPUT_S3_PATH": paths["TRAIN_OUTPUT_S3_PATH"],
@@ -76,7 +78,7 @@ with DAG(
         }
 
     @task
-    def prepare_metrics_env(paths, **context):
+    def prepare_metrics_env(paths, **context) -> dict[str, str]:
         return {
             "EXPERIMENT_NAME": paths["EXPERIMENT_NAME"],
             "GENERATED_OUTPUT_S3_PATH": paths["GENERATED_OUTPUT_S3_PATH"],

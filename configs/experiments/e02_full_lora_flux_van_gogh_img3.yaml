@@ -1,5 +1,5 @@
 ---
-# E02 — Full-LoRA-FLUX, Van Gogh style image 1
+# E02 — Full-LoRA-FLUX, Van Gogh style image 3
 # Baseline: LoRA on ALL FLUX blocks (no block selection)
 job: extension
 config:

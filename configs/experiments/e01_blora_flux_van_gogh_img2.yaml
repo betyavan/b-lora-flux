@@ -1,5 +1,5 @@
 ---
-# E01 — B-LoRA-FLUX, Van Gogh style image 1
+# E01 — B-LoRA-FLUX, Van Gogh style image 2
 # Method: style LoRA on single-stream blocks 30–37 only
 job: extension
 config:

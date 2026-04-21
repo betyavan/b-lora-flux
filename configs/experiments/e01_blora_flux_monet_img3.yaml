@@ -1,5 +1,5 @@
 ---
-# E01-F — B-LoRA-FLUX, Monet style image 1  (group F validation)
+# E01-F — B-LoRA-FLUX, Monet style image 3  (group F validation)
 job: extension
 config:
   name: "e01_blora_flux_monet_img3"

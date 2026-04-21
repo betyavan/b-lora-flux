@@ -1,5 +1,5 @@
 ---
-# E04 — B-LoRA-SDXL, Van Gogh style image 1
+# E04 — B-LoRA-SDXL, Van Gogh style image 2
 # Baseline: original B-LoRA on SDXL (style block up_blocks[0].attentions[1])
 # NOTE: uses SDXL model, not FLUX. ai-toolkit supports SDXL via is_sdxl flag.
 job: extension

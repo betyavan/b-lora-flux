@@ -1,10 +1,9 @@
 ---
-# E04 — B-LoRA-SDXL, Van Gogh style image 4
-# Baseline: original B-LoRA on SDXL (style block up_blocks[0].attentions[1])
-# NOTE: uses SDXL model, not FLUX. ai-toolkit supports SDXL via is_sdxl flag.
+# E02 — Full-LoRA-FLUX, Monet style image 2
+# Baseline: LoRA on ALL FLUX blocks (no block selection)
 job: extension
 config:
-  name: "e04_blora_sdxl_van_gogh_img4"
+  name: "e02_full_lora_flux_monet_img2"
   process:
     - type: 'sd_trainer'
       training_folder: "output"
@@ -13,16 +12,14 @@ config:
         type: "lora"
         linear: 16
         linear_alpha: 16
-        network_kwargs:
-          only_if_contains:
-            - "up_blocks.0.attentions.1"
+        # no only_if_contains → all blocks are trained
       save:
         dtype: float16
         save_every: 250
         max_step_saves_to_keep: 4
         push_to_hub: false
       datasets:
-        - folder_path: "data/styles/van_gogh/img4"
+        - folder_path: "data/styles/monet/img2"
           caption_ext: "txt"
           caption_dropout_rate: 0.05
           shuffle_tokens: false
@@ -35,7 +32,7 @@ config:
         train_unet: true
         train_text_encoder: false
         gradient_checkpointing: true
-        noise_scheduler: "ddpm"
+        noise_scheduler: "flowmatch"
         optimizer: "adamw8bit"
         lr: 1e-4
         ema_config:
@@ -43,12 +40,11 @@ config:
           ema_decay: 0.99
         dtype: bf16
       model:
-        name_or_path: "stabilityai/stable-diffusion-xl-base-1.0"
-        is_flux: false
-        is_xl: true
-        quantize: false
+        name_or_path: "black-forest-labs/FLUX.1-dev"
+        is_flux: true
+        quantize: true
       sample:
-        sampler: "ddpm"
+        sampler: "flowmatch"
         sample_every: 250
         width: 1024
         height: 1024
@@ -59,8 +55,8 @@ config:
         neg: ""
         seed: 42
         walk_seed: false
-        guidance_scale: 7.5
-        sample_steps: 20
+        guidance_scale: 3.5
+        sample_steps: 28
 
 meta:
   name: "[name]"
