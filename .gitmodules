@@ -1,0 +1,3 @@
+[submodule "src/ai-toolkit"]
+	path = src/ai-toolkit
+	url = https://github.com/ostris/ai-toolkit
