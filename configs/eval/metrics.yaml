@@ -1,0 +1,27 @@
+# Hydra config for compute_metrics.py
+# Override from CLI: python scripts/eval/compute_metrics.py metrics.generated_dir=...
+
+metrics:
+  generated_dir: ???                   # required: folder with generated .png files
+  exp_name: "unnamed"                  # used as ClearML task name suffix
+
+  # Style reference — at least one of the two must be set for CLIP-style / LPIPS.
+  # style_refs_dir takes precedence over style_ref when both are provided.
+  style_ref: null                      # path to a single reference image
+  style_refs_dir: null                 # path to folder with multiple reference images
+
+  prompt_file: "data/coco_prompts.txt" # one prompt per line; order must match generated files
+
+  # ArtBench-10 real-image folder for FID (e.g. data/artbench10/van_gogh).
+  # Set to null to skip FID computation.
+  artbench_dir: null
+
+model:
+  clip: "openai/clip-vit-large-patch14"
+  lpips_net: "vgg"
+  batch_size: 8                        # CLIP encoding batch size
+
+clearml:
+  enabled: true
+  project: "blora-flux-eval"
+  task_prefix: "metrics"
