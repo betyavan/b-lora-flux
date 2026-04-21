@@ -1,0 +1,6 @@
+outs:
+- md5: 8d21ac7241ba3d82f518e9e793ae1f88.dir
+  size: 748782
+  nfiles: 10
+  hash: md5
+  path: styles

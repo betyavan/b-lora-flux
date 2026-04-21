@@ -1,0 +1,6 @@
+outs:
+- md5: 916207b1c37998a5900f5a2a90660e65.dir
+  size: 13480655
+  nfiles: 1001
+  hash: md5
+  path: artbench10
