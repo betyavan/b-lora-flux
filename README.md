@@ -169,4 +169,4 @@ python scripts/update_exp_plan.py
 
 ## Стек
 
-Python 3.10 · PyTorch 2.1 · Diffusers ≥0.30 · PEFT ≥0.12 · Hydra 1.3 · ClearML 1.16 · DVC 3.54 · ai-toolkit 0.9.4
+Python 3.10 · PyTorch 2.1 · Diffusers ≥0.30 · PEFT ≥0.12 · Hydra 1.3 · ClearML 1.16 · DVC 3.54 · ai-toolkit 0.9.4 · Airflow 2.x · boto3 · s3cmd · pre-commit
