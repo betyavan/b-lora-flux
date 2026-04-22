@@ -3,7 +3,7 @@ set -e
 
 # 0. Verify Python environment before starting expensive training
 cd /root/b-lora-flux
-poetry run python scripts/check_env.py --strict
+python scripts/check_env.py --strict
 
 # 1. Set up data symlinks (data/ -> /my_datasets/)
 mkdir -p /root/b-lora-flux/data

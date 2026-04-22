@@ -8,7 +8,7 @@ set -e
 
 # 0. Verify Python environment
 cd /root/b-lora-flux
-poetry run python scripts/check_env.py --strict
+python scripts/check_env.py --strict
 
 # 1. Symlink datasets
 mkdir -p /root/b-lora-flux/data
@@ -32,7 +32,7 @@ echo "Using LoRA: $LORA_PATH"
 
 # 4. Generate 100 images
 mkdir -p results/generated
-poetry run python scripts/eval/generate_images.py \
+python scripts/eval/generate_images.py \
   generate.lora_path="$LORA_PATH" \
   generate.prompt_file=data/coco_prompts.txt \
   generate.output_dir=results/generated \

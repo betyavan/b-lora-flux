@@ -8,7 +8,7 @@ set -e
 
 # 0. Verify Python environment
 cd /root/b-lora-flux
-poetry run python scripts/check_env.py --strict
+python scripts/check_env.py --strict
 
 # 1. Symlink datasets (style refs + artbench10 needed for metrics)
 mkdir -p /root/b-lora-flux/data
@@ -33,7 +33,7 @@ else
 fi
 
 # 4. Compute metrics
-poetry run python scripts/eval/compute_metrics.py \
+python scripts/eval/compute_metrics.py \
   metrics.generated_dir="results/generated/${EXPERIMENT_NAME}" \
   metrics.style_refs_dir="$STYLE_REFS_DIR" \
   metrics.prompt_file=data/coco_prompts.txt \
