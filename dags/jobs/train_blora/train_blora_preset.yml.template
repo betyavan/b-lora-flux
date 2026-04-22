@@ -23,7 +23,7 @@ job:
   args:
     - -c
     - >-
-      pip install -q hydra-core datasets torchmetrics clean-fid boto3 s3cmd;
+      pip install -q hydra-core datasets torchmetrics clean-fid boto3 s3cmd clearml;
       git clone --recurse-submodules ${CORP_GITHUB_REPO} /root/b-lora-flux;
       bash /root/train_job_script.sh;
   work_dir: /root
@@ -51,6 +51,11 @@ job:
       name: script
       src: ./files/train_job_script.sh
       dst: /root/train_job_script.sh
+
+    - type: files
+      name: s3cfg
+      src: ./files/s3cfg
+      dst: /root/.s3cfg
 
   container_ports:
     - name: http
