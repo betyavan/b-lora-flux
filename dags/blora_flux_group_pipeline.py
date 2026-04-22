@@ -145,7 +145,7 @@ with DAG(
     generate_all = JobSubmitDictOperator.partial(
         task_id="remote-generate-blora-group",
         dp_conn_id=_AIRFLOW_CONN_ID,
-        autosensor=True,
+        autosensor=False,
         runner_job_path=str(JOBS_DIR / "generate_blora"),
         runner_preset_file="generate_blora_preset.yml",
         executor_config={},
@@ -155,7 +155,7 @@ with DAG(
     metrics_all = JobSubmitDictOperator.partial(
         task_id="remote-metrics-blora-group",
         dp_conn_id=_AIRFLOW_CONN_ID,
-        autosensor=True,
+        autosensor=False,
         runner_job_path=str(JOBS_DIR / "metrics_blora"),
         runner_preset_file="metrics_blora_preset.yml",
         executor_config={},
