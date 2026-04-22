@@ -40,7 +40,7 @@ echo "[$(ts)] smoke_run.sh starting (timeout: ${TIMEOUT_SECONDS}s)"
 # ---------------------------------------------------------------------------
 echo ""
 echo "[$(ts)] Step 1: Running connectivity checks..."
-python "${SCRIPT_DIR}/check_connectivity.py"
+poetry run python "${SCRIPT_DIR}/check_connectivity.py"
 echo "[$(ts)] Connectivity checks passed."
 
 # ---------------------------------------------------------------------------
