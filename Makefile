@@ -1,5 +1,6 @@
 .PHONY: export infer train docker docker-push check refactor lint show install isort black mdformat yamlfix mypy pylint mdlint test clean docs docs-serve \
-        run run-group status update-plan pull-results configure install-hooks
+        run run-group status update-plan pull-results configure install-hooks \
+        check-infra smoke-run
 
 tag   ?= v0.0
 image ?= $(shell grep CORP_DOCKER_IMAGE infra.env 2>/dev/null | cut -d= -f2)
@@ -59,6 +60,14 @@ dvc-init:
 # Trigger single experiment DAG
 run:
 	airflow dags trigger blora_flux_pipeline --conf '{"EXPERIMENT_NAME": "$(EXP)"}'
+
+## Run connectivity checks before submitting jobs
+check-infra:
+	python scripts/check_connectivity.py
+
+## Run full pipeline smoke test with minimal config (10 steps)
+smoke-run:
+	bash scripts/smoke_run.sh
 
 # Trigger group DAG
 run-group:

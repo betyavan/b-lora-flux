@@ -81,7 +81,8 @@ def test_experiment_config_required_fields(cfg_path: Path) -> None:
 
 def test_experiment_configs_total_count() -> None:
     configs = _experiment_configs()
-    assert len(configs) == 32, f"Expected 32 configs, got {len(configs)}"
+    # 32 experiment configs + smoke_test
+    assert len(configs) == 33, f"Expected 33 configs, got {len(configs)}"
 
 
 def test_ablation_configs_have_block_constraints() -> None:
