@@ -17,9 +17,9 @@ _CORP_VARS = $${CORP_S3_BUCKET_DATA} $${CORP_S3_BUCKET_MODELS} $${CORP_S3_DATA_P
 configure:
 	@test -f infra.env || { echo "ERROR: infra.env not found. Copy infra.env.template → infra.env and fill in values."; exit 1; }
 	@bash -c 'set -a && source infra.env && set +a && \
-		envsubst "$(_CORP_VARS)" < dags/jobs/train_blora/train_blora_preset.yml.template > dags/jobs/train_blora/train_blora_preset.yml && \
-		envsubst "$(_CORP_VARS)" < dags/jobs/generate_blora/generate_blora_preset.yml.template > dags/jobs/generate_blora/generate_blora_preset.yml && \
-		envsubst "$(_CORP_VARS)" < dags/jobs/metrics_blora/metrics_blora_preset.yml.template > dags/jobs/metrics_blora/metrics_blora_preset.yml'
+		envsubst < dags/jobs/train_blora/train_blora_preset.yml.template > dags/jobs/train_blora/train_blora_preset.yml && \
+		envsubst < dags/jobs/generate_blora/generate_blora_preset.yml.template > dags/jobs/generate_blora/generate_blora_preset.yml && \
+		envsubst < dags/jobs/metrics_blora/metrics_blora_preset.yml.template > dags/jobs/metrics_blora/metrics_blora_preset.yml'
 	@echo "Preset files rendered from templates."
 
 ## Install pre-commit hooks (run once after clone)
