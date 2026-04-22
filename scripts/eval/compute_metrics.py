@@ -192,12 +192,13 @@ def compute_lpips_score(
     import lpips  # type: ignore[import]
     import torchvision.transforms.functional as TF  # type: ignore[import]
 
-    loss_fn = lpips.LPIPS(net=net, normalize=True).to(device)
+    loss_fn = lpips.LPIPS(net=net).to(device)
     loss_fn.eval()
 
     def _to_tensor(path: Path) -> torch.Tensor:
         img = Image.open(path).convert("RGB").resize((target_size, target_size))
-        return TF.to_tensor(img).unsqueeze(0)  # (1, 3, H, W) in [0, 1]
+        t = TF.to_tensor(img).unsqueeze(0)  # (1, 3, H, W) in [0, 1]
+        return t * 2 - 1  # LPIPS expects [-1, 1]
 
     scores_per_ref: list[float] = []
     for ref_path in style_refs:
