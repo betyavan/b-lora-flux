@@ -4,7 +4,6 @@ import os
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import boto3
 from airflow import DAG
 from airflow.decorators import task
 from airflow.models.param import Param
@@ -16,8 +15,6 @@ from dags.plugins.job_runner_wrapper import JobSubmitOperatorEnv
 JOBS_DIR = Path(__file__).parent / "jobs"
 
 _S3_BASE_PATH_DEFAULT = os.environ.get("CORP_S3_BASE_PATH", "")
-_S3_ENDPOINT = os.environ.get("CORP_S3_ENDPOINT", "")
-_S3_BUCKET_DATA = os.environ.get("CORP_S3_BUCKET_DATA", "")
 _AIRFLOW_CONN_ID = os.environ.get("CORP_AIRFLOW_CONN_ID", "dp_conn")
 
 with DAG(
@@ -55,11 +52,12 @@ with DAG(
         params = context["params"]
         base = params["S3_BASE_PATH"].rstrip("/")
         exp = params["EXPERIMENT_NAME"]
+        run_ts = context["logical_date"].strftime("%Y%m%dT%H%M%S")
         return {
             "EXPERIMENT_NAME": exp,
-            "TRAIN_OUTPUT_S3_PATH": f"{base}/exp_logs/{exp}/loras",
-            "GENERATED_OUTPUT_S3_PATH": f"{base}/exp_logs/{exp}/generated",
-            "METRICS_OUTPUT_S3_PATH": f"{base}/exp_logs/{exp}/metrics",
+            "TRAIN_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/loras",
+            "GENERATED_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/generated",
+            "METRICS_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/metrics",
         }
 
     @task
@@ -87,22 +85,8 @@ with DAG(
 
     @task
     def update_plan(**context):
-        """Download metrics.json from S3 and update experiments/plan.md."""
+        """Pull metrics from ClearML and update experiments/plan.md."""
         import subprocess
-
-        params = context["params"]
-        paths = context["ti"].xcom_pull(task_ids="prepare_paths")
-        exp = params["EXPERIMENT_NAME"]
-
-        bucket = _S3_BUCKET_DATA
-        from urllib.parse import urlparse
-        parsed = urlparse(paths["METRICS_OUTPUT_S3_PATH"])
-        key = parsed.path.lstrip("/") + "/metrics.json"
-        local_path = Path(f"output/results/{exp}.json")
-        local_path.parent.mkdir(parents=True, exist_ok=True)
-
-        s3 = boto3.client("s3", endpoint_url=_S3_ENDPOINT)
-        s3.download_file(bucket, key, str(local_path))
 
         result = subprocess.run(
             ["poetry", "run", "python", "scripts/update_exp_plan.py"],

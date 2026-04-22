@@ -133,3 +133,7 @@ test:
 
 clean:
 	poetry run pyclean . && rm -rf __pycache__ && rm -rf *.egg-info && rm -rf build && rm -rf dist && rm -rf .pytest_cache && rm -rf .mypy_cache
+
+git_push:
+	git push origin
+	git push gitlab

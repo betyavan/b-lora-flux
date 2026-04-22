@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# Populate s3cmd config with credentials from vault env vars
-envsubst < /root/.s3cfg.template > /root/.s3cfg
-
 # Env vars injected by Airflow:
 #   EXPERIMENT_NAME           — e.g. e01_blora_flux_van_gogh_img1
 #   TRAIN_OUTPUT_S3_PATH      — S3 path where LoRA weights were uploaded

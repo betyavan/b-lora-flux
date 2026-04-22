@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# Populate s3cmd config with credentials from vault env vars
-envsubst < /root/.s3cfg.template > /root/.s3cfg
-
 # Env vars injected by Airflow:
 #   EXPERIMENT_NAME           — e.g. e01_blora_flux_van_gogh_img1
 #   GENERATED_OUTPUT_S3_PATH  — S3 path where generated images are stored
@@ -24,6 +21,9 @@ if echo "$EXPERIMENT_NAME" | grep -q "van_gogh"; then
   STYLE_REFS_DIR="/my_datasets/styles/van_gogh"
 elif echo "$EXPERIMENT_NAME" | grep -q "monet"; then
   STYLE_REFS_DIR="/my_datasets/styles/monet"
+elif echo "$EXPERIMENT_NAME" | grep -qE "^[abc][0-9]+_"; then
+  # Ablation groups a/b/c all train on van_gogh/img1 — use full van_gogh dir for eval
+  STYLE_REFS_DIR="/my_datasets/styles/van_gogh"
 else
   echo "WARNING: Cannot determine style from '${EXPERIMENT_NAME}', skipping style metrics"
   STYLE_REFS_DIR="null"
@@ -43,4 +43,4 @@ if [ ! -f "$METRICS_JSON" ]; then
   echo "ERROR: metrics JSON not found at $METRICS_JSON"
   exit 1
 fi
-s3cmd put -v "$METRICS_JSON" "${METRICS_OUTPUT_S3_PATH%/}/metrics.json"
+s3cmd put -v "$METRICS_JSON" "${METRICS_OUTPUT_S3_PATH%/}/${EXPERIMENT_NAME}.json"

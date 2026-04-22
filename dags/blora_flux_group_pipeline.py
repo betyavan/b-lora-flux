@@ -94,10 +94,11 @@ with DAG(
     def prepare_train_env_dicts(**context):
         params = context["params"]
         base = params["S3_BASE_PATH"].rstrip("/")
+        run_ts = context["logical_date"].strftime("%Y%m%dT%H%M%S")
         return [
             {"env": {
                 "EXPERIMENT_NAME": exp,
-                "TRAIN_OUTPUT_S3_PATH": f"{base}/exp_logs/{exp}/loras",
+                "TRAIN_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/loras",
             }}
             for exp in GROUP_EXPERIMENTS[params["GROUP"]]
         ]
@@ -106,11 +107,12 @@ with DAG(
     def prepare_generate_env_dicts(**context):
         params = context["params"]
         base = params["S3_BASE_PATH"].rstrip("/")
+        run_ts = context["logical_date"].strftime("%Y%m%dT%H%M%S")
         return [
             {"env": {
                 "EXPERIMENT_NAME": exp,
-                "TRAIN_OUTPUT_S3_PATH": f"{base}/exp_logs/{exp}/loras",
-                "GENERATED_OUTPUT_S3_PATH": f"{base}/exp_logs/{exp}/generated",
+                "TRAIN_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/loras",
+                "GENERATED_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/generated",
             }}
             for exp in GROUP_EXPERIMENTS[params["GROUP"]]
         ]
@@ -119,11 +121,12 @@ with DAG(
     def prepare_metrics_env_dicts(**context):
         params = context["params"]
         base = params["S3_BASE_PATH"].rstrip("/")
+        run_ts = context["logical_date"].strftime("%Y%m%dT%H%M%S")
         return [
             {"env": {
                 "EXPERIMENT_NAME": exp,
-                "GENERATED_OUTPUT_S3_PATH": f"{base}/exp_logs/{exp}/generated",
-                "METRICS_OUTPUT_S3_PATH": f"{base}/exp_logs/{exp}/metrics",
+                "GENERATED_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/generated",
+                "METRICS_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/metrics",
             }}
             for exp in GROUP_EXPERIMENTS[params["GROUP"]]
         ]

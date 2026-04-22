@@ -44,7 +44,7 @@ def _load_style_refs(cfg: DictConfig) -> list[Path]:
     """Return sorted list of style reference image paths."""
     if cfg.metrics.style_refs_dir is not None:
         d = Path(str(cfg.metrics.style_refs_dir))
-        refs = sorted(p for p in d.iterdir() if p.suffix.lower() in _IMAGE_EXTS)
+        refs = sorted(p for p in d.rglob("*") if p.is_file() and p.suffix.lower() in _IMAGE_EXTS)
         if not refs:
             raise FileNotFoundError(f"No images found in style_refs_dir: {d}")
         log.info("Style refs (dir): %d images from %s", len(refs), d)

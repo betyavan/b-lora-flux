@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# Populate s3cmd config with credentials from vault env vars
-envsubst < /root/.s3cfg.template > /root/.s3cfg
-
 # 0. Verify Python environment before starting expensive training
 cd /root/b-lora-flux
 python scripts/check_env.py --strict
