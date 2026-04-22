@@ -11,7 +11,7 @@ cd /root/b-lora-flux
 python scripts/check_env.py --strict
 
 # 1. Symlink datasets
-ln -sfn /my_datasets/data /root/b-lora-flux/data
+cp -r /my_datasets/data /root/b-lora-flux/data
 
 cd /root/b-lora-flux
 
