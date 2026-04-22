@@ -6,6 +6,10 @@ set -e
 #   GENERATED_OUTPUT_S3_PATH  — S3 path where generated images are stored
 #   METRICS_OUTPUT_S3_PATH    — S3 path to upload metrics.json
 
+# 0. Verify Python environment
+cd /root/b-lora-flux
+poetry run python scripts/check_env.py --strict
+
 # 1. Symlink datasets (style refs + artbench10 needed for metrics)
 mkdir -p /root/b-lora-flux/data
 ln -sfn /my_datasets/styles        /root/b-lora-flux/data/styles
