@@ -8,7 +8,7 @@ generate:
   exp_name: "unnamed"                     # used as sub-folder and ClearML task name
 
 model:
-  name_or_path: "black-forest-labs/FLUX.1-dev"
+  name_or_path: "/models/flux-dev"
   lora_scale: 1.0                         # LoRA weight α/r applied at inference
 
 sampling:
