@@ -36,8 +36,7 @@ python scripts/eval/generate_images.py \
   generate.lora_path="$LORA_PATH" \
   generate.prompt_file=data/coco_prompts.txt \
   generate.output_dir=results/generated \
-  generate.exp_name="$EXPERIMENT_NAME" \
-  clearml.enabled=false
+  generate.exp_name="$EXPERIMENT_NAME"
 
 # 5. Upload generated images to S3
 s3cmd sync -v --follow-symlinks "results/generated/${EXPERIMENT_NAME}/" "${GENERATED_OUTPUT_S3_PATH%/}/"

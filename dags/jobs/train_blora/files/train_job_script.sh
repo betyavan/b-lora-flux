@@ -13,7 +13,7 @@ ln -sfn /my_datasets/coco_prompts.txt /root/b-lora-flux/data/coco_prompts.txt
 
 # 2. Run ai-toolkit training
 cd /root/b-lora-flux
-python run.py configs/experiments/${EXPERIMENT_NAME}.yaml
+python src/ai-toolkit/run.py configs/experiments/${EXPERIMENT_NAME}.yaml
 
 # 3. Collect .safetensors to results/loras/
 mkdir -p results/loras

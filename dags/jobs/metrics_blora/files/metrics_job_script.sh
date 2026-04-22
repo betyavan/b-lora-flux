@@ -38,8 +38,7 @@ python scripts/eval/compute_metrics.py \
   metrics.style_refs_dir="$STYLE_REFS_DIR" \
   metrics.prompt_file=data/coco_prompts.txt \
   metrics.artbench_dir=data/artbench10 \
-  metrics.exp_name="$EXPERIMENT_NAME" \
-  clearml.enabled=false
+  metrics.exp_name="$EXPERIMENT_NAME"
 
 # 5. Upload metrics.json to S3
 METRICS_JSON="output/results/${EXPERIMENT_NAME}.json"
