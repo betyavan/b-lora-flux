@@ -63,7 +63,7 @@ run:
 
 ## Run connectivity checks before submitting jobs
 check-infra:
-	python scripts/check_connectivity.py
+	poetry run python scripts/check_connectivity.py
 
 ## Run full pipeline smoke test with minimal config (10 steps)
 smoke-run:
