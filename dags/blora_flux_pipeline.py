@@ -95,14 +95,25 @@ with DAG(
         exp = params["EXPERIMENT_NAME"]
 
         bucket = _S3_BUCKET_DATA
-        key = paths["METRICS_OUTPUT_S3_PATH"].replace(f"s3://{bucket}/", "") + "/metrics.json"
+        from urllib.parse import urlparse
+        parsed = urlparse(paths["METRICS_OUTPUT_S3_PATH"])
+        key = parsed.path.lstrip("/") + "/metrics.json"
         local_path = Path(f"output/results/{exp}.json")
         local_path.parent.mkdir(parents=True, exist_ok=True)
 
         s3 = boto3.client("s3", endpoint_url=_S3_ENDPOINT)
         s3.download_file(bucket, key, str(local_path))
 
-        subprocess.run(["poetry", "run", "python", "scripts/update_exp_plan.py"], check=False)
+        result = subprocess.run(
+            ["poetry", "run", "python", "scripts/update_exp_plan.py"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            import logging as _log
+            _log.getLogger(__name__).error("update_exp_plan.py failed:\n%s", result.stderr)
+            raise RuntimeError(f"update_exp_plan.py exited with code {result.returncode}")
 
     paths_dict = prepare_paths()
     train_env = prepare_train_env(paths=paths_dict)

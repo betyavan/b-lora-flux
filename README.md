@@ -42,7 +42,6 @@ DIPLOMA/
 │   └── plan.md                     # прогресс 32 экспериментов
 ├── scripts/
 │   ├── download_datasets.py        # загрузка COCO + ArtBench
-│   ├── fetch_style_images.py       # Wikimedia Commons → data/styles/
 │   ├── update_exp_plan.py          # синхронизация ClearML → plan.md
 │   └── eval/
 │       ├── generate_images.py      # генерация с LoRA-адаптером

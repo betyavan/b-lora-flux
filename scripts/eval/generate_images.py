@@ -67,7 +67,7 @@ def _setup_clearml(cfg: DictConfig, task_name: str) -> object | None:
 
 def main(cfg: DictConfig) -> None:
     task_name = cfg.generate.exp_name
-    _setup_clearml(cfg, task_name)
+    task = _setup_clearml(cfg, task_name)
 
     out_dir = Path(cfg.generate.output_dir) / task_name
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -97,6 +97,10 @@ def main(cfg: DictConfig) -> None:
             log.info("  %d / %d", idx + 1, len(prompts))
 
     log.info("Done. Images saved to %s", out_dir)
+
+    if task is not None:
+        task.get_logger().report_scalar("generate", "total_images", value=len(prompts), iteration=0)
+        task.close()
 
 
 if __name__ == "__main__":

@@ -186,13 +186,13 @@ def compute_lpips_score(
 ) -> float:
     """Mean LPIPS between generated images and each style reference, averaged over refs.
 
-    lpips.LPIPS applies its own ImageNet normalisation internally;
-    inputs must be in [0, 1] range (NOT [-1, 1]).
+    normalize=True tells lpips to scale [0, 1] → [-1, 1] internally;
+    without it the library expects [-1, 1] and [0, 1] inputs give wrong values.
     """
     import lpips  # type: ignore[import]
     import torchvision.transforms.functional as TF  # type: ignore[import]
 
-    loss_fn = lpips.LPIPS(net=net).to(device)
+    loss_fn = lpips.LPIPS(net=net, normalize=True).to(device)
     loss_fn.eval()
 
     def _to_tensor(path: Path) -> torch.Tensor:

@@ -1,6 +1,6 @@
 .PHONY: export infer train docker docker-push check refactor lint show install isort black mdformat yamlfix mypy pylint mdlint test clean docs docs-serve \
         run run-group status update-plan pull-results configure install-hooks \
-        check-infra smoke-run
+        check-infra smoke-run prepare-environment
 
 tag   ?= v0.0
 image ?= $(shell grep CORP_DOCKER_IMAGE infra.env 2>/dev/null | cut -d= -f2)
@@ -44,7 +44,7 @@ show:
 	poetry run python --version && poetry show
 
 install:
-	poetry install --only main
+	poetry install
 
 prepare-environment:
 	pip install -U pip
@@ -88,9 +88,9 @@ pull-results:
 
 # ---------- code quality ----------
 
-find_all_py = `find . -type f -name '*.py' | grep -v .venv | sort | uniq`
-find_all_md = `find . -type f -name '*.md' | grep -v .venv | sort | uniq`
-find_all_yaml = `find . -type f \( -iname \*.yaml -o -iname \*.yml \) | grep -v .venv | sort | uniq`
+find_all_py = $(shell find . -type f -name '*.py' | grep -v .venv | grep -v src/ | sort | uniq)
+find_all_md = $(shell find . -type f -name '*.md' | grep -v .venv | sort | uniq)
+find_all_yaml = $(shell find . -type f \( -iname \*.yaml -o -iname \*.yml \) | grep -v .venv | sort | uniq)
 
 isort:
 	poetry run isort $(find_all_py)
