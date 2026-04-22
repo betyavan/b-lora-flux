@@ -2,7 +2,7 @@
 # C02 — Ablation C: 250 training steps, r=16, blocks [30–37], Van Gogh img1
 job: extension
 config:
-  name: "c02_steps250"
+  name: "c02_steps_250"
   process:
     - type: 'sd_trainer'
       training_folder: "output"

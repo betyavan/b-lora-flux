@@ -2,7 +2,7 @@
 # B01 — Ablation B: rank r=4, blocks [30–37], 500 steps, Van Gogh img1
 job: extension
 config:
-  name: "b01_rank4"
+  name: "b01_rank_4"
   process:
     - type: 'sd_trainer'
       training_folder: "output"
