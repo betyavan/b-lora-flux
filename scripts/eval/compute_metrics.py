@@ -21,6 +21,7 @@ ClearML scalar keys logged (match update_exp_plan.py _METRIC_KEYS):
 
 from __future__ import annotations
 
+import json
 import logging
 import sys
 from pathlib import Path
@@ -329,6 +330,12 @@ def main(cfg: DictConfig) -> None:
         display = f"{value:.4f}" if value is not None else "—"
         print(f"  {name:<16} {display}")
     print("=" * 50 + "\n")
+
+    out_path = Path("output") / "results" / f"{cfg.metrics.exp_name}.json"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"exp_name": cfg.metrics.exp_name, **{k: v for k, v in results.items()}}
+    out_path.write_text(json.dumps(payload, indent=2))
+    log.info("Metrics saved to %s", out_path)
 
 
 if __name__ == "__main__":
