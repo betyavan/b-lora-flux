@@ -10,34 +10,31 @@ set -e
 cd /root/b-lora-flux
 python scripts/check_env.py --strict
 
-# 1. Symlink datasets (style refs + artbench10 needed for metrics)
-cp -r /my_datasets/data /root/b-lora-flux/data
-
 cd /root/b-lora-flux
 
-# 2. Download generated images from S3
+# 1. Download generated images from S3
 mkdir -p "results/generated/${EXPERIMENT_NAME}"
 s3cmd sync -v "${GENERATED_OUTPUT_S3_PATH%/}/" "results/generated/${EXPERIMENT_NAME}/"
 
-# 3. Determine style refs dir from experiment name
+# 2. Determine style refs dir from experiment name
 if echo "$EXPERIMENT_NAME" | grep -q "van_gogh"; then
-  STYLE_REFS_DIR="data/styles/van_gogh"
+  STYLE_REFS_DIR="/my_datasets/styles/van_gogh"
 elif echo "$EXPERIMENT_NAME" | grep -q "monet"; then
-  STYLE_REFS_DIR="data/styles/monet"
+  STYLE_REFS_DIR="/my_datasets/styles/monet"
 else
   echo "WARNING: Cannot determine style from '${EXPERIMENT_NAME}', skipping style metrics"
   STYLE_REFS_DIR="null"
 fi
 
-# 4. Compute metrics
+# 3. Compute metrics
 python scripts/eval/compute_metrics.py \
   metrics.generated_dir="results/generated/${EXPERIMENT_NAME}" \
   metrics.style_refs_dir="$STYLE_REFS_DIR" \
-  metrics.prompt_file=data/coco_prompts.txt \
-  metrics.artbench_dir=data/artbench10 \
+  metrics.prompt_file=/my_datasets/coco_prompts.txt \
+  metrics.artbench_dir=/my_datasets/artbench10 \
   metrics.exp_name="$EXPERIMENT_NAME"
 
-# 5. Upload metrics.json to S3
+# 4. Upload metrics.json to S3
 METRICS_JSON="output/results/${EXPERIMENT_NAME}.json"
 if [ ! -f "$METRICS_JSON" ]; then
   echo "ERROR: metrics JSON not found at $METRICS_JSON"

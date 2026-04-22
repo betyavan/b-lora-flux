@@ -5,10 +5,7 @@ set -e
 cd /root/b-lora-flux
 python scripts/check_env.py --strict
 
-# 1. Set up data symlinks (data/ -> /my_datasets/)
-cp -r /my_datasets/data /root/b-lora-flux/data
-
-# 2. Run ai-toolkit training
+# 1. Run ai-toolkit training
 cd /root/b-lora-flux
 python src/ai-toolkit/run.py configs/experiments/${EXPERIMENT_NAME}.yaml
 
