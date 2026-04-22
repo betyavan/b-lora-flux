@@ -29,7 +29,7 @@ REQUIRED: list[tuple[str, str]] = [
     ("datasets", "datasets"),
     ("torchmetrics", "torchmetrics"),
     ("lpips", "lpips"),
-    ("clean_fid", "clean-fid"),
+    ("cleanfid", "clean-fid"),
     ("boto3", "boto3"),
     ("s3cmd", None),   # CLI tool, not a Python package — checked separately
 ]
