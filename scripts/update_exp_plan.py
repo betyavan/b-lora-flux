@@ -38,12 +38,12 @@ EXPERIMENT_IDS = [
     "B01", "B02", "B03", "B04",
     # Ablation C
     "C01", "C02", "C03", "C04",
-    # Group E (Van Gogh ×4 images, 4 methods)
+    # Group E — B-LoRA-FLUX vs Full-LoRA-FLUX (Van Gogh + Monet, ×4 images)
     "E01-1", "E01-2", "E01-3", "E01-4",
     "E02-1", "E02-2", "E02-3", "E02-4",
-    "E03-1", "E03-2", "E03-3", "E03-4",
-    "E04-1", "E04-2", "E04-3", "E04-4",
-    # Group F (Monet ×4)
+    "E01M-1", "E01M-2", "E01M-3", "E01M-4",
+    "E02M-1", "E02M-2", "E02M-3", "E02M-4",
+    # Group F — B-LoRA-SDXL, Van Gogh ×4 images
     "F01-1", "F01-2", "F01-3", "F01-4",
 ]
 
@@ -52,6 +52,7 @@ _ID_TO_TASK_PREFIX: dict[str, str] = {
     "A01": "a01", "A02": "a02", "A03": "a03", "A04": "a04",
     "B01": "b01", "B02": "b02", "B03": "b03", "B04": "b04",
     "C01": "c01", "C02": "c02", "C03": "c03", "C04": "c04",
+    # Group E — Van Gogh
     "E01-1": "e01_blora_flux_van_gogh_img1",
     "E01-2": "e01_blora_flux_van_gogh_img2",
     "E01-3": "e01_blora_flux_van_gogh_img3",
@@ -60,18 +61,20 @@ _ID_TO_TASK_PREFIX: dict[str, str] = {
     "E02-2": "e02_full_lora_flux_van_gogh_img2",
     "E02-3": "e02_full_lora_flux_van_gogh_img3",
     "E02-4": "e02_full_lora_flux_van_gogh_img4",
-    "E03-1": "e03_ip_adapter_flux_van_gogh_img1",
-    "E03-2": "e03_ip_adapter_flux_van_gogh_img2",
-    "E03-3": "e03_ip_adapter_flux_van_gogh_img3",
-    "E03-4": "e03_ip_adapter_flux_van_gogh_img4",
-    "E04-1": "e04_blora_sdxl_van_gogh_img1",
-    "E04-2": "e04_blora_sdxl_van_gogh_img2",
-    "E04-3": "e04_blora_sdxl_van_gogh_img3",
-    "E04-4": "e04_blora_sdxl_van_gogh_img4",
-    "F01-1": "e01_blora_flux_monet_img1",
-    "F01-2": "e01_blora_flux_monet_img2",
-    "F01-3": "e01_blora_flux_monet_img3",
-    "F01-4": "e01_blora_flux_monet_img4",
+    # Group E — Monet
+    "E01M-1": "e01_blora_flux_monet_img1",
+    "E01M-2": "e01_blora_flux_monet_img2",
+    "E01M-3": "e01_blora_flux_monet_img3",
+    "E01M-4": "e01_blora_flux_monet_img4",
+    "E02M-1": "e02_full_lora_flux_monet_img1",
+    "E02M-2": "e02_full_lora_flux_monet_img2",
+    "E02M-3": "e02_full_lora_flux_monet_img3",
+    "E02M-4": "e02_full_lora_flux_monet_img4",
+    # Group F — B-LoRA-SDXL, Van Gogh
+    "F01-1": "e04_blora_sdxl_van_gogh_img1",
+    "F01-2": "e04_blora_sdxl_van_gogh_img2",
+    "F01-3": "e04_blora_sdxl_van_gogh_img3",
+    "F01-4": "e04_blora_sdxl_van_gogh_img4",
 }
 
 _METRIC_KEYS = {
@@ -145,18 +148,18 @@ def _query_clearml(project: str) -> dict[str, ExpResult]:
 
 def _update_table_row(line: str, result: ExpResult) -> str:
     """Replace metric cells and status cell in a Markdown table row."""
-    # Rows look like: | A01  | a01_blocks_34_37.yaml | [34–37] | — | — | — | — | [ ] |
     parts = [p.strip() for p in line.split("|")]
-    if len(parts) < 8:
+    if len(parts) < 10:
         return line
 
-    # find ID column (parts[0] is empty due to leading |)
     row_id = parts[1].strip()
     if row_id != result.exp_id:
         return line
 
-    # columns: id, config/desc, param, clip_style, clip_content, fid, lpips, status
-    offset = 3  # first metric column index in parts[]
+    # Metrics always occupy the last 5 columns before the trailing empty part:
+    # clip_style, clip_content, fid, lpips, status.
+    # offset = index of clip_style = len(parts) - 6
+    offset = len(parts) - 6
     parts[offset] = f" {result.fmt(result.clip_style)} "
     parts[offset + 1] = f" {result.fmt(result.clip_content)} "
     parts[offset + 2] = f" {result.fmt(result.fid, 1)} "
