@@ -39,7 +39,7 @@ config:
           ema_decay: 0.99
         dtype: bf16
       model:
-        name_or_path: "black-forest-labs/FLUX.1-dev"
+        name_or_path: "/models/flux-dev"
         is_flux: true
         quantize: true
       sample:
