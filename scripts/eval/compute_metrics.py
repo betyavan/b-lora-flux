@@ -1,4 +1,4 @@
-"""Compute CLIP-style, CLIP-content, FID and LPIPS for a folder of generated images.
+"""Compute CLIP-style, CLIP-content, DINO-style, FID and LPIPS for a folder of generated images.
 
 Usage (single style reference):
     python scripts/eval/compute_metrics.py \\
@@ -16,7 +16,9 @@ Usage (multiple style references — averaged):
         metrics.exp_name=e01_blora_flux_van_gogh_img1
 
 ClearML scalar keys logged (match update_exp_plan.py _METRIC_KEYS):
-    eval / clip_style, eval / clip_content, eval / fid, eval / lpips
+    eval / clip_style, eval / clip_content, eval / dino_style, eval / fid, eval / lpips
+
+DINO ViT-B/8 is the primary style metric matching the original B-LoRA paper.
 """
 
 from __future__ import annotations
@@ -125,6 +127,58 @@ def _encode_texts_clip(
         feats = model.get_text_features(**inputs)
         embeddings.append(F.normalize(feats, dim=-1).cpu())
     return torch.cat(embeddings, dim=0)  # (N, D)
+
+
+# ---------------------------------------------------------------------------
+# DINO helpers
+# ---------------------------------------------------------------------------
+
+def _load_dino(model_name: str, device: torch.device):
+    from transformers import AutoImageProcessor, AutoModel  # type: ignore[import]
+
+    log.info("Loading DINO: %s", model_name)
+    processor = AutoImageProcessor.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(model_name).to(device).eval()
+    return model, processor
+
+
+@torch.no_grad()
+def _encode_images_dino(
+    paths: list[Path],
+    model,
+    processor,
+    device: torch.device,
+    batch_size: int,
+) -> torch.Tensor:
+    """Return L2-normalised [CLS] token embeddings from DINO, shape (N, D)."""
+    embeddings: list[torch.Tensor] = []
+    for i in range(0, len(paths), batch_size):
+        batch_paths = paths[i : i + batch_size]
+        images = [Image.open(p).convert("RGB") for p in batch_paths]
+        inputs = processor(images=images, return_tensors="pt").to(device)
+        outputs = model(**inputs)
+        cls_tokens = outputs.last_hidden_state[:, 0, :]  # (B, D) — [CLS] token
+        embeddings.append(F.normalize(cls_tokens, dim=-1).cpu())
+    return torch.cat(embeddings, dim=0)  # (N, D)
+
+
+def compute_dino_style(
+    generated_paths: list[Path],
+    style_refs: list[Path],
+    dino_model,
+    dino_processor,
+    device: torch.device,
+    batch_size: int,
+) -> float:
+    """Mean DINO ViT-B/8 cosine similarity between generated images and style references.
+
+    This is the primary metric used in the original B-LoRA paper (Table 1).
+    For M references and N generated images, returns mean of all M×N similarity values.
+    """
+    ref_embs = _encode_images_dino(style_refs, dino_model, dino_processor, device, batch_size)
+    gen_embs = _encode_images_dino(generated_paths, dino_model, dino_processor, device, batch_size)
+    sim_matrix = gen_embs @ ref_embs.T  # (N, M)
+    return float(sim_matrix.mean())
 
 
 # ---------------------------------------------------------------------------
@@ -280,6 +334,7 @@ def main(cfg: DictConfig) -> None:
     results: dict[str, float | None] = {
         "clip_style": None,
         "clip_content": None,
+        "dino_style": None,
         "fid": None,
         "lpips": None,
     }
@@ -304,6 +359,19 @@ def main(cfg: DictConfig) -> None:
     del clip_model, clip_processor
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
+
+    # --- DINO ViT-B/8 (primary metric from B-LoRA paper) ---
+    if style_refs:
+        log.info("Computing DINO-style (%d refs)...", len(style_refs))
+        dino_model, dino_processor = _load_dino(str(cfg.model.dino), device)
+        results["dino_style"] = compute_dino_style(
+            generated_paths, style_refs, dino_model, dino_processor, device, batch_size
+        )
+        del dino_model, dino_processor
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    else:
+        log.warning("No style_ref / style_refs_dir provided — skipping DINO-style.")
 
     # --- LPIPS ---
     if style_refs:

@@ -18,8 +18,9 @@ metrics:
 
 model:
   clip: "openai/clip-vit-large-patch14"
+  dino: "facebook/dino-vitb8"          # primary metric from B-LoRA paper (DINO ViT-B/8)
   lpips_net: "vgg"
-  batch_size: 8                        # CLIP encoding batch size
+  batch_size: 8                        # CLIP / DINO encoding batch size
 
 clearml:
   enabled: true

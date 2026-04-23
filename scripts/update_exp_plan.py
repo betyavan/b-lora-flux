@@ -80,6 +80,7 @@ _ID_TO_TASK_PREFIX: dict[str, str] = {
 _METRIC_KEYS = {
     "clip_style": "eval/clip_style",
     "clip_content": "eval/clip_content",
+    "dino_style": "eval/dino_style",
     "fid": "eval/fid",
     "lpips": "eval/lpips",
 }
@@ -91,6 +92,7 @@ class ExpResult:
     status: str = "pending"       # pending | running | done | failed
     clip_style: float | None = None
     clip_content: float | None = None
+    dino_style: float | None = None
     fid: float | None = None
     lpips: float | None = None
 
