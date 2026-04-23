@@ -54,7 +54,7 @@ config:
         gradient_checkpointing: true
         noise_scheduler: "flowmatch"
         optimizer: "adamw8bit"
-        lr: 1e-4
+        lr: 5e-5
         ema_config:
           use_ema: false
         dtype: bf16
