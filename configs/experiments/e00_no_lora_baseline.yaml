@@ -1,0 +1,11 @@
+---
+# E00 — Baseline: pure FLUX.1-dev, no LoRA — establishes CLIP/FID/LPIPS floor for Van Gogh eval
+# Training: none (this config is a no-op placeholder; only generate + metrics steps run)
+job: extension
+config:
+  name: "e00_no_lora_baseline"
+  process: []   # no training — DAG train step will skip gracefully
+
+meta:
+  name: "[name]"
+  version: '1.0'

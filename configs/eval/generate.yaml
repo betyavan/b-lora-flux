@@ -2,14 +2,14 @@
 # Override any field from CLI: python scripts/eval/generate_images.py lora_path=... prompt_file=...
 
 generate:
-  lora_path: ???                          # required: path to .safetensors LoRA adapter
+  lora_path: null                         # path to .safetensors LoRA adapter; null = baseline (no LoRA)
   prompt_file: "data/coco_prompts.txt"    # one prompt per line, 100 lines for main eval
   output_dir: "output/generated"          # images saved as {exp_name}/{idx:04d}.png
   exp_name: "unnamed"                     # used as sub-folder and ClearML task name
 
 model:
   name_or_path: "/models/flux-dev"
-  lora_scale: 1.0                         # LoRA weight α/r applied at inference
+  lora_scale: 1.0                         # LoRA weight α/r applied at inference; try 3.0–5.0 to amplify weak LoRA
 
 sampling:
   seed: 42

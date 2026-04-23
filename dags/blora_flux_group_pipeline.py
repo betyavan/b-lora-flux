@@ -58,6 +58,12 @@ GROUP_EXPERIMENTS = {
         "e04_blora_sdxl_van_gogh_img3",
         "e04_blora_sdxl_van_gogh_img4",
     ],
+    "diag_d": [
+        "e00_no_lora_baseline",
+        "d01_double_stream_1000steps",
+        "d02_double_stream_2000steps",
+        "d03_double_stream_rank32",
+    ],
 }
 
 
@@ -79,7 +85,7 @@ with DAG(
     params={
         "GROUP": Param(
             default="ablation_a",
-            enum=["ablation_a", "ablation_b", "ablation_c", "compare_e", "compare_f"],
+            enum=["ablation_a", "ablation_b", "ablation_c", "compare_e", "compare_f", "diag_d"],
             description="Experiment group to run",
         ),
         "S3_BASE_PATH": Param(

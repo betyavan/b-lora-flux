@@ -1,4 +1,6 @@
 [core]
     remote = local_storage
+[cache]
+    type = copy
 ['remote "local_storage"']
     url = /Users/i.betev/Desktop/DIPLOMA_dvc_storage

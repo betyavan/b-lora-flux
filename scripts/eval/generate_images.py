@@ -39,10 +39,13 @@ def _build_pipeline(cfg: DictConfig):
     )
     pipe = pipe.to("cuda")
 
-    lora_path = str(cfg.generate.lora_path)
-    log.info("Loading LoRA: %s  (scale=%.2f)", lora_path, cfg.model.lora_scale)
-    pipe.load_lora_weights(lora_path)
-    pipe.fuse_lora(lora_scale=float(cfg.model.lora_scale))
+    lora_path = cfg.generate.lora_path
+    if lora_path is not None:
+        log.info("Loading LoRA: %s  (scale=%.2f)", lora_path, cfg.model.lora_scale)
+        pipe.load_lora_weights(str(lora_path))
+        pipe.fuse_lora(lora_scale=float(cfg.model.lora_scale))
+    else:
+        log.info("No LoRA specified — running baseline (pure FLUX)")
 
     return pipe
 
