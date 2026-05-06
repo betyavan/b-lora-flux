@@ -11,7 +11,12 @@
 }
 
 % основной шрифт документа
-\setmainfont{CMU Serif}
+\setmainfont{cmunrm.otf}[
+    Path = /usr/local/texlive/2026/texmf-dist/fonts/opentype/public/cm-unicode/,
+    BoldFont = cmunbx.otf,
+    ItalicFont = cmunti.otf,
+    BoldItalicFont = cmunbi.otf
+]
 
 % перечень использованных источников
 
@@ -31,10 +36,12 @@
 \usemintedstyle{colorful}
 \newenvironment{code}{\captionsetup{type=listing}}{}
 
-% шрифт для листингов с лигатурами
-\setmonofont{FiraCode-Regular.otf}[
-    Path = templates/,
-    Contextuals=Alternate
+% шрифт для листингов
+\setmonofont{SourceCodePro-Regular.otf}[
+    Path = /usr/local/texlive/2026/texmf-dist/fonts/opentype/adobe/sourcecodepro/,
+    BoldFont = SourceCodePro-Bold.otf,
+    ItalicFont = SourceCodePro-RegularIt.otf,
+    BoldItalicFont = SourceCodePro-BoldIt.otf
 ]
 
 % оформления подписи рисунка
