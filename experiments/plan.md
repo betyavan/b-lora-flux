@@ -1,380 +1,319 @@
 # Experiment Plan
 
-Auto-generated structure, statuses synced by `scripts/update_exp_plan.py`. Last updated: 2026-04-24
-
+Последовательный план: от реализации инфраструктуры до финальных экспериментов.
 Статусы: `[ ]` pending · `[~]` running · `[x]` done · `[!]` failed
 
----
+Общие параметры (действуют во всех фазах, если не указано иначе): base = FLUX.1-dev,
+lr = 5e-5, optimizer = Adam, prompt = "a sks", steps = 1000, rank r = 16, seed = 42,
+inference: steps = 28, guidance scale = 3.5, alpha = 1.0.
 
-## Соответствие оригинальной статье B-LoRA
+Описание используемых данных — `experiments/datasets.md`.
 
-> Оригинальная статья (SDXL, UNet): rank=64, lr=5e-5, Adam, 1000 steps, 1 image, prompt="A [v]",
-> метрика — **DINO ViT-B/8 cosine similarity**, базовые методы — ZipLoRA / StyleAligned / DB-LoRA / StyleDrop.
-> Блоки стиля/контента идентифицированы через **prompt-injection + CLIP-анализ на 400 парах промптов**
-> по всем Up-blocks (Section 4.1 статьи). Метод использует **два** адаптера: ΔW⁴ (content) и ΔW⁵ (style),
-> применяемые независимо или в комбинации для трёх сценариев: reference-based style transfer,
-> text-based stylization, consistent style generation.
+### Согласование протоколов оценки (Phase 4 vs B-LoRA §5.1 / DS8)
 
-**Расхождения с оригиналом и статус их устранения:**
+| Протокол | Данные | Задача | Метрики (ядро) | Где в плане |
+|----------|--------|--------|----------------|-------------|
+| **A — генерация по тексту (основной FLUX-пайплайн)** | DS1 × 8 картин, **DS2** (100 текстовых промптов), **DS3** для FID | Тот же финальный эксперимент, что описан ниже как Phase 4: стиль задаётся картиной DS1, контент главы — промпты из COCO | по таблицам Phase 4: DINO-/CLIP-сигналы, **FID**, LPIPS (как уже задано столбцами) | Phase 4 |
+| **B — парный style-transfer (реплика §5.1)** | **DS8**: пул контента `eval_content/`, стилей `eval_styles/`, манифест **50 пар** `b_lora_eval_pairs.json`, `seed = 42` | Как Table 1 в B-LoRA: для каждой пары (контент-референс, стиль-референс) перенос стиля в изображение; усреднение по 50 парам | **Cosine similarity DINO ViT-B/8** выходного изображения с эмбеддингами **стилевого** и **контентного** референса (две строки таблицы: style / content) | Phase **5.2** (обязательно на SDXL); **Phase 6 M02**, если используете DS8 вместо/вместе с матрицей 3×3 |
 
-| # | Расхождение | Критичность | Статус |
-|---|-------------|-------------|--------|
-| 1 | ~~Аблации A/B/C использовали single-stream блоки (19–37) — неверно для FLUX~~ | 🔴 | fixed через D-серию |
-| 2 | Метрика DINO ViT-B/8 отсутствует | 🔴 | Issue #1 [ ] |
-| 3 | Ранг r=64 не тестировался | 🟡 | fixed: DB04 добавлен |
-| 4 | LR=1e-4 вместо 5e-5 | 🟡 | fixed: d01/d02/d03 + base_flux_lora.yaml = 5e-5 |
-| 5 | Общий lora_scale вместо раздельного α для style/content | 🟠 | частично: Phase 3; полное решение требует Θ_content |
-| 6 | **Нет prompt-injection анализа блоков** (Section 4.1 статьи) | 🔴 | Phase 0, **теперь обязательно до E-серии** |
-| 7 | **Обучается только Θ_style; нет Θ_content** | 🔴 | Phase 1b добавлена; диагностика Θ_content |
-| 8 | **SplitFlux не в baseline** (противоречит заявленной научной новизне) | 🔴 | добавлен в Phase 4 (E03) |
-| 9 | Нет ablation по training prompt ("A [v]" vs "A [v] class") | 🟠 | Phase 2b (D-P) |
-| 10 | Нет анализа limitations (color leakage / background / complex scenes) | 🟠 | Phase 4b |
-| 11 | Исчерпывающая матрица пар блоков (8×8, Fig. 19–20) не перебирается | 🟡 | вынесено в scope limitations (бюджет) |
-| 12 | Style-content mixing / swapping демонстрация отсутствует | 🟡 | Phase 6 (опционально, после Θ_content) |
+Протоколы **взаимно дополняют**: Phase 4 не заменяет §5.1 (нет фиксированных пар изображений-референсов и иной генеративный сценарий). Для главы следует явно подписать, какая таблица к какому протоколу относится.
 
 ---
 
-## Приоритетный порядок фаз
+## Шаг 0 — Инфраструктура
 
-Из-за изменений выше меняется зависимость между фазами:
+Реализуется до любых экспериментов. Делится на две части: код/конфиги и данные.
 
-```
-Phase 0 (block analysis) ─┐
-                          ├──► GATE 1 ──► Phase 2 (D-A/B/C) ─┐
-Phase 1 (diag_d) ─────────┤                                  │
-                          │                                  ├──► Phase 3 (Alpha G) ──► Phase 4 (E) ──► Phase 5 (F)
-Phase 1b (Θ_content) ─────┘                                  │                                              │
-                                         Phase 2b (D-P) ─────┘                                              ▼
-                                                                                                   Phase 4b (Limitations)
-                                                                                                   Phase 6 (Mixing demo)
-```
+### 0.1 — Код и конфиги
 
-**Правило**: Phase 0, 1, 1b — параллельны, все должны быть выполнены до GATE 1.
-**GATE 1** — решение о структуре E-серии принимается только после получения результатов всех трёх фаз.
+| ID  | Артефакт                                          | Описание                                                                 | Статус |
+|-----|---------------------------------------------------|--------------------------------------------------------------------------|--------|
+| I01 | `scripts/eval/compute_metrics.py` (DINO ViT-B/8)  | Cosine similarity DINO-output↔ref (style/content) как в §5.1 Table 1; метрики для Phase 4 (столбцы таблицы) | [ ]    |
+| I02 | `scripts/analysis/block_analysis.py`              | Prompt-injection анализ блоков FLUX + CLIP-сходство                       | [ ]    |
+| I03 | `scripts/eval/limitations_eval.py`                | Скрипт количественной оценки ограничений (color/background/complexity)    | [ ]    |
+| I04 | Конфиги Phase 1b (`dc_content_*.yaml`, 3 шт.)     | Диагностика Θ_content                                                     | [ ]    |
+| I05 | Конфиги Phase 2b (`dp*.yaml`, 4 шт.)              | Ablation training prompt                                                  | [ ]    |
+| I06 | Конфиги Phase 4.3 SplitFlux (`e03_*.yaml`, 8 шт.) | Реализация конкурирующего метода из статьи SplitFlux                      | [ ]    |
+| I07 | Конфиги IP-Adapter-FLUX (`e04_*.yaml`, 2 шт.)     | Дополнительный baseline (включается при наличии стабильной реализации)    | [ ]    |
+| I08 | Caption файлы                                      | Единообразный prompt "a sks" во всех 8 файлах                             | [x]    |
+| I09 | `configs/experiments/base_flux_lora.yaml`         | lr = 5e-5 (исправлено)                                                    | [x]    |
+| I10 | `scripts/data/build_eval_pairs.py` (+ `--validate-only`) | Сборка/проверка манифеста **50 пар** для DS8 (`b_lora_eval_pairs.json`), `seed=42` | [ ]    |
 
----
+### 0.2 — Данные (см. `datasets.md`)
 
-## Phase 0 — Prompt-injection анализ блоков FLUX (методология статьи, раздел 4.1)
-
-> **Цель:** Воспроизвести процедуру идентификации стилевых/контентных блоков из статьи для FLUX.
-> Для каждого из 19 double-stream (0–18) и 38 single-stream блоков (0–37) инжектируем альтернативный промпт
-> и измеряем CLIP-сходство между выходом и инжектированным промптом.
-> Промпты: P_content = "A photo of a {object}", P_style = "A photo of a {color} {object}".
-> Минимум 200 пар (компромисс между 400 из статьи и бюджетом).
-> Выводим матрицу 57×2 (content response, style response) → определяем целевые блоки.
-
-| ID   | Описание                                      | Блоки           | #пар | Статус |
-|------|-----------------------------------------------|-----------------|------|--------|
-| P0-DS| Prompt injection, double-stream (0–18)        | DS 0–18         | 200  | [ ]    |
-| P0-SS| Prompt injection, single-stream sample        | SS {0,10,20,30,37} | 200 | [ ]    |
-| P0-R | Сводный отчёт + выбор target-блоков           | —               | —    | [ ]    |
-
-> ⚠️ Требует скрипта `scripts/analysis/block_analysis.py` (Issue #4).
-> **Приоритет изменён**: теперь обязательно до GATE 1, блокирует Phase 4.
-> Обоснование: в оригинальной статье выбор блоков (2, 4, 5) следует именно из этого анализа, а не из функциональной аналогии.
+| ID  | Артефакт                                          | Назначение                                                                | Статус |
+|-----|---------------------------------------------------|---------------------------------------------------------------------------|--------|
+| D01 | `data/styles/` (DS1)                              | 8 стилевых референсов Van Gogh + Monet                                    | [x]    |
+| D02 | `data/coco_prompts.txt` (DS2)                     | 100 промптов из COCO val2017 с фиксированным протоколом отбора            | [x]    |
+| D03 | `data/artbench10/{impressionism,post_impressionism}/` (DS3) | Структурировать ArtBench-10 по жанрам для FID-референса         | [ ]    |
+| D04 | `scripts/analysis/generate_block_prompts.py` + `experiments/data/block_analysis_prompts.json` (DS4) | 200 пар промптов для Phase 0 | [ ]    |
+| D05 | `data/dreambooth_*` / subject-папки (DS5)         | Canonical subjects: минимум **dog** для Phase 1b; полный DS5 — источник `eval_content/*` для DS8 | [ ]    |
+| D06 | `experiments/data/limitations_prompts.json` (DS6) | 5 + 5 промптов для L01 и L03                                              | [ ]    |
+| D07 | `scripts/data/make_center_crops.py` + `data/styles_cropped/` (DS7) | Центр-кропы стилей для L02                                | [ ]    |
+| D08 | DS8 — `data/eval_content/`, `data/eval_styles/`, `experiments/data/b_lora_eval_pairs.json` (+ опц. DVC, `eval_assets_registry.yaml`) | Парная выборка **§5.1**: 23/25 объектов как в `datasets.md`, **50 пар** для Phase 5.2 и опц. M02 | [ ]    |
 
 ---
 
-## Phase 1 — Диагностика: правильные блоки + baseline (группа diag_d)
+## Phase 0 — Анализ блоков FLUX (prompt-injection + CLIP)
 
-> **Цель:** Проверить гипотезу о том, что double-stream блоки (0–18) несут стиль в FLUX,
-> и установить baseline CLIP/DINO/FID без LoRA.
-> Запуск: `GROUP=diag_d` в `blora_flux_group_pipeline`.
+Воспроизводит Section 4.1 оригинальной статьи. Для каждого блока подменяется текстовый эмбеддинг и измеряется
+CLIP-сходство выхода с альтернативным промптом. Определяет целевые блоки для всех последующих фаз.
 
-| ID   | Конфиг                              | Блоки              | r  | Steps | CLIP-style | CLIP-content | DINO-style | FID   | LPIPS | Статус |
-|------|-------------------------------------|--------------------|----|-------|------------|--------------|------------|-------|-------|--------|
-| E00  | e00_no_lora_baseline.yaml           | нет LoRA           | —  | —     | —          | —            | —          | —     | —     | [ ]    |
-| D01  | d01_double_stream_1000steps.yaml    | double-stream 0–18 | 16 | 1000  | —          | —            | —          | —     | —     | [ ]    |
-| D02  | d02_double_stream_2000steps.yaml    | double-stream 0–18 | 16 | 2000  | —          | —            | —          | —     | —     | [ ]    |
-| D03  | d03_double_stream_rank32.yaml       | double-stream 0–18 | 32 | 1000  | —          | —            | —          | —     | —     | [ ]    |
+**Промпты:** `P_content = "A photo of a {object}"`, `P_style = "A photo of a {color} {object}"`, 200 пар.
+
+| ID    | Блоки                                 | Выход                                                 | Статус |
+|-------|---------------------------------------|-------------------------------------------------------|--------|
+| P0-DS | Double-stream 0–18                    | CLIP-сходство content/style по 19 блокам              | [ ]    |
+| P0-SS | Single-stream {0, 10, 20, 30, 37}     | CLIP-сходство content/style по 5 блокам               | [ ]    |
+| P0-R  | Сводный отчёт                         | Ранжирование блоков → выбор target-блоков для Phase 2 | [ ]    |
 
 ---
 
-## Phase 1b — Диагностика Θ_content (новая фаза)
+## Phase 1 — Диагностика гипотезы double-stream (группа `diag_d`)
 
-> **Цель:** Проверить, можно ли в FLUX выделить подмножество блоков, специализирующееся на контенте,
-> чтобы воспроизвести парадигму двух адаптеров из оригинальной статьи (ΔW⁴ content, ΔW⁵ style).
-> Если Phase 0 укажет конкретные "content-блоки" — берутся они; иначе тестируется разбиение double-stream
-> на ранние (0–8, кандидат на content) vs поздние (9–18, кандидат на style).
+Проверка: несут ли double-stream блоки стилевые признаки? Устанавливает baseline без LoRA.
 
-| ID   | Конфиг (планируется)                | Блоки (предполагаемый content) | r  | Steps | Reconstruction? | Content-isolation? | Статус |
-|------|-------------------------------------|--------------------------------|----|-------|-----------------|--------------------|--------|
-| DC-01| dc_content_early_ds.yaml            | DS [0–8]                       | 16 | 1000  | —               | —                  | [ ]    |
-| DC-02| dc_content_late_ds.yaml             | DS [9–18]                      | 16 | 1000  | —               | —                  | [ ]    |
-| DC-03| dc_content_from_p0.yaml             | по результатам Phase 0         | 16 | 1000  | —               | —                  | [ ]    |
+| ID  | Конфиг                              | Блоки              | r  | Steps | DINO-style | CLIP-style | CLIP-content | FID | LPIPS | Статус |
+|-----|-------------------------------------|--------------------|----|-------|------------|------------|--------------|-----|-------|--------|
+| E00 | `e00_no_lora_baseline.yaml`         | нет LoRA           | —  | —     | —          | —          | —            | —   | —     | [ ]    |
+| D01 | `d01_double_stream_1000steps.yaml`  | double-stream 0–18 | 16 | 1000  | —          | —          | —            | —   | —     | [ ]    |
+| D02 | `d02_double_stream_2000steps.yaml`  | double-stream 0–18 | 16 | 2000  | —          | —          | —            | —   | —     | [ ]    |
+| D03 | `d03_double_stream_rank32.yaml`     | double-stream 0–18 | 32 | 1000  | —          | —          | —            | —   | —     | [ ]    |
 
-> **GATE 1b**: если ни одна конфигурация не даёт разделения (content-только vs style-только) → фиксируем
-> в scope limitations, что Θ_content не найден, и ограничиваем работу одним Θ_style.
-> Если разделение найдено — Θ_content включается в Phase 3 (раздельный α), Phase 4 (E-baseline),
-> Phase 6 (style-content mixing).
+---
+
+## Phase 1b — Поиск Θ_content
+
+Проверка возможности выделить отдельный адаптер содержания (ΔW⁴ в терминах оригинальной статьи).
+
+| ID    | Конфиг                        | Блоки (кандидат content)     | r  | Steps | Reconstruction | Content isolation | Статус |
+|-------|-------------------------------|------------------------------|----|-------|----------------|-------------------|--------|
+| DC-01 | `dc_content_early_ds.yaml`    | double-stream [0–8]          | 16 | 1000  | —              | —                 | [ ]    |
+| DC-02 | `dc_content_late_ds.yaml`     | double-stream [9–18]         | 16 | 1000  | —              | —                 | [ ]    |
+| DC-03 | `dc_content_from_p0.yaml`     | по результатам Phase 0       | 16 | 1000  | —              | —                 | [ ]    |
 
 ---
 
 ## GATE 1 (после Phase 0 + Phase 1 + Phase 1b)
 
-Решение о структуре Phase 2–6:
+Решение о дальнейшем плане:
 
-- **Сценарий A (гипотеза double-stream подтверждена + Θ_content найден):** полный план со всеми фазами.
-- **Сценарий B (double-stream подтверждён, Θ_content не выделяется):** Phase 2–5 выполняются,
-  Phase 3 без раздельного α, Phase 6 исключается, scope limitations обновляется.
-- **Сценарий C (double-stream не даёт переноса стиля):** возврат к анализу Phase 0,
-  пересмотр целевых блоков (возможно, mid single-stream).
+- **Сценарий A** — double-stream подтверждены, Θ_content выделен → полный план Phase 2–6.
+- **Сценарий B** — double-stream подтверждены, Θ_content не выделяется → Phase 2–5 без Phase 3b и Phase 6.
+- **Сценарий C** — double-stream не дают переноса → возврат к Phase 0 с пересмотром целевых блоков.
 
 ---
 
-## Phase 2 — Аблации с правильными блоками (double-stream, после GATE 1)
+## Phase 2 — Аблации гиперпараметров
 
-> Параметры по умолчанию из статьи: lr=5e-5, prompt="A [v]", Adam.
+### Phase 2.1 (D-A) — диапазон double-stream блоков
 
-### Аблация D-A — выбор диапазона double-stream блоков (Van Gogh img1, r=32, 1000 steps)
+Van Gogh img1, r = 32, 1000 steps.
 
-| ID    | Конфиг                     | Блоки (double-stream) | CLIP-style | CLIP-content | DINO-style | FID | LPIPS | Статус |
-|-------|----------------------------|-----------------------|------------|--------------|------------|-----|-------|--------|
-| DA01  | da01_ds_blocks_0_6.yaml    | [0–6]                 | —          | —            | —          | —   | —     | [ ]    |
-| DA02  | da02_ds_blocks_0_12.yaml   | [0–12]                | —          | —            | —          | —   | —     | [ ]    |
-| DA03  | da03_ds_blocks_0_18.yaml   | [0–18] (все)          | —          | —            | —          | —   | —     | [ ]    |
-| DA04  | da04_ds_blocks_6_18.yaml   | [6–18]                | —          | —            | —          | —   | —     | [ ]    |
+| ID   | Конфиг                      | Блоки        | DINO-style | CLIP-style | CLIP-content | FID | LPIPS | Статус |
+|------|-----------------------------|--------------|------------|------------|--------------|-----|-------|--------|
+| DA01 | `da01_ds_blocks_0_6.yaml`   | DS [0–6]     | —          | —          | —            | —   | —     | [ ]    |
+| DA02 | `da02_ds_blocks_0_12.yaml`  | DS [0–12]    | —          | —          | —            | —   | —     | [ ]    |
+| DA03 | `da03_ds_blocks_0_18.yaml`  | DS [0–18]    | —          | —          | —            | —   | —     | [ ]    |
+| DA04 | `da04_ds_blocks_6_18.yaml`  | DS [6–18]    | —          | —          | —            | —   | —     | [ ]    |
 
-> Лучший диапазон → используется в аблациях D-B и D-C.
+### Phase 2.2 (D-B) — ранг LoRA
 
-### Аблация D-B — ранг LoRA (лучшие блоки из DA, 1000 steps)
+Блоки = лучший из D-A, 1000 steps.
 
-| ID    | Конфиг                 | Ранг r | CLIP-style | CLIP-content | DINO-style | FID | LPIPS | Статус |
-|-------|------------------------|--------|------------|--------------|------------|-----|-------|--------|
-| DB01  | db01_rank_4.yaml       | 4      | —          | —            | —          | —   | —     | [ ]    |
-| DB02  | db02_rank_16.yaml      | 16     | —          | —            | —          | —   | —     | [ ]    |
-| DB03  | db03_rank_32.yaml      | 32     | —          | —            | —          | —   | —     | [ ]    |
-| DB04  | db04_rank_64.yaml      | **64** | —          | —            | —          | —   | —     | [ ]    |
+| ID   | Конфиг                 | r     | DINO-style | CLIP-style | CLIP-content | FID | LPIPS | Статус |
+|------|------------------------|-------|------------|------------|--------------|-----|-------|--------|
+| DB01 | `db01_rank_4.yaml`     | 4     | —          | —          | —            | —   | —     | [ ]    |
+| DB02 | `db02_rank_16.yaml`    | 16    | —          | —          | —            | —   | —     | [ ]    |
+| DB03 | `db03_rank_32.yaml`    | 32    | —          | —          | —            | —   | —     | [ ]    |
+| DB04 | `db04_rank_64.yaml`    | 64    | —          | —          | —            | —   | —     | [ ]    |
 
-> r=64 — значение из оригинальной статьи, обязательно включить.
+### Phase 2.3 (D-C) — число шагов обучения
 
-### Аблация D-C — число шагов (лучшие блоки + ранг из DA/DB)
+Блоки = лучший из D-A, r = лучший из D-B.
 
-| ID    | Конфиг                 | Steps | CLIP-style | CLIP-content | DINO-style | FID | LPIPS | Статус |
-|-------|------------------------|-------|------------|--------------|------------|-----|-------|--------|
-| DC01  | dc01_steps_500.yaml    | 500   | —          | —            | —          | —   | —     | [ ]    |
-| DC02  | dc02_steps_1000.yaml   | 1000  | —          | —            | —          | —   | —     | [ ]    |
-| DC03  | dc03_steps_2000.yaml   | 2000  | —          | —            | —          | —   | —     | [ ]    |
-| DC04  | dc04_steps_4000.yaml   | 4000  | —          | —            | —          | —   | —     | [ ]    |
+| ID   | Конфиг                 | Steps | DINO-style | CLIP-style | CLIP-content | FID | LPIPS | Статус |
+|------|------------------------|-------|------------|------------|--------------|-----|-------|--------|
+| DC01 | `dc01_steps_500.yaml`  | 500   | —          | —          | —            | —   | —     | [ ]    |
+| DC02 | `dc02_steps_1000.yaml` | 1000  | —          | —          | —            | —   | —     | [ ]    |
+| DC03 | `dc03_steps_2000.yaml` | 2000  | —          | —          | —            | —   | —     | [ ]    |
+| DC04 | `dc04_steps_4000.yaml` | 4000  | —          | —          | —            | —   | —     | [ ]    |
 
----
+### Phase 2.4 (D-P) — training prompt
 
-## Phase 2b — Аблация training prompt (D-P, новая фаза)
+Блоки = лучший из D-A, r = лучший из D-B, steps = лучший из D-C.
 
-> Воспроизводит Appendix C / Fig. 21 оригинальной статьи. Нужно учесть, что FLUX использует T5-XXL
-> (другая чувствительность к промпту, чем у CLIP в SDXL), поэтому вывод статьи (без class-name лучше)
-> требует независимой проверки.
-
-| ID    | Конфиг                    | Training prompt                   | Inference prompt              | CLIP-content | DINO-style | Statu |
-|-------|---------------------------|-----------------------------------|-------------------------------|--------------|------------|-------|
-| DP01  | dp01_prompt_sks.yaml      | "a sks" (текущий)                 | standard                      | —            | —          | [ ]   |
-| DP02  | dp02_prompt_sks_class.yaml| "a sks painting"                  | standard                      | —            | —          | [ ]   |
-| DP03  | dp03_prompt_v.yaml        | "a [v]"                           | standard                      | —            | —          | [ ]   |
-| DP04  | dp04_prompt_v_class.yaml  | "a [v] painting in [s] style"     | standard                      | —            | —          | [ ]   |
-
-> Базовая конфигурация — лучшая из D-A/B/C. Лучший prompt → используется в Phase 3, 4, 5.
+| ID   | Конфиг                         | Training prompt                | DINO-style | CLIP-content | Статус |
+|------|--------------------------------|--------------------------------|------------|--------------|--------|
+| DP01 | `dp01_prompt_sks.yaml`         | "a sks"                        | —          | —            | [ ]    |
+| DP02 | `dp02_prompt_sks_class.yaml`   | "a sks painting"               | —          | —            | [ ]    |
+| DP03 | `dp03_prompt_v.yaml`           | "a [v]"                        | —          | —            | [ ]    |
+| DP04 | `dp04_prompt_v_class.yaml`     | "a [v] painting in [s] style"  | —          | —            | [ ]    |
 
 ---
 
-## Phase 3 — Аблация Alpha / lora_scale (группа G)
+## Phase 3 — Alpha (lora_scale)
 
-> Из статьи: α=0.4–0.5 для стилевого адаптера лучше сохраняет оригинальные цвета объекта.
-> Тестируем через `LORA_SCALE` env var при генерации (без переобучения — только инференс).
+Тестируется инференсом без переобучения (через переменную `LORA_SCALE`). Базовая конфигурация = финальная из Phase 2.
 
-### Phase 3a — общий lora_scale (всегда выполняется)
+### Phase 3.1 — общий lora_scale
 
-| ID    | LORA_SCALE | Базовый конфиг       | DINO-style | DINO-content | CLIP-style | Статус |
-|-------|------------|----------------------|------------|--------------|------------|--------|
-| G01   | 0.3        | лучший из D-A/B/C/P  | —          | —            | —          | [ ]    |
-| G02   | 0.5        | лучший из D-A/B/C/P  | —          | —            | —          | [ ]    |
-| G03   | 0.7        | лучший из D-A/B/C/P  | —          | —            | —          | [ ]    |
-| G04   | 1.0        | лучший из D-A/B/C/P  | —          | —            | —          | [ ]    |
-| G05   | 1.5        | лучший из D-A/B/C/P  | —          | —            | —          | [ ]    |
-| G06   | 2.0        | лучший из D-A/B/C/P  | —          | —            | —          | [ ]    |
+| ID  | alpha | DINO-style | DINO-content | CLIP-style | Статус |
+|-----|-------|------------|--------------|------------|--------|
+| G01 | 0.3   | —          | —            | —          | [ ]    |
+| G02 | 0.5   | —          | —            | —          | [ ]    |
+| G03 | 0.7   | —          | —            | —          | [ ]    |
+| G04 | 1.0   | —          | —            | —          | [ ]    |
+| G05 | 1.5   | —          | —            | —          | [ ]    |
+| G06 | 2.0   | —          | —            | —          | [ ]    |
 
-### Phase 3b — раздельный α для style/content (только если Θ_content найден в Phase 1b)
+### Phase 3.2 — раздельный α_style / α_content (только при Сценарии A)
 
-> Воспроизводит Fig. 22 и Appendix B оригинала. Рекомендация статьи: α_style ∈ [0.4, 0.5]
-> при α_content = 1.0 для решения проблемы color leakage.
-
-| ID    | α_style | α_content | Базовый конфиг | DINO-style | CLIP-content | Color preservation | Статус |
-|-------|---------|-----------|----------------|------------|--------------|--------------------|--------|
-| GS01  | 0.4     | 1.0       | best           | —          | —            | —                  | [ ]    |
-| GS02  | 0.5     | 1.0       | best           | —          | —            | —                  | [ ]    |
-| GS03  | 0.7     | 1.0       | best           | —          | —            | —                  | [ ]    |
-| GS04  | 1.0     | 0.5       | best           | —          | —            | —                  | [ ]    |
+| ID   | α_style | α_content | DINO-style | CLIP-content | Color preservation | Статус |
+|------|---------|-----------|------------|--------------|--------------------|--------|
+| GS01 | 0.4     | 1.0       | —          | —            | —                  | [ ]    |
+| GS02 | 0.5     | 1.0       | —          | —            | —                  | [ ]    |
+| GS03 | 0.7     | 1.0       | —          | —            | —                  | [ ]    |
+| GS04 | 1.0     | 0.5       | —          | —            | —                  | [ ]    |
 
 ---
 
-## Phase 4 — Финальное сравнение методов (группа E)
+## Phase 4 — Финальное сравнение методов
 
-> Финальная конфигурация из D-A/B/C/P/G применяется ко всем 4 стилевым изображениям двух стилей.
-> Набор промптов: 100 из COCO val2017; seed=42; steps=28; guidance=3.5.
+**Протокол A** (таблица выше «Согласование протоколов»): финальная конфигурация (блоки + r + steps + prompt + alpha) применяется ко всем 4 изображениям каждого из двух направлений стиля (Van Gogh / Monet из **DS1**). Инференс по тексту — **DS2**, 100 первых промптов; **seed = 42**. Количественно — столбцы DINO-/CLIP-/FID/LPIPS как ниже (**не** смешивать построчно с метриками §5.1 без пояснения).
 
 ### Phase 4.1 — B-LoRA-FLUX (предлагаемый метод)
 
-| ID      | Конфиг                                  | Стиль    | img | CLIP-style | DINO-style | FID | LPIPS | Статус |
-|---------|-----------------------------------------|----------|-----|------------|------------|-----|-------|--------|
-| E01-1   | e01_blora_flux_van_gogh_img1.yaml       | Van Gogh | 1   | —          | —          | —   | —     | [ ]    |
-| E01-2   | e01_blora_flux_van_gogh_img2.yaml       | Van Gogh | 2   | —          | —          | —   | —     | [ ]    |
-| E01-3   | e01_blora_flux_van_gogh_img3.yaml       | Van Gogh | 3   | —          | —          | —   | —     | [ ]    |
-| E01-4   | e01_blora_flux_van_gogh_img4.yaml       | Van Gogh | 4   | —          | —          | —   | —     | [ ]    |
-| E01M-1  | e01_blora_flux_monet_img1.yaml          | Monet    | 1   | —          | —          | —   | —     | [ ]    |
-| E01M-2  | e01_blora_flux_monet_img2.yaml          | Monet    | 2   | —          | —          | —   | —     | [ ]    |
-| E01M-3  | e01_blora_flux_monet_img3.yaml          | Monet    | 3   | —          | —          | —   | —     | [ ]    |
-| E01M-4  | e01_blora_flux_monet_img4.yaml          | Monet    | 4   | —          | —          | —   | —     | [ ]    |
+| ID      | Конфиг                                  | Стиль    | img | DINO-style | CLIP-style | CLIP-content | FID | LPIPS | Статус |
+|---------|-----------------------------------------|----------|-----|------------|------------|--------------|-----|-------|--------|
+| E01-1   | `e01_blora_flux_van_gogh_img1.yaml`     | Van Gogh | 1   | —          | —          | —            | —   | —     | [ ]    |
+| E01-2   | `e01_blora_flux_van_gogh_img2.yaml`     | Van Gogh | 2   | —          | —          | —            | —   | —     | [ ]    |
+| E01-3   | `e01_blora_flux_van_gogh_img3.yaml`     | Van Gogh | 3   | —          | —          | —            | —   | —     | [ ]    |
+| E01-4   | `e01_blora_flux_van_gogh_img4.yaml`     | Van Gogh | 4   | —          | —          | —            | —   | —     | [ ]    |
+| E01M-1  | `e01_blora_flux_monet_img1.yaml`        | Monet    | 1   | —          | —          | —            | —   | —     | [ ]    |
+| E01M-2  | `e01_blora_flux_monet_img2.yaml`        | Monet    | 2   | —          | —          | —            | —   | —     | [ ]    |
+| E01M-3  | `e01_blora_flux_monet_img3.yaml`        | Monet    | 3   | —          | —          | —            | —   | —     | [ ]    |
+| E01M-4  | `e01_blora_flux_monet_img4.yaml`        | Monet    | 4   | —          | —          | —            | —   | —     | [ ]    |
 
 ### Phase 4.2 — Full-LoRA-FLUX (наивный baseline)
 
-| ID      | Конфиг                                  | Стиль    | img | CLIP-style | DINO-style | FID | LPIPS | Статус |
-|---------|-----------------------------------------|----------|-----|------------|------------|-----|-------|--------|
-| E02-1   | e02_full_lora_flux_van_gogh_img1.yaml   | Van Gogh | 1   | —          | —          | —   | —     | [ ]    |
-| E02-2   | e02_full_lora_flux_van_gogh_img2.yaml   | Van Gogh | 2   | —          | —          | —   | —     | [ ]    |
-| E02-3   | e02_full_lora_flux_van_gogh_img3.yaml   | Van Gogh | 3   | —          | —          | —   | —     | [ ]    |
-| E02-4   | e02_full_lora_flux_van_gogh_img4.yaml   | Van Gogh | 4   | —          | —          | —   | —     | [ ]    |
-| E02M-1  | e02_full_lora_flux_monet_img1.yaml      | Monet    | 1   | —          | —          | —   | —     | [ ]    |
-| E02M-2  | e02_full_lora_flux_monet_img2.yaml      | Monet    | 2   | —          | —          | —   | —     | [ ]    |
-| E02M-3  | e02_full_lora_flux_monet_img3.yaml      | Monet    | 3   | —          | —          | —   | —     | [ ]    |
-| E02M-4  | e02_full_lora_flux_monet_img4.yaml      | Monet    | 4   | —          | —          | —   | —     | [ ]    |
+| ID      | Конфиг                                  | Стиль    | img | DINO-style | CLIP-style | CLIP-content | FID | LPIPS | Статус |
+|---------|-----------------------------------------|----------|-----|------------|------------|--------------|-----|-------|--------|
+| E02-1   | `e02_full_lora_flux_van_gogh_img1.yaml` | Van Gogh | 1   | —          | —          | —            | —   | —     | [ ]    |
+| E02-2   | `e02_full_lora_flux_van_gogh_img2.yaml` | Van Gogh | 2   | —          | —          | —            | —   | —     | [ ]    |
+| E02-3   | `e02_full_lora_flux_van_gogh_img3.yaml` | Van Gogh | 3   | —          | —          | —            | —   | —     | [ ]    |
+| E02-4   | `e02_full_lora_flux_van_gogh_img4.yaml` | Van Gogh | 4   | —          | —          | —            | —   | —     | [ ]    |
+| E02M-1  | `e02_full_lora_flux_monet_img1.yaml`    | Monet    | 1   | —          | —          | —            | —   | —     | [ ]    |
+| E02M-2  | `e02_full_lora_flux_monet_img2.yaml`    | Monet    | 2   | —          | —          | —            | —   | —     | [ ]    |
+| E02M-3  | `e02_full_lora_flux_monet_img3.yaml`    | Monet    | 3   | —          | —          | —            | —   | —     | [ ]    |
+| E02M-4  | `e02_full_lora_flux_monet_img4.yaml`    | Monet    | 4   | —          | —          | —            | —   | —     | [ ]    |
 
-### Phase 4.3 — SplitFlux (конкурирующий метод — критично для научной новизны)
+### Phase 4.3 — SplitFlux (конкурирующий метод из литературного обзора)
 
-> **Критичный baseline**: в введении диплома (`chapter1_introduction.tex`) научная новизна явно
-> формулируется как отстройка от SplitFlux ("в отличие от SplitFlux, применяющего single-stream блоки").
-> Без численного сравнения заявленная новизна не подтверждена.
-
-| ID      | Конфиг (создать)                        | Стиль    | img | CLIP-style | DINO-style | FID | LPIPS | Статус |
-|---------|-----------------------------------------|----------|-----|------------|------------|-----|-------|--------|
-| E03-1   | e03_splitflux_van_gogh_img1.yaml        | Van Gogh | 1   | —          | —          | —   | —     | [ ]    |
-| E03-2   | e03_splitflux_van_gogh_img2.yaml        | Van Gogh | 2   | —          | —          | —   | —     | [ ]    |
-| E03-3   | e03_splitflux_van_gogh_img3.yaml        | Van Gogh | 3   | —          | —          | —   | —     | [ ]    |
-| E03-4   | e03_splitflux_van_gogh_img4.yaml        | Van Gogh | 4   | —          | —          | —   | —     | [ ]    |
-| E03M-1  | e03_splitflux_monet_img1.yaml           | Monet    | 1   | —          | —          | —   | —     | [ ]    |
-| E03M-2  | e03_splitflux_monet_img2.yaml           | Monet    | 2   | —          | —          | —   | —     | [ ]    |
-| E03M-3  | e03_splitflux_monet_img3.yaml           | Monet    | 3   | —          | —          | —   | —     | [ ]    |
-| E03M-4  | e03_splitflux_monet_img4.yaml           | Monet    | 4   | —          | —          | —   | —     | [ ]    |
-
-> Реализация: по конфигурации из статьи SplitFlux (single-stream блоки, их параметры).
-> Issue #6: создать конфиги и валидировать соответствие оригинальной методике.
+| ID      | Конфиг                                  | Стиль    | img | DINO-style | CLIP-style | CLIP-content | FID | LPIPS | Статус |
+|---------|-----------------------------------------|----------|-----|------------|------------|--------------|-----|-------|--------|
+| E03-1   | `e03_splitflux_van_gogh_img1.yaml`      | Van Gogh | 1   | —          | —          | —            | —   | —     | [ ]    |
+| E03-2   | `e03_splitflux_van_gogh_img2.yaml`      | Van Gogh | 2   | —          | —          | —            | —   | —     | [ ]    |
+| E03-3   | `e03_splitflux_van_gogh_img3.yaml`      | Van Gogh | 3   | —          | —          | —            | —   | —     | [ ]    |
+| E03-4   | `e03_splitflux_van_gogh_img4.yaml`      | Van Gogh | 4   | —          | —          | —            | —   | —     | [ ]    |
+| E03M-1  | `e03_splitflux_monet_img1.yaml`         | Monet    | 1   | —          | —          | —            | —   | —     | [ ]    |
+| E03M-2  | `e03_splitflux_monet_img2.yaml`         | Monet    | 2   | —          | —          | —            | —   | —     | [ ]    |
+| E03M-3  | `e03_splitflux_monet_img3.yaml`         | Monet    | 3   | —          | —          | —            | —   | —     | [ ]    |
+| E03M-4  | `e03_splitflux_monet_img4.yaml`         | Monet    | 4   | —          | —          | —            | —   | —     | [ ]    |
 
 ### Phase 4.4 — IP-Adapter-FLUX (опционально)
 
-| ID      | Конфиг (создать)                        | Метод            | Стиль    | img | Статус |
-|---------|-----------------------------------------|------------------|----------|-----|--------|
-| E04-VG  | e04_ipadapter_van_gogh.yaml             | IP-Adapter-FLUX  | Van Gogh | all | [ ]    |
-| E04-M   | e04_ipadapter_monet.yaml                | IP-Adapter-FLUX  | Monet    | all | [ ]    |
+| ID     | Конфиг                             | Стиль    | Статус |
+|--------|------------------------------------|----------|--------|
+| E04-VG | `e04_ipadapter_van_gogh.yaml`      | Van Gogh | [ ]    |
+| E04-M  | `e04_ipadapter_monet.yaml`         | Monet    | [ ]    |
 
-> Включается, если для FLUX.1-dev появится стабильная реализация IP-Adapter.
+### Сводная таблица (заполняется по завершении Phase 4)
 
-### Сводная таблица результатов (заполняется по завершении Phase 4)
+Среднее по 4 изображениям, Van Gogh:
 
-Среднее по 4 изображениям (Van Gogh):
+| Метод            | DINO-style ↑ | CLIP-style ↑ | CLIP-content ↑ | FID ↓ | LPIPS ↓ |
+|------------------|--------------|--------------|----------------|-------|---------|
+| No-LoRA (E00)    | —            | —            | —              | —     | —       |
+| B-LoRA-FLUX      | —            | —            | —              | —     | —       |
+| Full-LoRA-FLUX   | —            | —            | —              | —     | —       |
+| SplitFlux        | —            | —            | —              | —     | —       |
+| IP-Adapter-FLUX  | —            | —            | —              | —     | —       |
 
-| Метод             | CLIP-style ↑ | DINO-style ↑ | FID ↓ | LPIPS ↓ |
-|-------------------|-------------|-------------|-------|---------|
-| No-LoRA (E00)     | —           | —           | —     | —       |
-| B-LoRA-FLUX       | —           | —           | —     | —       |
-| Full-LoRA-FLUX    | —           | —           | —     | —       |
-| SplitFlux         | —           | —           | —     | —       |
-| IP-Adapter-FLUX   | —           | —           | —     | —       |
+Среднее по 4 изображениям, Monet:
 
-Среднее по 4 изображениям (Monet):
-
-| Метод             | CLIP-style ↑ | DINO-style ↑ | FID ↓ | LPIPS ↓ |
-|-------------------|-------------|-------------|-------|---------|
-| No-LoRA (E00)     | —           | —           | —     | —       |
-| B-LoRA-FLUX       | —           | —           | —     | —       |
-| Full-LoRA-FLUX    | —           | —           | —     | —       |
-| SplitFlux         | —           | —           | —     | —       |
-| IP-Adapter-FLUX   | —           | —           | —     | —       |
+| Метод            | DINO-style ↑ | CLIP-style ↑ | CLIP-content ↑ | FID ↓ | LPIPS ↓ |
+|------------------|--------------|--------------|----------------|-------|---------|
+| No-LoRA (E00)    | —            | —            | —              | —     | —       |
+| B-LoRA-FLUX      | —            | —            | —              | —     | —       |
+| Full-LoRA-FLUX   | —            | —            | —              | —     | —       |
+| SplitFlux        | —            | —            | —              | —     | —       |
+| IP-Adapter-FLUX  | —            | —            | —              | —     | —       |
 
 ---
 
-## Phase 4b — Анализ ограничений метода (воспроизводит Appendix B статьи)
+## Phase 4b — Анализ ограничений метода
 
-> Качественное и количественное исследование проблемных случаев. Минимум 3 случая по 5 генераций каждый.
+Качественное и количественное исследование проблемных случаев. На каждый случай — 5 генераций.
 
-| ID   | Ограничение                                      | Протокол                                                      | Метрика         | Статус |
-|------|--------------------------------------------------|---------------------------------------------------------------|-----------------|--------|
-| L01  | Color leakage (цвет объекта уезжает в стиль)     | 5 объектов с characteristic colors, сравнение α_style=0.5 vs 1.0 | ΔE colordiff   | [ ]    |
-| L02  | Background leakage                               | 5 стилей с выраженным фоном, сравнение full vs center-cropped train| DINO-object  | [ ]    |
-| L03  | Complex scenes (много объектов)                  | 5 сложных промптов (COCO), сравнение generation fidelity      | CLIP-content    | [ ]    |
-
-> По каждому limitation — описание + 1–2 figures с качественным сравнением + предлагаемый workaround.
-> Формат: раздел в главе 4 диплома (новый подраздел "Ограничения метода").
+| ID  | Ограничение         | Протокол                                                            | Метрика       | Статус |
+|-----|---------------------|---------------------------------------------------------------------|---------------|--------|
+| L01 | Color leakage       | 5 объектов с характерными цветами; α_style = 0.5 vs 1.0             | ΔE colordiff  | [ ]    |
+| L02 | Background leakage  | 5 стилей с выраженным фоном; full-frame vs center-cropped train     | DINO-object   | [ ]    |
+| L03 | Complex scenes      | 5 сложных промптов COCO; сравнение fidelity сгенерированной сцены    | CLIP-content  | [ ]    |
 
 ---
 
-## Phase 5 — Кросс-архитектурное сравнение (группа F)
+## Phase 5 — Кросс-архитектурное сравнение (B-LoRA-SDXL)
 
-> B-LoRA-SDXL на тех же промптах и стилях. Проверка переносимости подхода.
+Базовая модель совпадает с оригинальной статьей (**SDXL**). Разделено на два подпротокола.
 
-| ID    | Конфиг                              | Метод       | Стиль    | img | CLIP-style | DINO-style | FID | LPIPS | Статус |
-|-------|-------------------------------------|-------------|----------|-----|------------|------------|-----|-------|--------|
-| F01-1 | e04_blora_sdxl_van_gogh_img1.yaml   | B-LoRA-SDXL | Van Gogh | 1   | —          | —          | —   | —     | [ ]    |
-| F01-2 | e04_blora_sdxl_van_gogh_img2.yaml   | B-LoRA-SDXL | Van Gogh | 2   | —          | —          | —   | —     | [ ]    |
-| F01-3 | e04_blora_sdxl_van_gogh_img3.yaml   | B-LoRA-SDXL | Van Gogh | 3   | —          | —          | —   | —     | [ ]    |
-| F01-4 | e04_blora_sdxl_van_gogh_img4.yaml   | B-LoRA-SDXL | Van Gogh | 4   | —          | —          | —   | —     | [ ]    |
+### Phase 5.1 — Совпадение с Phase 4 по курированному подмножеству DS1 (Van Gogh)
 
----
+Те же 4 эталонных картины Van Gogh, что в Phase 4 для VG, только пайплайн SDXL+B-LoRA. Monet здесь можно не включать при ограничении по времени (тогда текст ВКР: «единый курированный поднабор как в Phase 4, без расширения на второй художника на SDXL»).
 
-## Phase 6 — Style-content mixing demo (опционально, только при Θ_content)
+| ID    | Конфиг                              | Стиль    | img | DINO-style | CLIP-style | CLIP-content | FID | LPIPS | Статус |
+|-------|-------------------------------------|----------|-----|------------|------------|--------------|-----|-------|--------|
+| F01-1 | `e04_blora_sdxl_van_gogh_img1.yaml` | Van Gogh | 1   | —          | —          | —            | —   | —     | [ ]    |
+| F01-2 | `e04_blora_sdxl_van_gogh_img2.yaml` | Van Gogh | 2   | —          | —          | —            | —   | —     | [ ]    |
+| F01-3 | `e04_blora_sdxl_van_gogh_img3.yaml` | Van Gogh | 3   | —          | —          | —            | —   | —     | [ ]    |
+| F01-4 | `e04_blora_sdxl_van_gogh_img4.yaml` | Van Gogh | 4   | —          | —          | —            | —   | —     | [ ]    |
 
-> Воспроизводит Fig. 1, 27, 28 оригинальной статьи: обмен style и content между двумя стилизованными изображениями.
-> Выполняется, только если Phase 1b подтвердила выделение Θ_content.
+### Phase 5.2 — Парная оценка по **§5.1 / DS8** (аналог Table 1)
 
-| ID   | Протокол                                                           | Результат                       | Статус |
-|------|--------------------------------------------------------------------|---------------------------------|--------|
-| M01  | 3×3 матрица (3 content × 3 style), swap Θ_content и Θ_style        | Figure в главе 4                | [ ]    |
-| M02  | Количественная оценка DINO-content (vs content ref) + DINO-style   | Таблица в главе 4               | [ ]    |
+Источники пар и числа объектов стиля/контента — см. **`datasets.md` (DS8)**. Для каждой из **50** строк манифеста `experiments/data/b_lora_eval_pairs.json`: обучить/склеить метод (см. оригинал: наш B-LoRA; опционально ZipLoRA, StyleAligned, StyleDrop, DB-LoRA+ControlNet), сгенерировать выход; усреднить две метрики **DINO ViT-B/8 cosine** (output↔style ref, output↔content ref). При сравнении с литературой указывать, использован ли *full* пул (23×25) или *reduced* из `datasets.md`.
 
-> Если Phase 1b даёт негативный результат — фаза исключается, в scope limitations добавляется
-> "style-content mixing невозможен без Θ_content; задача оставлена для будущих работ".
+| ID   | Описание | Метрики | Статус |
+|------|----------|---------|--------|
+| F02  | Батч-прогон по 50 парам DS8: B-LoRA-SDXL (+ baselines по возможности) | Table 1–style (DINO-style sim), Table 1–content (DINO-content sim); опц. поднабор **30** пар для user study | [ ]    |
 
----
-
-## Scope limitations (что явно вынесено за рамки работы)
-
-Эти эксперименты из оригинальной статьи **сознательно не воспроизводятся**, с фиксированным обоснованием:
-
-| Пропущенный этап | Обоснование | Куда добавить в диплом |
-|------------------|-------------|------------------------|
-| Exhaustive 8×8 матрица пар блоков (Fig. 19–20) | Вычислительный бюджет: 64 конфигурации × 1000 шагов × A100-час ≈ 26 GPU·часов только на эту аблацию; вместо этого используется целевой prompt-injection (Phase 0) и проверка 4 диапазонов (D-A) | Глава 4, "Scope" |
-| User study (34 участника, 1020 ответов) | Замена на комбинированную DINO + CLIP + FID оценку; для ВКР количественные метрики признаются достаточными | Глава 4, "Протокол оценки" |
-| B-LoRA for Personalization (App. D; multiple content images) | За рамками задачи single-image style transfer; требует изменения постановки | Глава 4, "Scope" |
-| Baselines ZipLoRA / StyleDrop / StyleAligned / InstantStyle | Нет стабильных реализаций для FLUX.1; сравнение с ближайшим прямым конкурентом (SplitFlux) покрывает научную новизну | Глава 4, "Сравниваемые методы" |
-| Style-content mixing (Fig. 1, 27, 28) | Зависит от Phase 1b: включается только при подтверждении Θ_content | Условно, Phase 6 |
+**Зависимости:** D08, I01 (две косинусные метрики по референс-картинкам), I10.
 
 ---
 
-## Технический долг / Issue tracker
+## Phase 6 — Style-content mixing (только при Сценарии A)
 
-| # | Проблема | Критичность | Статус |
-|---|----------|-------------|--------|
-| 1 | Добавить DINO ViT-B/8 в `compute_metrics.py` | 🔴 критично | [ ] |
-| 2 | Проверить training prompt в caption файлах | 🟡 важно | [x] fixed: "a sks painting" → "a sks" (все 8 файлов) |
-| 3 | Новые конфиги D-A/B/C нужны после GATE 1 | 🟡 важно | [ ] |
-| 4 | Скрипт `scripts/analysis/block_analysis.py` для Phase 0 | 🔴 критично | [ ] |
-| 5 | Конфиги E-серии нужно обновить под финальные гиперпараметры | 🟡 важно | [ ] |
-| 6 | Конфиги SplitFlux baseline (E03-\*) | 🔴 критично | [ ] |
-| 7 | Конфиги Phase 1b (dc_content_\*.yaml) | 🟠 высокий | [ ] |
-| 8 | Конфиги Phase 2b (dp\*.yaml — prompt ablation) | 🟠 высокий | [ ] |
-| 9 | Скрипт анализа limitations (L01–L03) | 🟠 высокий | [ ] |
-| 10 | Конфиги IP-Adapter-FLUX (E04-\*) | 🟡 средний | [ ] |
-| 11 | Обновить главы 3 и 4 диплома под расширенный план (включить Phase 0 как обязательную, Phase 1b, SplitFlux, Limitations, Scope) | 🟡 важно | [ ] |
+Выполняется, если Phase 1b подтвердила выделение Θ_content.
+
+| ID  | Протокол                                                          | Выход              | Статус |
+|-----|-------------------------------------------------------------------|--------------------|--------|
+| M01 | Матрица 3×3 (3 content × 3 style), swap Θ_content и Θ_style       | Figure в главе 4   | [ ]    |
+| M02 | Количественная оценка DINO-style и DINO-content: **либо** усреднение по ячейкам M01, **либо** тот же протокол, что **F02** по манифесту DS8 (выбрать один и зафиксировать в тексте ВКР) | Таблица в главе 4  | [ ]    |
 
 ---
 
 ## Прогресс
 
-- **Phase 0** (Prompt-injection block analysis): 0/3 — P0-DS, P0-SS, P0-R
-- **Phase 1** (diag_d): 0/4 — e00, d01, d02, d03
-- **Phase 1b** (Θ_content diagnostic): 0/3 — dc01, dc02, dc03
-- **Phase 2** (D-A/B/C ablations): 0/12 — pending (конфиги после GATE 1)
-- **Phase 2b** (D-P prompt ablation): 0/4 — pending
-- **Phase 3** (Alpha): 0/6 (Phase 3a) + 0/4 (Phase 3b, условно) = 0/10
-- **Phase 4** (Group E comparison): 0/24 — 8 B-LoRA + 8 Full-LoRA + 8 SplitFlux, +2 IP-Adapter (опц.)
-- **Phase 4b** (Limitations): 0/3 — L01, L02, L03
-- **Phase 5** (Group F cross-arch): 0/4 — F01-1..4
-- **Phase 6** (Mixing demo): 0/2 — M01, M02 (условно)
-- **Итого:** 0 / 69 (был 0/43; +26 экспериментов после ревизии)
+- **Шаг 0.1** (Код и конфиги): 2/10 — I08, I09 ✓
+- **Шаг 0.2** (Данные): 2/8 — D01, D02 ✓
+- **Phase 0** (Block analysis): 0/3
+- **Phase 1** (diag_d): 0/4
+- **Phase 1b** (Θ_content): 0/3
+- **Phase 2** (D-A/B/C/P): 0/16
+- **Phase 3** (Alpha): 0/10 (6 + 4 условно)
+- **Phase 4** (Group E): 0/26 (24 основных + 2 IP-Adapter опц.)
+- **Phase 4b** (Limitations): 0/3
+- **Phase 5** (SDXL): 0/5 (F01 ×4 + **F02** батч DS8)
+- **Phase 6** (Mixing): 0/2 (условно)
+- **Итого экспериментов:** 0 / **72** (71 ранее + F02 как отдельная единица учёта; сами 50 пар DS8 — внутри F02, не отдельные строки таблицы плана)
+- **Инфраструктура:** 4 / **18** (10 код/конфиги + **8** данные)
