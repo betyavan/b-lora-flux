@@ -3,6 +3,13 @@
 # (${data_root} would look for a root-level key and fail).
 data_root: ${oc.env:DATA_ROOT,data}
 
+# Paired evaluation (B-LoRA §5.1) — see experiments/datasets.md DS8
+eval_content:
+  dir: ${data.data_root}/eval_content
+eval_styles:
+  dir: ${data.data_root}/eval_styles
+eval_pairs_manifest: experiments/data/b_lora_eval_pairs.json
+
 # Style reference images for B-LoRA fine-tuning (curated manually, ~10-20 images per style)
 styles:
   dir: ${data.data_root}/styles
