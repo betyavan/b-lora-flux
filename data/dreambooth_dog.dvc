@@ -1,0 +1,6 @@
+outs:
+- md5: d28dbca92752d3828648978eb631d5be.dir
+  size: 458182
+  nfiles: 5
+  hash: md5
+  path: dreambooth_dog

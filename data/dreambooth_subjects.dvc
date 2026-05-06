@@ -1,0 +1,6 @@
+outs:
+- md5: 7a37bea681fe62adbb8ef725fec7aa39.dir
+  size: 16180682
+  nfiles: 40
+  hash: md5
+  path: dreambooth_subjects
