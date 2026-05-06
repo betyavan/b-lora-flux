@@ -1,0 +1,391 @@
+{
+  "protocol": "b_lora_tab1_style_transfer",
+  "seed": 42,
+  "n_content": 8,
+  "n_styles": 8,
+  "n_pairs": 50,
+  "pairs": [
+    {
+      "pair_id": 0,
+      "content_subject_id": "backpack",
+      "content_repr_path": "data/dreambooth_subjects/backpack/img_00.jpg",
+      "style_id": "wikimo_04",
+      "style_repr_path": "data/styles/monet/img4/waterloo-bridge-london.jpg"
+    },
+    {
+      "pair_id": 1,
+      "content_subject_id": "bowl",
+      "content_repr_path": "data/dreambooth_subjects/bowl/img_00.jpg",
+      "style_id": "wikivg_02",
+      "style_repr_path": "data/styles/van_gogh/img2/self-portrait-with-bandaged-ear-1889.jpg"
+    },
+    {
+      "pair_id": 2,
+      "content_subject_id": "dog",
+      "content_repr_path": "data/dreambooth_dog/img_00.jpg",
+      "style_id": "wikimo_04",
+      "style_repr_path": "data/styles/monet/img4/waterloo-bridge-london.jpg"
+    },
+    {
+      "pair_id": 3,
+      "content_subject_id": "backpack",
+      "content_repr_path": "data/dreambooth_subjects/backpack/img_00.jpg",
+      "style_id": "wikimo_03",
+      "style_repr_path": "data/styles/monet/img3/water-lilies-evening-effect-1899.jpg"
+    },
+    {
+      "pair_id": 4,
+      "content_subject_id": "clock",
+      "content_repr_path": "data/dreambooth_subjects/clock/img_00.jpg",
+      "style_id": "wikimo_02",
+      "style_repr_path": "data/styles/monet/img2/madame-monet-and-child.jpg"
+    },
+    {
+      "pair_id": 5,
+      "content_subject_id": "can",
+      "content_repr_path": "data/dreambooth_subjects/can/img_00.jpg",
+      "style_id": "wikivg_02",
+      "style_repr_path": "data/styles/van_gogh/img2/self-portrait-with-bandaged-ear-1889.jpg"
+    },
+    {
+      "pair_id": 6,
+      "content_subject_id": "backpack",
+      "content_repr_path": "data/dreambooth_subjects/backpack/img_00.jpg",
+      "style_id": "wikivg_04",
+      "style_repr_path": "data/styles/van_gogh/img4/the-starry-night-1889.jpg"
+    },
+    {
+      "pair_id": 7,
+      "content_subject_id": "bear",
+      "content_repr_path": "data/dreambooth_subjects/bear/img_00.jpg",
+      "style_id": "wikivg_04",
+      "style_repr_path": "data/styles/van_gogh/img4/the-starry-night-1889.jpg"
+    },
+    {
+      "pair_id": 8,
+      "content_subject_id": "clock",
+      "content_repr_path": "data/dreambooth_subjects/clock/img_00.jpg",
+      "style_id": "wikimo_03",
+      "style_repr_path": "data/styles/monet/img3/water-lilies-evening-effect-1899.jpg"
+    },
+    {
+      "pair_id": 9,
+      "content_subject_id": "cat",
+      "content_repr_path": "data/dreambooth_subjects/cat/img_00.jpg",
+      "style_id": "wikivg_02",
+      "style_repr_path": "data/styles/van_gogh/img2/self-portrait-with-bandaged-ear-1889.jpg"
+    },
+    {
+      "pair_id": 10,
+      "content_subject_id": "clock",
+      "content_repr_path": "data/dreambooth_subjects/clock/img_00.jpg",
+      "style_id": "wikivg_01",
+      "style_repr_path": "data/styles/van_gogh/img1/red-vineyards-at-arles-1888.jpg"
+    },
+    {
+      "pair_id": 11,
+      "content_subject_id": "backpack",
+      "content_repr_path": "data/dreambooth_subjects/backpack/img_00.jpg",
+      "style_id": "wikivg_03",
+      "style_repr_path": "data/styles/van_gogh/img3/still-life-vase-with-fifteen-sunflowers-1888.jpg"
+    },
+    {
+      "pair_id": 12,
+      "content_subject_id": "clock",
+      "content_repr_path": "data/dreambooth_subjects/clock/img_00.jpg",
+      "style_id": "wikivg_03",
+      "style_repr_path": "data/styles/van_gogh/img3/still-life-vase-with-fifteen-sunflowers-1888.jpg"
+    },
+    {
+      "pair_id": 13,
+      "content_subject_id": "bowl",
+      "content_repr_path": "data/dreambooth_subjects/bowl/img_00.jpg",
+      "style_id": "wikimo_04",
+      "style_repr_path": "data/styles/monet/img4/waterloo-bridge-london.jpg"
+    },
+    {
+      "pair_id": 14,
+      "content_subject_id": "backpack",
+      "content_repr_path": "data/dreambooth_subjects/backpack/img_00.jpg",
+      "style_id": "wikivg_01",
+      "style_repr_path": "data/styles/van_gogh/img1/red-vineyards-at-arles-1888.jpg"
+    },
+    {
+      "pair_id": 15,
+      "content_subject_id": "backpack",
+      "content_repr_path": "data/dreambooth_subjects/backpack/img_00.jpg",
+      "style_id": "wikimo_02",
+      "style_repr_path": "data/styles/monet/img2/madame-monet-and-child.jpg"
+    },
+    {
+      "pair_id": 16,
+      "content_subject_id": "can",
+      "content_repr_path": "data/dreambooth_subjects/can/img_00.jpg",
+      "style_id": "wikimo_01",
+      "style_repr_path": "data/styles/monet/img1/haystack-at-giverny-1886.jpg"
+    },
+    {
+      "pair_id": 17,
+      "content_subject_id": "clock",
+      "content_repr_path": "data/dreambooth_subjects/clock/img_00.jpg",
+      "style_id": "wikivg_02",
+      "style_repr_path": "data/styles/van_gogh/img2/self-portrait-with-bandaged-ear-1889.jpg"
+    },
+    {
+      "pair_id": 18,
+      "content_subject_id": "bowl",
+      "content_repr_path": "data/dreambooth_subjects/bowl/img_00.jpg",
+      "style_id": "wikimo_02",
+      "style_repr_path": "data/styles/monet/img2/madame-monet-and-child.jpg"
+    },
+    {
+      "pair_id": 19,
+      "content_subject_id": "backpack",
+      "content_repr_path": "data/dreambooth_subjects/backpack/img_00.jpg",
+      "style_id": "wikimo_01",
+      "style_repr_path": "data/styles/monet/img1/haystack-at-giverny-1886.jpg"
+    },
+    {
+      "pair_id": 20,
+      "content_subject_id": "cat",
+      "content_repr_path": "data/dreambooth_subjects/cat/img_00.jpg",
+      "style_id": "wikivg_04",
+      "style_repr_path": "data/styles/van_gogh/img4/the-starry-night-1889.jpg"
+    },
+    {
+      "pair_id": 21,
+      "content_subject_id": "vase",
+      "content_repr_path": "data/dreambooth_subjects/vase/img_00.jpg",
+      "style_id": "wikivg_03",
+      "style_repr_path": "data/styles/van_gogh/img3/still-life-vase-with-fifteen-sunflowers-1888.jpg"
+    },
+    {
+      "pair_id": 22,
+      "content_subject_id": "can",
+      "content_repr_path": "data/dreambooth_subjects/can/img_00.jpg",
+      "style_id": "wikimo_04",
+      "style_repr_path": "data/styles/monet/img4/waterloo-bridge-london.jpg"
+    },
+    {
+      "pair_id": 23,
+      "content_subject_id": "vase",
+      "content_repr_path": "data/dreambooth_subjects/vase/img_00.jpg",
+      "style_id": "wikivg_01",
+      "style_repr_path": "data/styles/van_gogh/img1/red-vineyards-at-arles-1888.jpg"
+    },
+    {
+      "pair_id": 24,
+      "content_subject_id": "dog",
+      "content_repr_path": "data/dreambooth_dog/img_00.jpg",
+      "style_id": "wikivg_04",
+      "style_repr_path": "data/styles/van_gogh/img4/the-starry-night-1889.jpg"
+    },
+    {
+      "pair_id": 25,
+      "content_subject_id": "bowl",
+      "content_repr_path": "data/dreambooth_subjects/bowl/img_00.jpg",
+      "style_id": "wikimo_03",
+      "style_repr_path": "data/styles/monet/img3/water-lilies-evening-effect-1899.jpg"
+    },
+    {
+      "pair_id": 26,
+      "content_subject_id": "bowl",
+      "content_repr_path": "data/dreambooth_subjects/bowl/img_00.jpg",
+      "style_id": "wikivg_01",
+      "style_repr_path": "data/styles/van_gogh/img1/red-vineyards-at-arles-1888.jpg"
+    },
+    {
+      "pair_id": 27,
+      "content_subject_id": "vase",
+      "content_repr_path": "data/dreambooth_subjects/vase/img_00.jpg",
+      "style_id": "wikimo_04",
+      "style_repr_path": "data/styles/monet/img4/waterloo-bridge-london.jpg"
+    },
+    {
+      "pair_id": 28,
+      "content_subject_id": "dog",
+      "content_repr_path": "data/dreambooth_dog/img_00.jpg",
+      "style_id": "wikimo_01",
+      "style_repr_path": "data/styles/monet/img1/haystack-at-giverny-1886.jpg"
+    },
+    {
+      "pair_id": 29,
+      "content_subject_id": "bear",
+      "content_repr_path": "data/dreambooth_subjects/bear/img_00.jpg",
+      "style_id": "wikivg_02",
+      "style_repr_path": "data/styles/van_gogh/img2/self-portrait-with-bandaged-ear-1889.jpg"
+    },
+    {
+      "pair_id": 30,
+      "content_subject_id": "vase",
+      "content_repr_path": "data/dreambooth_subjects/vase/img_00.jpg",
+      "style_id": "wikimo_03",
+      "style_repr_path": "data/styles/monet/img3/water-lilies-evening-effect-1899.jpg"
+    },
+    {
+      "pair_id": 31,
+      "content_subject_id": "vase",
+      "content_repr_path": "data/dreambooth_subjects/vase/img_00.jpg",
+      "style_id": "wikivg_02",
+      "style_repr_path": "data/styles/van_gogh/img2/self-portrait-with-bandaged-ear-1889.jpg"
+    },
+    {
+      "pair_id": 32,
+      "content_subject_id": "cat",
+      "content_repr_path": "data/dreambooth_subjects/cat/img_00.jpg",
+      "style_id": "wikivg_03",
+      "style_repr_path": "data/styles/van_gogh/img3/still-life-vase-with-fifteen-sunflowers-1888.jpg"
+    },
+    {
+      "pair_id": 33,
+      "content_subject_id": "dog",
+      "content_repr_path": "data/dreambooth_dog/img_00.jpg",
+      "style_id": "wikivg_01",
+      "style_repr_path": "data/styles/van_gogh/img1/red-vineyards-at-arles-1888.jpg"
+    },
+    {
+      "pair_id": 34,
+      "content_subject_id": "bear",
+      "content_repr_path": "data/dreambooth_subjects/bear/img_00.jpg",
+      "style_id": "wikimo_01",
+      "style_repr_path": "data/styles/monet/img1/haystack-at-giverny-1886.jpg"
+    },
+    {
+      "pair_id": 35,
+      "content_subject_id": "bowl",
+      "content_repr_path": "data/dreambooth_subjects/bowl/img_00.jpg",
+      "style_id": "wikimo_01",
+      "style_repr_path": "data/styles/monet/img1/haystack-at-giverny-1886.jpg"
+    },
+    {
+      "pair_id": 36,
+      "content_subject_id": "clock",
+      "content_repr_path": "data/dreambooth_subjects/clock/img_00.jpg",
+      "style_id": "wikimo_01",
+      "style_repr_path": "data/styles/monet/img1/haystack-at-giverny-1886.jpg"
+    },
+    {
+      "pair_id": 37,
+      "content_subject_id": "bowl",
+      "content_repr_path": "data/dreambooth_subjects/bowl/img_00.jpg",
+      "style_id": "wikivg_03",
+      "style_repr_path": "data/styles/van_gogh/img3/still-life-vase-with-fifteen-sunflowers-1888.jpg"
+    },
+    {
+      "pair_id": 38,
+      "content_subject_id": "vase",
+      "content_repr_path": "data/dreambooth_subjects/vase/img_00.jpg",
+      "style_id": "wikimo_01",
+      "style_repr_path": "data/styles/monet/img1/haystack-at-giverny-1886.jpg"
+    },
+    {
+      "pair_id": 39,
+      "content_subject_id": "cat",
+      "content_repr_path": "data/dreambooth_subjects/cat/img_00.jpg",
+      "style_id": "wikimo_01",
+      "style_repr_path": "data/styles/monet/img1/haystack-at-giverny-1886.jpg"
+    },
+    {
+      "pair_id": 40,
+      "content_subject_id": "can",
+      "content_repr_path": "data/dreambooth_subjects/can/img_00.jpg",
+      "style_id": "wikivg_04",
+      "style_repr_path": "data/styles/van_gogh/img4/the-starry-night-1889.jpg"
+    },
+    {
+      "pair_id": 41,
+      "content_subject_id": "vase",
+      "content_repr_path": "data/dreambooth_subjects/vase/img_00.jpg",
+      "style_id": "wikimo_02",
+      "style_repr_path": "data/styles/monet/img2/madame-monet-and-child.jpg"
+    },
+    {
+      "pair_id": 42,
+      "content_subject_id": "can",
+      "content_repr_path": "data/dreambooth_subjects/can/img_00.jpg",
+      "style_id": "wikimo_03",
+      "style_repr_path": "data/styles/monet/img3/water-lilies-evening-effect-1899.jpg"
+    },
+    {
+      "pair_id": 43,
+      "content_subject_id": "can",
+      "content_repr_path": "data/dreambooth_subjects/can/img_00.jpg",
+      "style_id": "wikivg_01",
+      "style_repr_path": "data/styles/van_gogh/img1/red-vineyards-at-arles-1888.jpg"
+    },
+    {
+      "pair_id": 44,
+      "content_subject_id": "bear",
+      "content_repr_path": "data/dreambooth_subjects/bear/img_00.jpg",
+      "style_id": "wikivg_03",
+      "style_repr_path": "data/styles/van_gogh/img3/still-life-vase-with-fifteen-sunflowers-1888.jpg"
+    },
+    {
+      "pair_id": 45,
+      "content_subject_id": "cat",
+      "content_repr_path": "data/dreambooth_subjects/cat/img_00.jpg",
+      "style_id": "wikimo_02",
+      "style_repr_path": "data/styles/monet/img2/madame-monet-and-child.jpg"
+    },
+    {
+      "pair_id": 46,
+      "content_subject_id": "vase",
+      "content_repr_path": "data/dreambooth_subjects/vase/img_00.jpg",
+      "style_id": "wikivg_04",
+      "style_repr_path": "data/styles/van_gogh/img4/the-starry-night-1889.jpg"
+    },
+    {
+      "pair_id": 47,
+      "content_subject_id": "bear",
+      "content_repr_path": "data/dreambooth_subjects/bear/img_00.jpg",
+      "style_id": "wikimo_03",
+      "style_repr_path": "data/styles/monet/img3/water-lilies-evening-effect-1899.jpg"
+    },
+    {
+      "pair_id": 48,
+      "content_subject_id": "dog",
+      "content_repr_path": "data/dreambooth_dog/img_00.jpg",
+      "style_id": "wikivg_03",
+      "style_repr_path": "data/styles/van_gogh/img3/still-life-vase-with-fifteen-sunflowers-1888.jpg"
+    },
+    {
+      "pair_id": 49,
+      "content_subject_id": "bowl",
+      "content_repr_path": "data/dreambooth_subjects/bowl/img_00.jpg",
+      "style_id": "wikivg_04",
+      "style_repr_path": "data/styles/van_gogh/img4/the-starry-night-1889.jpg"
+    }
+  ],
+  "user_study_pair_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    9,
+    11,
+    12,
+    15,
+    16,
+    18,
+    23,
+    25,
+    26,
+    27,
+    28,
+    29,
+    31,
+    32,
+    33,
+    35,
+    37,
+    38,
+    40,
+    41,
+    42,
+    44,
+    45,
+    47
+  ]
+}

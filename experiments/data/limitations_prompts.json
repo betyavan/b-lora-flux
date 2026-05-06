@@ -1,0 +1,16 @@
+{
+  "L01_color_leakage": [
+    "a red apple on a wooden table",
+    "a yellow school bus parked on a street",
+    "blue jeans folded on a chair",
+    "a green parrot sitting on a branch",
+    "an orange pumpkin in a field"
+  ],
+  "L03_complex_scenes": [
+    "a crowded kitchen with multiple people cooking together",
+    "a busy street market with vendors and shoppers",
+    "a living room with many furniture pieces and decorations",
+    "a classroom full of children sitting at desks with books and pencils",
+    "a dining table set with many plates, glasses, and silverware for a dinner party"
+  ]
+}

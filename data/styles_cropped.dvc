@@ -1,0 +1,6 @@
+outs:
+- md5: b8141de97f366dcc4d1578d31c48976d.dir
+  size: 1151129
+  nfiles: 8
+  hash: md5
+  path: styles_cropped
