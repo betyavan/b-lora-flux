@@ -1,6 +1,9 @@
 [core]
-    remote = local_storage
+    remote = s3_remote
 [cache]
     type = copy
 ['remote "local_storage"']
     url = /Users/i.betev/Desktop/DIPLOMA_dvc_storage
+['remote "s3_remote"']
+    url = s3://tfusion-ml-style3d/experiments/generative_upscale/upscale_loras/jasper/diploma/dvc
+    endpointurl = https://s3-msk.tinkoff.ru

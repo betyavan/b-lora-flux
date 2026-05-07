@@ -1,6 +1,6 @@
 .PHONY: export infer train docker docker-push check refactor lint show install isort black mdformat yamlfix mypy pylint mdlint test clean docs docs-serve \
         run run-group status update-plan pull-results configure install-hooks \
-        check-infra smoke-run prepare-environment
+        check-infra smoke-run prepare-environment dvc-init dvc-setup-s3
 
 tag   ?= v0.0
 image ?= $(shell grep CORP_DOCKER_IMAGE infra.env 2>/dev/null | cut -d= -f2)
@@ -54,6 +54,15 @@ prepare-environment:
 
 dvc-init:
 	dvc init
+
+## Write S3 credentials into .dvc/config.local (gitignored).
+## Requires AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY to be exported.
+dvc-setup-s3:
+	@test -n "$$AWS_ACCESS_KEY_ID"     || { echo "ERROR: AWS_ACCESS_KEY_ID is not set"; exit 1; }
+	@test -n "$$AWS_SECRET_ACCESS_KEY" || { echo "ERROR: AWS_SECRET_ACCESS_KEY is not set"; exit 1; }
+	dvc remote modify --local s3_remote access_key_id     $$AWS_ACCESS_KEY_ID
+	dvc remote modify --local s3_remote secret_access_key $$AWS_SECRET_ACCESS_KEY
+	@echo "Credentials written to .dvc/config.local"
 
 # ---------- experiment submission ----------
 
@@ -137,3 +146,6 @@ clean:
 git_push:
 	git push origin
 	git push gitlab
+
+push_s3:
+	s3cmd put data/ s3://tfusion-ml-style3d/experiments/generative_upscale/upscale_loras/jasper/diploma/data/ --recursive
