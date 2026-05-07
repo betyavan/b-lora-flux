@@ -1,0 +1,15 @@
+---
+# GS03 — Phase 3.2: split alpha — alpha_style=0.7, alpha_content=1.0 (Scenario A only)
+job: extension
+config:
+  name: "gs03_style_0.7_content_1.0"
+  process: []
+
+meta:
+  name: "gs03_style_0.7_content_1.0"
+  version: '1.0'
+  alpha_style: 0.7
+  alpha_content: 1.0
+  phase: "3.2"
+  style_lora: "PHASE2_BEST"
+  content_lora: "DC_CONTENT_BEST"

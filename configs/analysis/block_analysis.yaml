@@ -1,0 +1,28 @@
+# Hydra config for scripts/analysis/block_analysis.py
+# Override from CLI: python scripts/analysis/block_analysis.py analysis.n_prompts=10
+
+analysis:
+  prompts_file: "experiments/data/block_analysis_prompts.json"
+  n_prompts: 200              # how many pairs to use (subsampled if file has more)
+  seed: 42
+  target_ds_blocks: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]   # double-stream
+  target_ss_blocks: [0,10,20,30,37]                                       # single-stream
+  output_dir: "output/analysis"
+
+model:
+  name_or_path: "/models/flux-dev"
+  dtype: "bfloat16"           # FLUX requires bfloat16
+  clip: "openai/clip-vit-large-patch14"
+  batch_size: 8
+
+sampling:
+  seed: 42
+  steps: 28
+  guidance_scale: 3.5
+  width: 512
+  height: 512
+
+clearml:
+  enabled: true
+  project: "blora-flux-analysis"
+  task_prefix: "block_analysis"

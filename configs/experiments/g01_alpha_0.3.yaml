@@ -1,0 +1,17 @@
+---
+# G01 — Phase 3.1: inference-only alpha ablation, lora_scale = 0.3
+# NO TRAINING — uses LoRA weights from final Phase 2 config.
+# Run via: make run EXP=g01_alpha_0.3  (DAG skips training, generate uses LORA_SCALE=0.3)
+# Or locally: python scripts/eval/generate_images.py model.lora_scale=0.3 \
+#               generate.lora_path=output/PHASE2_BEST/... generate.exp_name=g01_alpha_0.3
+job: extension
+config:
+  name: "g01_alpha_0.3"
+  process: []   # no training
+
+meta:
+  name: "g01_alpha_0.3"
+  version: '1.0'
+  lora_scale: 0.3
+  phase: "3.1"
+  base_exp: "PHASE2_BEST"   # update to final Phase 2 experiment name before running

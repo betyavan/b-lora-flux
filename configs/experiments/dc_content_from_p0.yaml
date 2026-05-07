@@ -1,0 +1,72 @@
+---
+# DC-03 — Phase 1b: Θ_content search — top blocks from Phase 0 results
+# PLACEHOLDER: update only_if_contains after Phase 0 (block_analysis) completes.
+# Default uses double-stream [0–5] as best-guess content-sensitive prefix; replace with
+# actual top-N blocks ranked by content CLIP-similarity from P0-R report.
+job: extension
+config:
+  name: "dc_content_from_p0"
+  process:
+    - type: 'sd_trainer'
+      training_folder: "output"
+      device: cuda:0
+      network:
+        type: "lora"
+        linear: 16
+        linear_alpha: 16
+        network_kwargs:
+          only_if_contains:
+            # Update these after Phase 0 — top content-sensitive double-stream blocks
+            - "transformer_blocks.0"
+            - "transformer_blocks.1"
+            - "transformer_blocks.2"
+            - "transformer_blocks.3"
+            - "transformer_blocks.4"
+            - "transformer_blocks.5"
+      save:
+        dtype: float16
+        save_every: 500
+        max_step_saves_to_keep: 2
+        push_to_hub: false
+      datasets:
+        - folder_path: "/my_datasets/styles/van_gogh/img1"
+          caption_ext: "txt"
+          caption_dropout_rate: 0.05
+          shuffle_tokens: false
+          cache_latents_to_disk: true
+          resolution: [512, 768, 1024]
+      train:
+        batch_size: 1
+        steps: 1000
+        gradient_accumulation_steps: 1
+        train_unet: true
+        train_text_encoder: false
+        gradient_checkpointing: true
+        noise_scheduler: "flowmatch"
+        optimizer: "adamw8bit"
+        lr: 5e-5
+        ema_config:
+          use_ema: false
+        dtype: bf16
+      model:
+        name_or_path: "/models/flux-dev"
+        is_flux: true
+        quantize: true
+      sample:
+        sampler: "flowmatch"
+        sample_every: 500
+        width: 1024
+        height: 1024
+        prompts:
+          - "a cat sitting on a chair"
+          - "a landscape with mountains and a river"
+          - "a person reading a book in a park"
+        neg: ""
+        seed: 42
+        walk_seed: false
+        guidance_scale: 3.5
+        sample_steps: 28
+
+meta:
+  name: "[name]"
+  version: '1.0'

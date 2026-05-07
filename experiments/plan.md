@@ -28,12 +28,12 @@ inference: steps = 28, guidance scale = 3.5, alpha = 1.0.
 
 | ID  | Артефакт                                          | Описание                                                                 | Статус |
 |-----|---------------------------------------------------|--------------------------------------------------------------------------|--------|
-| I01 | `scripts/eval/compute_metrics.py` (DINO ViT-B/8)  | Cosine similarity DINO-output↔ref (style/content) как в §5.1 Table 1; метрики для Phase 4 (столбцы таблицы) | [ ]    |
-| I02 | `scripts/analysis/block_analysis.py`              | Prompt-injection анализ блоков FLUX + CLIP-сходство                       | [ ]    |
-| I03 | `scripts/eval/limitations_eval.py`                | Скрипт количественной оценки ограничений (color/background/complexity)    | [ ]    |
-| I04 | Конфиги Phase 1b (`dc_content_*.yaml`, 3 шт.)     | Диагностика Θ_content                                                     | [ ]    |
-| I05 | Конфиги Phase 2b (`dp*.yaml`, 4 шт.)              | Ablation training prompt                                                  | [ ]    |
-| I06 | Конфиги Phase 4.3 SplitFlux (`e03_*.yaml`, 8 шт.) | Реализация конкурирующего метода из статьи SplitFlux                      | [ ]    |
+| I01 | `scripts/eval/compute_metrics.py` (DINO ViT-B/8)  | Cosine similarity DINO-output↔ref (style/content) как в §5.1 Table 1; метрики для Phase 4 (столбцы таблицы) | [x]    |
+| I02 | `scripts/analysis/block_analysis.py`              | Prompt-injection анализ блоков FLUX + CLIP-сходство                       | [x]    |
+| I03 | `scripts/eval/limitations_eval.py`                | Скрипт количественной оценки ограничений (color/background/complexity)    | [x]    |
+| I04 | Конфиги Phase 1b (`dc_content_*.yaml`, 3 шт.)     | Диагностика Θ_content                                                     | [x]    |
+| I05 | Конфиги Phase 2b (`dp*.yaml`, 4 шт.)              | Ablation training prompt                                                  | [x]    |
+| I06 | Конфиги Phase 4.3 SplitFlux (`e03_*.yaml`, 8 шт.) | Реализация конкурирующего метода из статьи SplitFlux                      | [x]    |
 | I07 | Конфиги IP-Adapter-FLUX (`e04_*.yaml`, 2 шт.)     | Дополнительный baseline (включается при наличии стабильной реализации)    | [ ]    |
 | I08 | Caption файлы                                      | Единообразный prompt "a sks" во всех 8 файлах                             | [x]    |
 | I09 | `configs/experiments/base_flux_lora.yaml`         | lr = 5e-5 (исправлено)                                                    | [x]    |
@@ -304,7 +304,7 @@ Van Gogh img1, r = 32, 1000 steps.
 
 ## Прогресс
 
-- **Шаг 0.1** (Код и конфиги): 3/10 — I08, I09, I10 ✓
+- **Шаг 0.1** (Код и конфиги): 9/10 — I01–I06, I08, I09, I10 ✓ (I07 IP-Adapter опц. — pending)
 - **Шаг 0.2** (Данные): 8/8 — D01–D08 ✓ **все датасеты собраны**
 - **Phase 0** (Block analysis): 0/3
 - **Phase 1** (diag_d): 0/4

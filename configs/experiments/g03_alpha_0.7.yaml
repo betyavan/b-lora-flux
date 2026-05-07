@@ -1,0 +1,14 @@
+---
+# G03 — Phase 3.1: inference-only alpha ablation, lora_scale = 0.7
+# NO TRAINING — uses LoRA weights from final Phase 2 config.
+job: extension
+config:
+  name: "g03_alpha_0.7"
+  process: []
+
+meta:
+  name: "g03_alpha_0.7"
+  version: '1.0'
+  lora_scale: 0.7
+  phase: "3.1"
+  base_exp: "PHASE2_BEST"

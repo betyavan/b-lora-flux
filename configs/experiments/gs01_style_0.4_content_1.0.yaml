@@ -1,0 +1,18 @@
+---
+# GS01 — Phase 3.2: split alpha — alpha_style=0.4, alpha_content=1.0 (Scenario A only)
+# REQUIRES Scenario A from GATE-1 (Θ_content successfully isolated in Phase 1b).
+# NO TRAINING — uses two separate LoRAs: Θ_style (from Phase 2) and Θ_content (from Phase 1b).
+# Inference requires extended generate_images.py supporting dual LoRA with separate scales.
+job: extension
+config:
+  name: "gs01_style_0.4_content_1.0"
+  process: []
+
+meta:
+  name: "gs01_style_0.4_content_1.0"
+  version: '1.0'
+  alpha_style: 0.4
+  alpha_content: 1.0
+  phase: "3.2"
+  style_lora: "PHASE2_BEST"    # update to final style LoRA experiment name
+  content_lora: "DC_CONTENT_BEST"  # update to best Θ_content experiment from Phase 1b
