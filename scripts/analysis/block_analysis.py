@@ -256,7 +256,6 @@ def _generate_with_injection(
         result = pipe(
             prompt_embeds=base_embeds["prompt_embeds"].to(device),
             pooled_prompt_embeds=base_embeds["pooled_prompt_embeds"].to(device),
-            text_ids=base_embeds["text_ids"].to(device),
             num_inference_steps=int(cfg_sampling.steps),
             guidance_scale=float(cfg_sampling.guidance_scale),
             width=int(cfg_sampling.width),
