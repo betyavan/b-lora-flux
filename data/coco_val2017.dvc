@@ -1,6 +1,0 @@
-outs:
-- md5: cf00cf0417e481b0b9e103f42c913d2f.dir
-  size: 1649121454
-  nfiles: 5007
-  hash: md5
-  path: coco_val2017
