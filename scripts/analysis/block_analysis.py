@@ -185,10 +185,16 @@ def _generate_with_injection(
     transformer = pipe.transformer
     device = next(transformer.parameters()).device
 
-    inject_enc_hs = inject_embeds["prompt_embeds"].to(device)
+    inject_enc_hs_raw = inject_embeds["prompt_embeds"].to(device)
     handles: list[Any] = []
 
     if block_type == "double":
+        # DS blocks receive encoder_hidden_states that have already been projected
+        # from T5's 4096 dim to the transformer's inner dim (3072) via context_embedder.
+        ctx_embedder = transformer.context_embedder
+        with torch.no_grad():
+            inject_enc_hs = ctx_embedder(inject_enc_hs_raw.to(ctx_embedder.weight.dtype))
+
         block = transformer.transformer_blocks[block_idx]
 
         def _ds_pre_hook(module: torch.nn.Module, args: tuple, kwargs: dict) -> tuple[tuple, dict]:  # type: ignore[type-arg]
@@ -207,7 +213,7 @@ def _generate_with_injection(
         # using the transformer's own context_embedder weights (already trained).
         ctx_embedder = transformer.context_embedder  # Linear(4096, 3072)
         with torch.no_grad():
-            inject_enc_proj = ctx_embedder(inject_enc_hs.to(ctx_embedder.weight.dtype))
+            inject_enc_proj = ctx_embedder(inject_enc_hs_raw.to(ctx_embedder.weight.dtype))
         # inject_enc_proj: (1, seq_len, 3072)
 
         _state: dict[str, int | None] = {"img_seq_len": None}
