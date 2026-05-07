@@ -193,7 +193,7 @@ def _generate_with_injection(
 
         def _ds_pre_hook(module: torch.nn.Module, args: tuple, kwargs: dict) -> tuple[tuple, dict]:  # type: ignore[type-arg]
             if "encoder_hidden_states" in kwargs:
-                kwargs["encoder_hidden_states"] = inject_enc_hs
+                kwargs = {**kwargs, "encoder_hidden_states": inject_enc_hs}
             elif len(args) >= 2:
                 args = (args[0], inject_enc_hs) + args[2:]
             return args, kwargs

@@ -90,7 +90,7 @@ def _generate_images(
     for pidx, prompt in enumerate(prompts):
         paths: list[Path] = []
         for k in range(n_per_prompt):
-            gen = torch.Generator("cuda").manual_seed(seed + pidx * 100 + k)
+            gen = torch.Generator("cpu").manual_seed(seed + pidx * 100 + k)
             img = pipe(
                 prompt=prompt,
                 num_inference_steps=steps,
@@ -166,11 +166,12 @@ def _load_dino(model_name: str, device: torch.device):
 
 
 @torch.no_grad()
-def _dino_embed(paths: list[Path], model, processor, device: torch.device) -> torch.Tensor:
+def _dino_embed(paths: list[Path], model, processor, device: torch.device, batch_size: int = 8) -> torch.Tensor:
     embeddings: list[torch.Tensor] = []
-    for p in paths:
-        img = Image.open(p).convert("RGB")
-        inputs = processor(images=[img], return_tensors="pt").to(device)
+    for i in range(0, len(paths), batch_size):
+        batch_paths = paths[i : i + batch_size]
+        images = [Image.open(p).convert("RGB") for p in batch_paths]
+        inputs = processor(images=images, return_tensors="pt").to(device)
         out = model(**inputs)
         cls = out.last_hidden_state[:, 0, :]
         embeddings.append(F.normalize(cls, dim=-1).cpu())
@@ -216,11 +217,15 @@ def _load_clip(model_name: str, device: torch.device):
 
 
 @torch.no_grad()
-def _clip_image_embed(paths: list[Path], model, processor, device: torch.device) -> torch.Tensor:
-    images = [Image.open(p).convert("RGB") for p in paths]
-    inputs = processor(images=images, return_tensors="pt").to(device)
-    feats = model.get_image_features(**inputs)
-    return F.normalize(feats, dim=-1).cpu()
+def _clip_image_embed(paths: list[Path], model, processor, device: torch.device, batch_size: int = 8) -> torch.Tensor:
+    embeddings: list[torch.Tensor] = []
+    for i in range(0, len(paths), batch_size):
+        batch_paths = paths[i : i + batch_size]
+        images = [Image.open(p).convert("RGB") for p in batch_paths]
+        inputs = processor(images=images, return_tensors="pt").to(device)
+        feats = model.get_image_features(**inputs)
+        embeddings.append(F.normalize(feats, dim=-1).cpu())
+    return torch.cat(embeddings, dim=0)
 
 
 @torch.no_grad()

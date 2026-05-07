@@ -83,7 +83,7 @@ def main(cfg: DictConfig) -> None:
     log.info("Generating %d images -> %s", len(prompts), out_dir)
     for idx, prompt in enumerate(prompts):
         # Fresh generator per image: seed+idx gives deterministic, non-coupled outputs.
-        generator = torch.Generator("cuda").manual_seed(base_seed + idx)
+        generator = torch.Generator("cpu").manual_seed(base_seed + idx)
         result = pipe(
             prompt=prompt,
             num_inference_steps=int(cfg.sampling.steps),
