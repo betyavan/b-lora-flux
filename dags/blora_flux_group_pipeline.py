@@ -16,6 +16,7 @@ _S3_BASE_PATH_DEFAULT = os.environ.get("CORP_S3_BASE_PATH", "")
 _AIRFLOW_CONN_ID = os.environ.get("CORP_AIRFLOW_CONN_ID", "dp_conn")
 
 GROUP_EXPERIMENTS = {
+    # ---- Legacy single-stream ablations (early prototype, pre-plan) ----
     "ablation_a": [
         "a01_blocks_34_37",
         "a02_blocks_30_37",
@@ -34,6 +35,60 @@ GROUP_EXPERIMENTS = {
         "c03_steps_500",
         "c04_steps_1000",
     ],
+
+    # ---- Phase 1 — double-stream diagnostic ----
+    "diag_d": [
+        "e00_no_lora_baseline",
+        "d01_double_stream_1000steps",
+        "d02_double_stream_2000steps",
+        "d03_double_stream_rank32",
+    ],
+
+    # ---- Phase 1b — Θ_content search ----
+    "phase_1b": [
+        "dc_content_early_ds",
+        "dc_content_late_ds",
+        "dc_content_from_p0",
+    ],
+
+    # ---- Phase 2 — ablations (plan-aligned naming) ----
+    "ablation_da": [
+        "da01_ds_blocks_0_6",
+        "da02_ds_blocks_0_12",
+        "da03_ds_blocks_0_18",
+        "da04_ds_blocks_6_18",
+    ],
+    "ablation_db": [
+        "db01_rank_4",
+        "db02_rank_16",
+        "db03_rank_32",
+        "db04_rank_64",
+    ],
+    "ablation_dc": [
+        "dc01_steps_500",
+        "dc02_steps_1000",
+        "dc03_steps_2000",
+        "dc04_steps_4000",
+    ],
+    "ablation_dp": [
+        "dp01_prompt_sks",
+        "dp02_prompt_sks_class",
+        "dp03_prompt_v",
+        "dp04_prompt_v_class",
+    ],
+
+    # ---- Phase 3 — alpha ablation (inference-only, process: []) ----
+    # generate step uses LORA_SCALE from GROUP_LORA_SCALES below; no training.
+    "phase3_alpha": [
+        "g01_alpha_0.3",
+        "g02_alpha_0.5",
+        "g03_alpha_0.7",
+        "g04_alpha_1.0",
+        "g05_alpha_1.5",
+        "g06_alpha_2.0",
+    ],
+
+    # ---- Phase 4 — method comparison ----
     "compare_e": [
         "e01_blora_flux_van_gogh_img1",
         "e01_blora_flux_van_gogh_img2",
@@ -52,18 +107,35 @@ GROUP_EXPERIMENTS = {
         "e02_full_lora_flux_monet_img3",
         "e02_full_lora_flux_monet_img4",
     ],
+    "compare_e03": [
+        "e03_splitflux_van_gogh_img1",
+        "e03_splitflux_van_gogh_img2",
+        "e03_splitflux_van_gogh_img3",
+        "e03_splitflux_van_gogh_img4",
+        "e03_splitflux_monet_img1",
+        "e03_splitflux_monet_img2",
+        "e03_splitflux_monet_img3",
+        "e03_splitflux_monet_img4",
+    ],
+
+    # ---- Phase 5 — SDXL cross-architecture ----
     "compare_f": [
         "e04_blora_sdxl_van_gogh_img1",
         "e04_blora_sdxl_van_gogh_img2",
         "e04_blora_sdxl_van_gogh_img3",
         "e04_blora_sdxl_van_gogh_img4",
     ],
-    "diag_d": [
-        "e00_no_lora_baseline",
-        "d01_double_stream_1000steps",
-        "d02_double_stream_2000steps",
-        "d03_double_stream_rank32",
-    ],
+}
+
+# Per-experiment LORA_SCALE overrides for inference-only groups (Phase 3).
+# The generate step reads LORA_SCALE env var (default 1.0); entries here override it.
+GROUP_LORA_SCALES: dict[str, float] = {
+    "g01_alpha_0.3": 0.3,
+    "g02_alpha_0.5": 0.5,
+    "g03_alpha_0.7": 0.7,
+    "g04_alpha_1.0": 1.0,
+    "g05_alpha_1.5": 1.5,
+    "g06_alpha_2.0": 2.0,
 }
 
 
@@ -84,9 +156,29 @@ with DAG(
     template_searchpath="dags_folder/dags",
     params={
         "GROUP": Param(
-            default="ablation_a",
-            enum=["ablation_a", "ablation_b", "ablation_c", "compare_e", "compare_f", "diag_d"],
+            default="diag_d",
+            enum=[
+                # Phase 1
+                "diag_d",
+                # Phase 1b
+                "phase_1b",
+                # Phase 2 (plan-aligned)
+                "ablation_da", "ablation_db", "ablation_dc", "ablation_dp",
+                # Phase 3
+                "phase3_alpha",
+                # Phase 4
+                "compare_e", "compare_e03",
+                # Phase 5
+                "compare_f",
+                # Legacy proto ablations
+                "ablation_a", "ablation_b", "ablation_c",
+            ],
             description="Experiment group to run",
+        ),
+        "PHASE3_BASE_EXP": Param(
+            default="",
+            type="string",
+            description="(Phase 3 only) Experiment name whose trained LoRA is reused for all alpha variants",
         ),
         "S3_BASE_PATH": Param(
             default=_S3_BASE_PATH_DEFAULT,
@@ -114,14 +206,28 @@ with DAG(
         params = context["params"]
         base = params["S3_BASE_PATH"].rstrip("/")
         run_ts = context["logical_date"].strftime("%Y%m%dT%H%M%S")
-        return [
-            {"env": {
+        group = params["GROUP"]
+        phase3_base = params.get("PHASE3_BASE_EXP", "").strip()
+
+        env_dicts = []
+        for exp in GROUP_EXPERIMENTS[group]:
+            env: dict[str, str] = {
                 "EXPERIMENT_NAME": exp,
-                "TRAIN_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/loras",
                 "GENERATED_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/generated",
-            }}
-            for exp in GROUP_EXPERIMENTS[params["GROUP"]]
-        ]
+            }
+
+            # Phase 3: reuse trained LoRA from a base experiment; vary LORA_SCALE per variant.
+            if exp in GROUP_LORA_SCALES:
+                env["LORA_SCALE"] = str(GROUP_LORA_SCALES[exp])
+                if phase3_base:
+                    env["TRAIN_OUTPUT_S3_PATH"] = f"{base}/exp_logs/{run_ts}/{phase3_base}/loras"
+                else:
+                    env["TRAIN_OUTPUT_S3_PATH"] = f"{base}/exp_logs/{run_ts}/{exp}/loras"
+            else:
+                env["TRAIN_OUTPUT_S3_PATH"] = f"{base}/exp_logs/{run_ts}/{exp}/loras"
+
+            env_dicts.append({"env": env})
+        return env_dicts
 
     @task
     def prepare_metrics_env_dicts(**context):
