@@ -10,7 +10,8 @@ set -e
 cd /root/b-lora-flux
 python scripts/check_env.py --strict
 
-cd /root/b-lora-flux
+# Pull eval data via DVC
+dvc pull data/coco_prompts.txt.dvc
 
 # 1. Download LoRA weights from S3
 mkdir -p input_loras
@@ -30,7 +31,7 @@ fi
 mkdir -p results/generated
 python scripts/eval/generate_images.py \
   "$LORA_ARG" \
-  generate.prompt_file=/my_datasets/coco_prompts.txt \
+  generate.prompt_file=data/coco_prompts.txt \
   generate.output_dir=results/generated \
   generate.exp_name="$EXPERIMENT_NAME" \
   model.lora_scale="${LORA_SCALE:-1.0}"

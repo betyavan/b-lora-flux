@@ -5,6 +5,9 @@ set -e
 cd /root/b-lora-flux
 python scripts/check_env.py --strict
 
+# 1a. Pull training data via DVC
+dvc pull data/styles.dvc
+
 # 1. Check if experiment has a training process (baseline configs have process: [])
 PROCESS_COUNT=$(python3 -c "
 import yaml, sys

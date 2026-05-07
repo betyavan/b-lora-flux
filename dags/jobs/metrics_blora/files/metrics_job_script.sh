@@ -10,7 +10,8 @@ set -e
 cd /root/b-lora-flux
 python scripts/check_env.py --strict
 
-cd /root/b-lora-flux
+# Pull eval data via DVC
+dvc pull data/styles.dvc data/artbench10.dvc data/coco_prompts.txt.dvc
 
 # 1. Download generated images from S3
 mkdir -p "results/generated/${EXPERIMENT_NAME}"
@@ -18,12 +19,12 @@ s3cmd sync -v "${GENERATED_OUTPUT_S3_PATH%/}/" "results/generated/${EXPERIMENT_N
 
 # 2. Determine style refs dir from experiment name
 if echo "$EXPERIMENT_NAME" | grep -q "van_gogh"; then
-  STYLE_REFS_DIR="/my_datasets/styles/van_gogh"
+  STYLE_REFS_DIR="data/styles/van_gogh"
 elif echo "$EXPERIMENT_NAME" | grep -q "monet"; then
-  STYLE_REFS_DIR="/my_datasets/styles/monet"
+  STYLE_REFS_DIR="data/styles/monet"
 elif echo "$EXPERIMENT_NAME" | grep -qE "^[abc][0-9]+_"; then
   # Ablation groups a/b/c all train on van_gogh/img1 — use full van_gogh dir for eval
-  STYLE_REFS_DIR="/my_datasets/styles/van_gogh"
+  STYLE_REFS_DIR="data/styles/van_gogh"
 else
   echo "WARNING: Cannot determine style from '${EXPERIMENT_NAME}', skipping style metrics"
   STYLE_REFS_DIR="null"
@@ -33,8 +34,8 @@ fi
 python scripts/eval/compute_metrics.py \
   metrics.generated_dir="results/generated/${EXPERIMENT_NAME}" \
   metrics.style_refs_dir="$STYLE_REFS_DIR" \
-  metrics.prompt_file=/my_datasets/coco_prompts.txt \
-  metrics.artbench_dir=/my_datasets/artbench10 \
+  metrics.prompt_file=data/coco_prompts.txt \
+  metrics.artbench_dir=data/artbench10 \
   metrics.exp_name="$EXPERIMENT_NAME"
 
 # 4. Upload metrics.json to S3
