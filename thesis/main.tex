@@ -1,0 +1,75 @@
+\documentclass[14pt,a4paper]{extarticle}
+
+\input{packages}
+\input{preferences}
+
+\begin{document}
+
+% ---- Титульная страница (заглушка — заполнить перед финальной сдачей) ----
+\begin{titlepage}
+    \begin{center}
+        \large
+        Министерство науки и высшего образования Российской Федерации\\[0.5em]
+        \textbf{[Название университета]}\\[2em]
+        Кафедра [название кафедры]\\[4em]
+
+        \LARGE\textbf{Применение метода B-LoRA для повышения качества переноса стиля\\
+        в генеративных моделях на основе DiT — FLUX}\\[2em]
+
+        \large
+        Выпускная квалификационная работа\\[4em]
+
+        \begin{flushright}
+            Выполнил: студент группы [номер]\\{}
+            [Фамилия И.О.]\\[1em]
+            Научный руководитель:\\{}
+            [Звание, Фамилия И.О.]
+        \end{flushright}
+
+        \vfill
+        Москва, 2025
+    \end{center}
+\end{titlepage}
+
+% ---- Содержание ----
+\tableofcontents
+\newpage
+
+% ---- Глава 1: Введение ----
+\input{chapter1_introduction}
+\newpage
+
+% ---- Глава 2: Обзор литературы ----
+\input{chapter2_literature_review}
+\newpage
+
+% ---- Глава 3: Метод и экспериментальная установка ----
+\section{Метод и экспериментальная установка}
+\label{sec:chapter3}
+
+\input{chapter3_method}
+
+\input{chapter4_datasets}
+
+\input{chapter4_preprocessing}
+
+\input{chapter4_eval_protocol}
+\newpage
+
+% ---- Заключение ----
+\section*{Заключение}
+\addcontentsline{toc}{section}{Заключение}
+\input{conclusion}
+\newpage
+
+% ---- Список использованных источников ----
+\printbibliography[title={Список использованных источников}]
+\newpage
+
+% ---- Приложения ----
+\appendix
+\section*{Приложения}
+\addcontentsline{toc}{section}{Приложения}
+\input{appendix_a_stack}
+
+\end{document}
