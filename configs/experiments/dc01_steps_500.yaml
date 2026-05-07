@@ -39,7 +39,7 @@ config:
         max_step_saves_to_keep: 2
         push_to_hub: false
       datasets:
-        - folder_path: "/my_datasets/styles/van_gogh/img1"
+        - folder_path: "data/styles/van_gogh/img1"
           caption_ext: "txt"
           caption_dropout_rate: 0.05
           shuffle_tokens: false

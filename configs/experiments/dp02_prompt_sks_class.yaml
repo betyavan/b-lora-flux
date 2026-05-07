@@ -1,6 +1,6 @@
 ---
 # DP02 — Phase 2.4: training prompt "a sks painting"
-# Caption files at /my_datasets/styles/van_gogh/img1_sks_class/*.txt must contain: "a sks painting"
+# Caption files at data/styles/van_gogh/img1_sks_class/*.txt must contain: "a sks painting"
 # Data prep: copy img1 images to img1_sks_class/ and write "a sks painting" to each .txt file.
 # PLACEHOLDER: update only_if_contains/linear after Phase 2.1–2.3 results.
 job: extension
@@ -42,7 +42,7 @@ config:
         push_to_hub: false
       datasets:
         # Caption txt files must contain: "a sks painting"
-        - folder_path: "/my_datasets/styles/van_gogh/img1_sks_class"
+        - folder_path: "data/styles/van_gogh/img1_sks_class"
           caption_ext: "txt"
           caption_dropout_rate: 0.05
           shuffle_tokens: false

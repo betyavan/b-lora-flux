@@ -1,6 +1,6 @@
 ---
 # DP04 — Phase 2.4: training prompt "a [v] painting in [s] style"
-# Caption files at /my_datasets/styles/van_gogh/img1_v_class/*.txt must contain:
+# Caption files at data/styles/van_gogh/img1_v_class/*.txt must contain:
 #   "a [v] painting in [s] style"
 # Data prep: copy img1 images to img1_v_class/ and write that prompt to each .txt file.
 # PLACEHOLDER: update only_if_contains/linear after Phase 2.1–2.3 results.
@@ -43,7 +43,7 @@ config:
         push_to_hub: false
       datasets:
         # Caption txt files must contain: "a [v] painting in [s] style"
-        - folder_path: "/my_datasets/styles/van_gogh/img1_v_class"
+        - folder_path: "data/styles/van_gogh/img1_v_class"
           caption_ext: "txt"
           caption_dropout_rate: 0.05
           shuffle_tokens: false

@@ -1,6 +1,6 @@
 ---
 # DP01 — Phase 2.4: training prompt "a sks", best config from DA+DB+DC (placeholder: DS[0–18], r=16, 1000 steps)
-# Caption files at /my_datasets/styles/van_gogh/img1/*.txt must contain: "a sks"
+# Caption files at data/styles/van_gogh/img1/*.txt must contain: "a sks"
 # PLACEHOLDER: update only_if_contains/linear after Phase 2.1–2.3 results.
 job: extension
 config:
@@ -41,7 +41,7 @@ config:
         push_to_hub: false
       datasets:
         # Caption txt files must contain: "a sks"  (same as base I08 captions)
-        - folder_path: "/my_datasets/styles/van_gogh/img1"
+        - folder_path: "data/styles/van_gogh/img1"
           caption_ext: "txt"
           caption_dropout_rate: 0.05
           shuffle_tokens: false
