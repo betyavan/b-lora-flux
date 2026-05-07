@@ -78,7 +78,13 @@ def test_dag_files_valid_syntax(rel_path: str) -> None:
 
 def test_group_experiments_has_expected_keys() -> None:
     ge = _load_group_experiments()
-    expected = {"ablation_a", "ablation_b", "ablation_c", "compare_e", "compare_f"}
+    expected = {
+        "ablation_a", "ablation_b", "ablation_c",
+        "diag_d", "phase_1b",
+        "ablation_da", "ablation_db", "ablation_dc", "ablation_dp",
+        "phase3_alpha",
+        "compare_e", "compare_e03", "compare_f",
+    }
     assert expected == set(ge.keys())
 
 
@@ -87,7 +93,15 @@ def test_group_experiments_correct_counts() -> None:
     assert len(ge["ablation_a"]) == 4
     assert len(ge["ablation_b"]) == 4
     assert len(ge["ablation_c"]) == 4
+    assert len(ge["diag_d"]) == 4
+    assert len(ge["phase_1b"]) == 3
+    assert len(ge["ablation_da"]) == 4
+    assert len(ge["ablation_db"]) == 4
+    assert len(ge["ablation_dc"]) == 4
+    assert len(ge["ablation_dp"]) == 4
+    assert len(ge["phase3_alpha"]) == 6
     assert len(ge["compare_e"]) == 16  # e01+e02 × van_gogh+monet × img1-4
+    assert len(ge["compare_e03"]) == 8
     assert len(ge["compare_f"]) == 4
 
 
