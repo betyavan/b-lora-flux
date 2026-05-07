@@ -302,10 +302,12 @@ def _clip_text_image_sim(
     img_inputs = clip_processor(images=image, return_tensors="pt").to(device)
     txt_inputs = clip_processor(text=[text], return_tensors="pt", padding=True, truncation=True).to(device)
 
-    img_out = clip_model.get_image_features(**img_inputs)
-    txt_out = clip_model.get_text_features(**txt_inputs)
-    img_tensor = img_out if isinstance(img_out, torch.Tensor) else img_out.image_embeds
-    txt_tensor = txt_out if isinstance(txt_out, torch.Tensor) else txt_out.text_embeds
+    img_tensor = clip_model.visual_projection(
+        clip_model.vision_model(**img_inputs).pooler_output
+    )
+    txt_tensor = clip_model.text_projection(
+        clip_model.text_model(**txt_inputs).pooler_output
+    )
     img_feat = F.normalize(img_tensor, dim=-1)
     txt_feat = F.normalize(txt_tensor, dim=-1)
 
