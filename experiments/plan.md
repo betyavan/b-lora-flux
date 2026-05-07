@@ -37,7 +37,7 @@ inference: steps = 28, guidance scale = 3.5, alpha = 1.0.
 | I07 | Конфиги IP-Adapter-FLUX (`e04_*.yaml`, 2 шт.)     | Дополнительный baseline (включается при наличии стабильной реализации)    | [ ]    |
 | I08 | Caption файлы                                      | Единообразный prompt "a sks" во всех 8 файлах                             | [x]    |
 | I09 | `configs/experiments/base_flux_lora.yaml`         | lr = 5e-5 (исправлено)                                                    | [x]    |
-| I10 | `scripts/data/build_eval_pairs.py` (+ `--validate-only`) | Сборка/проверка манифеста **50 пар** для DS8 (`b_lora_eval_pairs.json`), `seed=42` | [ ]    |
+| I10 | `scripts/data/build_eval_pairs.py` (+ `--validate-only`) | Сборка/проверка манифеста **50 пар** для DS8 (`b_lora_eval_pairs.json`), `seed=42` | [x]    |
 
 ### 0.2 — Данные (см. `datasets.md`)
 
@@ -45,12 +45,12 @@ inference: steps = 28, guidance scale = 3.5, alpha = 1.0.
 |-----|---------------------------------------------------|---------------------------------------------------------------------------|--------|
 | D01 | `data/styles/` (DS1)                              | 8 стилевых референсов Van Gogh + Monet                                    | [x]    |
 | D02 | `data/coco_prompts.txt` (DS2)                     | 100 промптов из COCO val2017 с фиксированным протоколом отбора            | [x]    |
-| D03 | `data/artbench10/{impressionism,post_impressionism}/` (DS3) | Структурировать ArtBench-10 по жанрам для FID-референса         | [ ]    |
-| D04 | `scripts/analysis/generate_block_prompts.py` + `experiments/data/block_analysis_prompts.json` (DS4) | 200 пар промптов для Phase 0 | [ ]    |
-| D05 | `data/dreambooth_*` / subject-папки (DS5)         | Canonical subjects: минимум **dog** для Phase 1b; полный DS5 — источник `eval_content/*` для DS8 | [ ]    |
-| D06 | `experiments/data/limitations_prompts.json` (DS6) | 5 + 5 промптов для L01 и L03                                              | [ ]    |
-| D07 | `scripts/data/make_center_crops.py` + `data/styles_cropped/` (DS7) | Центр-кропы стилей для L02                                | [ ]    |
-| D08 | DS8 — `data/eval_content/`, `data/eval_styles/`, `experiments/data/b_lora_eval_pairs.json` (+ опц. DVC, `eval_assets_registry.yaml`) | Парная выборка **§5.1**: 23/25 объектов как в `datasets.md`, **50 пар** для Phase 5.2 и опц. M02 | [ ]    |
+| D03 | `data/artbench10/{impressionism,post_impressionism}/` (DS3) | Структурировать ArtBench-10 по жанрам для FID-референса         | [x]    |
+| D04 | `scripts/analysis/generate_block_prompts.py` + `experiments/data/block_analysis_prompts.json` (DS4) | 200 пар промптов для Phase 0 | [x]    |
+| D05 | `data/dreambooth_*` / subject-папки (DS5)         | Canonical subjects: минимум **dog** для Phase 1b; полный DS5 — источник `eval_content/*` для DS8 | [x]    |
+| D06 | `experiments/data/limitations_prompts.json` (DS6) | 5 + 5 промптов для L01 и L03                                              | [x]    |
+| D07 | `scripts/data/make_center_crops.py` + `data/styles_cropped/` (DS7) | Центр-кропы стилей для L02                                | [x]    |
+| D08 | DS8 — `data/eval_content/`, `data/eval_styles/`, `experiments/data/b_lora_eval_pairs.json` (+ опц. DVC, `eval_assets_registry.yaml`) | Парная выборка **§5.1**: 23/25 объектов как в `datasets.md`, **50 пар** для Phase 5.2 и опц. M02 | [x]    |
 
 ---
 
@@ -304,8 +304,8 @@ Van Gogh img1, r = 32, 1000 steps.
 
 ## Прогресс
 
-- **Шаг 0.1** (Код и конфиги): 2/10 — I08, I09 ✓
-- **Шаг 0.2** (Данные): 2/8 — D01, D02 ✓
+- **Шаг 0.1** (Код и конфиги): 3/10 — I08, I09, I10 ✓
+- **Шаг 0.2** (Данные): 8/8 — D01–D08 ✓ **все датасеты собраны**
 - **Phase 0** (Block analysis): 0/3
 - **Phase 1** (diag_d): 0/4
 - **Phase 1b** (Θ_content): 0/3
@@ -315,5 +315,5 @@ Van Gogh img1, r = 32, 1000 steps.
 - **Phase 4b** (Limitations): 0/3
 - **Phase 5** (SDXL): 0/5 (F01 ×4 + **F02** батч DS8)
 - **Phase 6** (Mixing): 0/2 (условно)
-- **Итого экспериментов:** 0 / **72** (71 ранее + F02 как отдельная единица учёта; сами 50 пар DS8 — внутри F02, не отдельные строки таблицы плана)
-- **Инфраструктура:** 4 / **18** (10 код/конфиги + **8** данные)
+- **Итого экспериментов:** 0 / **72**
+- **Инфраструктура:** 11 / **18** (3 код/конфиги + **8** данные)
