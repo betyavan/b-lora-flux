@@ -52,3 +52,7 @@ train_lora_preset.yml
 # s3cmd credential files (contain access/secret keys — never commit)
 dags/jobs/**/files/s3cfg
 .s3cfg
+
+thesis/main-blx.bib
+thesis/main.run.xml
+thesis/main.xwm
