@@ -1,0 +1,27 @@
+analysis:
+  prompts_file: experiments/data/block_analysis_prompts.json
+  n_prompts: 200
+  seed: 42
+  target_ds_blocks: []
+  target_ss_blocks:
+  - 0
+  - 10
+  - 20
+  - 30
+  - 37
+  output_dir: output/analysis
+model:
+  name_or_path: /mnt/huggingface_cache/transformers/models--black-forest-labs--FLUX.1-dev
+  dtype: bfloat16
+  clip: openai/clip-vit-large-patch14
+  batch_size: 8
+sampling:
+  seed: 42
+  steps: 28
+  guidance_scale: 3.5
+  width: 512
+  height: 512
+clearml:
+  enabled: true
+  project: blora-flux-analysis
+  task_prefix: block_analysis
