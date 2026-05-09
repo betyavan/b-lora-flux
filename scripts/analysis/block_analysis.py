@@ -221,9 +221,13 @@ def _generate_with_injection(
         def _transformer_img_ids_hook(
             module: torch.nn.Module, args: tuple, kwargs: dict
         ) -> tuple[tuple, dict]:  # type: ignore[type-arg]
-            """Capture img_seq_len from img_ids before the transformer runs."""
+            """Capture img_seq_len from img_ids before the transformer runs.
+
+            img_ids shape is (N, 3) or (B, N, 3) depending on diffusers version.
+            shape[-2] gives N in both cases (last dim is always 3 position coords).
+            """
             if "img_ids" in kwargs:
-                _state["img_seq_len"] = kwargs["img_ids"].shape[1]
+                _state["img_seq_len"] = kwargs["img_ids"].shape[-2]
             return args, kwargs
 
         h_t = transformer.register_forward_pre_hook(_transformer_img_ids_hook, with_kwargs=True)
