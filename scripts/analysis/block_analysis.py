@@ -174,11 +174,11 @@ def _generate_with_injection(
     timestep modulation (same for all blocks) and replacing it globally would
     confound the per-block sensitivity measurement.
 
-    For single-stream blocks: fused hidden_states = cat([img_tokens, txt_tokens]).
-    The T5 embeddings are projected from 4096→3072 via the transformer's own
-    context_embedder (Linear(4096, 3072)) before being concatenated with image
-    tokens. We apply the same projection to inject_embeds before replacing the
-    text slice of the fused tensor.
+    For single-stream blocks: fused hidden_states = cat([txt_tokens, img_tokens]).
+    FLUX concatenates encoder_hidden_states (text) first, then hidden_states (image)
+    before the single-stream phase. The T5 embeddings are projected from 4096→3072
+    via the transformer's own context_embedder (Linear(4096, 3072)). We apply the
+    same projection to inject_embeds and replace the leading text slice [0:txt_seq].
 
     All hooks are removed in a finally block to prevent state leakage across calls.
     """
@@ -234,24 +234,33 @@ def _generate_with_injection(
         def _ss_pre_hook(
             module: torch.nn.Module, args: tuple, kwargs: dict
         ) -> tuple[tuple, dict]:  # type: ignore[type-arg]
-            """Replace the text slice of fused hidden_states with inject embeddings."""
+            """Replace the text slice of fused hidden_states with inject embeddings.
+
+            FLUX concatenates before single-stream blocks as [txt_tokens, img_tokens]
+            (encoder_hidden_states first, then hidden_states). So txt tokens occupy
+            positions [0 : txt_seq_len] and img tokens [txt_seq_len : total_seq].
+            """
             img_seq_len = _state["img_seq_len"]
             if img_seq_len is None or not args:
                 return args, kwargs
 
-            hidden = args[0]  # (B, img_seq + txt_seq, 3072)
-            txt_seq_len = inject_enc_proj.shape[1]
+            hidden = args[0]  # (B, txt_seq + img_seq, 3072)
             total_seq = hidden.shape[1]
 
-            if img_seq_len + txt_seq_len != total_seq:
+            # Derive actual txt_seq_len from hidden shape — don't assume it matches
+            # inject_enc_proj in case base/inject were encoded with different lengths.
+            txt_seq_len_actual = total_seq - img_seq_len
+
+            if txt_seq_len_actual != inject_enc_proj.shape[1]:
                 log.debug(
-                    "SS block %d: seq mismatch img=%d txt=%d total=%d — skipping",
-                    block_idx, img_seq_len, txt_seq_len, total_seq,
+                    "SS block %d: txt seq mismatch actual=%d inject=%d — skipping",
+                    block_idx, txt_seq_len_actual, inject_enc_proj.shape[1],
                 )
                 return args, kwargs
 
-            img_part = hidden[:, :img_seq_len, :]
-            fused = torch.cat([img_part, inject_enc_proj.to(hidden.dtype)], dim=1)
+            # img tokens occupy [txt_seq_len_actual : total_seq]
+            img_part = hidden[:, txt_seq_len_actual:, :]
+            fused = torch.cat([inject_enc_proj.to(hidden.dtype), img_part], dim=1)
             args = (fused,) + args[1:]
             return args, kwargs
 
