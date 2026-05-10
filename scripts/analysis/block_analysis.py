@@ -240,19 +240,26 @@ def _generate_with_injection(
         ) -> tuple[tuple, dict]:  # type: ignore[type-arg]
             """Replace the text slice of fused hidden_states with inject embeddings.
 
-            FLUX concatenates before single-stream blocks as [txt_tokens, img_tokens]
-            (encoder_hidden_states first, then hidden_states). So txt tokens occupy
-            positions [0 : txt_seq_len] and img tokens [txt_seq_len : total_seq].
+            FLUX concatenates before single-stream blocks as [txt_tokens, img_tokens].
+            hidden_states may arrive as args[0] or kwargs["hidden_states"] depending
+            on the diffusers version — handle both.
             """
             img_seq_len = _state["img_seq_len"]
-            if img_seq_len is None or not args:
+            if img_seq_len is None:
                 return args, kwargs
 
-            hidden = args[0]  # (B, txt_seq + img_seq, 3072)
-            total_seq = hidden.shape[1]
+            # Resolve hidden_states from positional or keyword arguments.
+            if args:
+                hidden = args[0]
+                via_kwargs = False
+            elif "hidden_states" in kwargs:
+                hidden = kwargs["hidden_states"]
+                via_kwargs = True
+            else:
+                return args, kwargs
 
-            # Derive actual txt_seq_len from hidden shape — don't assume it matches
-            # inject_enc_proj in case base/inject were encoded with different lengths.
+            # (B, txt_seq + img_seq, 3072) — derive txt_seq from shape.
+            total_seq = hidden.shape[1]
             txt_seq_len_actual = total_seq - img_seq_len
 
             if txt_seq_len_actual != inject_enc_proj.shape[1]:
@@ -262,10 +269,13 @@ def _generate_with_injection(
                 )
                 return args, kwargs
 
-            # img tokens occupy [txt_seq_len_actual : total_seq]
             img_part = hidden[:, txt_seq_len_actual:, :]
             fused = torch.cat([inject_enc_proj.to(hidden.dtype), img_part], dim=1)
-            args = (fused,) + args[1:]
+
+            if via_kwargs:
+                kwargs = {**kwargs, "hidden_states": fused}
+            else:
+                args = (fused,) + args[1:]
             return args, kwargs
 
         h_ss = target_ss_block.register_forward_pre_hook(_ss_pre_hook, with_kwargs=True)
