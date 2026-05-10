@@ -209,73 +209,23 @@ def _generate_with_injection(
         handles.append(h)
 
     else:
-        # Single-stream: project T5 embeddings (4096) → FLUX hidden dim (3072)
-        # using the transformer's own context_embedder weights (already trained).
-        ctx_embedder = transformer.context_embedder  # Linear(4096, 3072)
+        # Single-stream blocks in this diffusers version receive hidden_states (image)
+        # and encoder_hidden_states (text) as separate kwargs — same interface as
+        # double-stream blocks. Inject by replacing encoder_hidden_states directly.
+        ctx_embedder = transformer.context_embedder
         with torch.no_grad():
-            inject_enc_proj = ctx_embedder(inject_enc_hs_raw.to(ctx_embedder.weight.dtype))
-        # inject_enc_proj: (1, seq_len, 3072)
-
-        _state: dict[str, int | None] = {"img_seq_len": None}
-
-        def _transformer_img_ids_hook(
-            module: torch.nn.Module, args: tuple, kwargs: dict
-        ) -> tuple[tuple, dict]:  # type: ignore[type-arg]
-            """Capture img_seq_len from img_ids before the transformer runs.
-
-            img_ids shape is (N, 3) or (B, N, 3) depending on diffusers version.
-            shape[-2] gives N in both cases (last dim is always 3 position coords).
-            """
-            if "img_ids" in kwargs:
-                _state["img_seq_len"] = kwargs["img_ids"].shape[-2]
-            return args, kwargs
-
-        h_t = transformer.register_forward_pre_hook(_transformer_img_ids_hook, with_kwargs=True)
-        handles.append(h_t)
+            inject_enc_hs = ctx_embedder(inject_enc_hs_raw.to(ctx_embedder.weight.dtype))
 
         target_ss_block = transformer.single_transformer_blocks[block_idx]
 
         def _ss_pre_hook(
             module: torch.nn.Module, args: tuple, kwargs: dict
         ) -> tuple[tuple, dict]:  # type: ignore[type-arg]
-            """Replace the text slice of fused hidden_states with inject embeddings.
-
-            FLUX concatenates before single-stream blocks as [txt_tokens, img_tokens].
-            hidden_states may arrive as args[0] or kwargs["hidden_states"] depending
-            on the diffusers version — handle both.
-            """
-            img_seq_len = _state["img_seq_len"]
-            if img_seq_len is None:
-                return args, kwargs
-
-            # Resolve hidden_states from positional or keyword arguments.
-            if args:
-                hidden = args[0]
-                via_kwargs = False
-            elif "hidden_states" in kwargs:
-                hidden = kwargs["hidden_states"]
-                via_kwargs = True
-            else:
-                return args, kwargs
-
-            # (B, txt_seq + img_seq, 3072) — derive txt_seq from shape.
-            total_seq = hidden.shape[1]
-            txt_seq_len_actual = total_seq - img_seq_len
-
-            if txt_seq_len_actual != inject_enc_proj.shape[1]:
-                log.debug(
-                    "SS block %d: txt seq mismatch actual=%d inject=%d — skipping",
-                    block_idx, txt_seq_len_actual, inject_enc_proj.shape[1],
-                )
-                return args, kwargs
-
-            img_part = hidden[:, txt_seq_len_actual:, :]
-            fused = torch.cat([inject_enc_proj.to(hidden.dtype), img_part], dim=1)
-
-            if via_kwargs:
-                kwargs = {**kwargs, "hidden_states": fused}
-            else:
-                args = (fused,) + args[1:]
+            """Replace encoder_hidden_states (text tokens) with inject embeddings."""
+            if "encoder_hidden_states" in kwargs:
+                kwargs = {**kwargs, "encoder_hidden_states": inject_enc_hs}
+            elif len(args) >= 2:
+                args = (args[0], inject_enc_hs) + args[2:]
             return args, kwargs
 
         h_ss = target_ss_block.register_forward_pre_hook(_ss_pre_hook, with_kwargs=True)
