@@ -1,0 +1,11 @@
+{
+  "exp_name": "d02_double_stream_2000steps",
+  "ai_score": 2.6,
+  "ai_notes": "Extended training at rank 16 weakens rather than strengthens style transfer, indicating content overfitting beyond ~1000 steps.",
+  "human_score": null,
+  "style_visible": "частично",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Регрессия стиля по сравнению с d01 — overfitting контента",
+  "reviewed_at": "2026-05-11T22:47:57Z"
+}

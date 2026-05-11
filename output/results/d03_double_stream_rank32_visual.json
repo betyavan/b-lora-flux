@@ -1,0 +1,11 @@
+{
+  "exp_name": "d03_double_stream_rank32",
+  "ai_score": 2.6,
+  "ai_notes": "Doubling LoRA rank to 32 at 1000 steps yields no improvement over rank 16.",
+  "human_score": null,
+  "style_visible": "частично",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Ранг 32 не улучшает стиль vs ранг 16 при том же бюджете шагов",
+  "reviewed_at": "2026-05-11T22:47:57Z"
+}

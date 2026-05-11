@@ -1,0 +1,11 @@
+{
+  "exp_name": "d01_double_stream_1000steps",
+  "ai_score": 2.8,
+  "ai_notes": "Early-stage style transfer is inconsistent — strong effect on outdoor scene with crowd, weak or absent on mechanical and monochrome subjects.",
+  "human_score": 3,
+  "style_visible": "да",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "есть классные картинки, а на остальных вообще стиля нет",
+  "reviewed_at": "2026-05-11T22:47:57Z"
+}

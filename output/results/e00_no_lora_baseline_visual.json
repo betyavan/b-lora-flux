@@ -1,0 +1,11 @@
+{
+  "exp_name": "e00_no_lora_baseline",
+  "ai_score": 2.0,
+  "ai_notes": "Crisp photorealistic outputs with zero Van Gogh style transfer, confirming the baseline produces no stylistic effect.",
+  "human_score": null,
+  "style_visible": "нет",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Baseline — без LoRA, стиль не ожидается",
+  "reviewed_at": "2026-05-11T22:47:57Z"
+}
