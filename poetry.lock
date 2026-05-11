@@ -6871,4 +6871,4 @@ reference = "tinkoff_pypi"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "9dd62872fd915fa2821d437483de5208e12df47047c6a89a4895c4fcc347c967"
+content-hash = "1304c8272948cdd5a09aee8374cc900fd8a19f1bf0fc4dbb5b1e2e8df330ade3"
