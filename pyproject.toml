@@ -16,6 +16,7 @@ python = ">=3.10,<3.11"
 # default PyPI torch wheels (cu13x) are incompatible with this driver.
 torch = { version = "2.5.1+cu121", source = "pytorch-cu121" }
 torchvision = { version = "0.20.1+cu121", source = "pytorch-cu121" }
+torchaudio = { version = "2.5.1+cu121", source = "pytorch-cu121" }
 diffusers = ">=0.30.0"
 transformers = ">=4.44.0"
 accelerate = ">=0.33.0"
@@ -162,6 +163,7 @@ module = [
     "clearml.*",
     "torch.*",
     "torchvision.*",
+    "torchaudio.*",
     "diffusers.*",
     "transformers.*",
     "accelerate.*",
