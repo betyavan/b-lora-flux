@@ -276,7 +276,7 @@ def compute_fid(generated_dir: Path, artbench_dir: Path) -> float:
     for label, d in [("generated_dir", generated_dir), ("artbench_dir", artbench_dir)]:
         if not d.is_dir():
             raise FileNotFoundError(f"{label} not found or not a directory: {d}")
-        imgs = [p for p in d.iterdir() if p.suffix.lower() in _IMAGE_EXTS]
+        imgs = [p for p in d.rglob("*") if p.is_file() and p.suffix.lower() in _IMAGE_EXTS]
         if not imgs:
             raise FileNotFoundError(f"No images found in {label}: {d}")
         log.info("%s: %d images", label, len(imgs))
