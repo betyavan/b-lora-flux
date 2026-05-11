@@ -2,7 +2,7 @@
         run run-group status update-plan pull-results configure install-hooks \
         check-infra smoke-run prepare-environment dvc-init dvc-setup-s3
 
-tag   ?= v0.0
+tag   ?= v0.1
 image ?= $(shell grep CORP_DOCKER_IMAGE infra.env 2>/dev/null | cut -d= -f2)
 EXP   ?= e01_blora_flux_van_gogh_img1
 GROUP ?= ablation_a
