@@ -30,7 +30,6 @@ REQUIRED: list[tuple[str, str]] = [
     ("torchmetrics", "torchmetrics"),
     ("lpips", "lpips"),
     ("cleanfid", "clean-fid"),
-    ("boto3", "boto3"),
     ("s3cmd", None),   # CLI tool, not a Python package — checked separately
 ]
 
