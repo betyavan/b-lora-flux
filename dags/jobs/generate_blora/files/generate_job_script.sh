@@ -5,6 +5,7 @@ set -e
 #   EXPERIMENT_NAME           — e.g. e01_blora_flux_van_gogh_img1
 #   TRAIN_OUTPUT_S3_PATH      — S3 path where LoRA weights were uploaded
 #   GENERATED_OUTPUT_S3_PATH  — S3 path to upload generated images
+#   PROMPT_SUFFIX             — (optional) appended to every COCO prompt, e.g. "painted in the style of Van Gogh"
 
 # 0. Verify Python environment
 cd /root/b-lora-flux
@@ -32,6 +33,7 @@ mkdir -p results/generated
 python scripts/eval/generate_images.py \
   "$LORA_ARG" \
   generate.prompt_file=data/coco_prompts.txt \
+  "generate.prompt_suffix=${PROMPT_SUFFIX:-}" \
   generate.output_dir=results/generated \
   generate.exp_name="$EXPERIMENT_NAME" \
   model.lora_scale="${LORA_SCALE:-1.0}"

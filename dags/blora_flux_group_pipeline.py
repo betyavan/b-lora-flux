@@ -185,6 +185,11 @@ with DAG(
             type="string",
             description="Base S3 path for all experiment data",
         ),
+        "PROMPT_SUFFIX": Param(
+            default="painted in the style of Van Gogh",
+            type="string",
+            description="Suffix appended to every COCO eval prompt (e.g. 'painted in the style of Van Gogh'). Set to empty string to disable.",
+        ),
     },
 ) as dag:
 
@@ -208,6 +213,7 @@ with DAG(
         run_ts = context["logical_date"].strftime("%Y%m%dT%H%M%S")
         group = params["GROUP"]
         phase3_base = params.get("PHASE3_BASE_EXP", "").strip()
+        prompt_suffix = params.get("PROMPT_SUFFIX", "").strip()
 
         env_dicts = []
         for exp in GROUP_EXPERIMENTS[group]:
@@ -215,6 +221,8 @@ with DAG(
                 "EXPERIMENT_NAME": exp,
                 "GENERATED_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/generated",
             }
+            if prompt_suffix:
+                env["PROMPT_SUFFIX"] = prompt_suffix
 
             # Phase 3: reuse trained LoRA from a base experiment; vary LORA_SCALE per variant.
             if exp in GROUP_LORA_SCALES:

@@ -20,12 +20,14 @@ from PIL import Image
 log = logging.getLogger(__name__)
 
 
-def _load_prompts(prompt_file: str) -> list[str]:
+def _load_prompts(prompt_file: str, suffix: str = "") -> list[str]:
     path = Path(prompt_file)
     if not path.exists():
         raise FileNotFoundError(f"Prompt file not found: {path}")
     prompts = [line.strip() for line in path.read_text().splitlines() if line.strip()]
-    log.info("Loaded %d prompts from %s", len(prompts), path)
+    if suffix:
+        prompts = [f"{p}, {suffix}" for p in prompts]
+    log.info("Loaded %d prompts from %s (suffix=%r)", len(prompts), path, suffix)
     return prompts
 
 
@@ -75,7 +77,7 @@ def main(cfg: DictConfig) -> None:
     out_dir = Path(cfg.generate.output_dir) / task_name
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    prompts = _load_prompts(cfg.generate.prompt_file)
+    prompts = _load_prompts(cfg.generate.prompt_file, cfg.generate.get("prompt_suffix", ""))
     pipe = _build_pipeline(cfg)
 
     base_seed = int(cfg.sampling.seed)

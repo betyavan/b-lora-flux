@@ -4,6 +4,7 @@
 generate:
   lora_path: null                         # path to .safetensors LoRA adapter; null = baseline (no LoRA)
   prompt_file: "data/coco_prompts.txt"    # one prompt per line, 100 lines for main eval
+  prompt_suffix: ""                       # appended to every prompt, e.g. "painted in the style of Van Gogh"
   output_dir: "output/generated"          # images saved as {exp_name}/{idx:04d}.png
   exp_name: "unnamed"                     # used as sub-folder and ClearML task name
 
