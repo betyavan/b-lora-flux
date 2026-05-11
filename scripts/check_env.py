@@ -30,7 +30,6 @@ REQUIRED: list[tuple[str, str]] = [
     ("torchmetrics", "torchmetrics"),
     ("lpips", "lpips"),
     ("cleanfid", "clean-fid"),
-    ("s3cmd", None),   # CLI tool, not a Python package — checked separately
 ]
 
 OPTIONAL: list[tuple[str, str]] = [
@@ -71,16 +70,6 @@ def main() -> None:
 
     print("Required packages:")
     for mod, pip in REQUIRED:
-        if mod == "s3cmd":
-            import subprocess
-            ok = subprocess.run(["which", "s3cmd"], capture_output=True).returncode == 0
-            status = "✓" if ok else "✗"
-            note = "" if ok else f"  ← install: pip install s3cmd"
-            print(f"  {status} s3cmd (CLI){note}")
-            if not ok:
-                failures.append("s3cmd")
-            continue
-
         err = _check_import(mod)
         if err is None:
             # Print version if available
