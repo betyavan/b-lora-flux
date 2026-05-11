@@ -12,7 +12,7 @@ RUN echo "deb http://repo-linux.tcsbank.ru/ubuntu/ focal multiverse main univers
     echo "deb http://repo-linux.tcsbank.ru/ubuntu/ focal-security multiverse main universe restricted" >> /etc/apt/sources.list && \
     echo "deb http://repo-linux.tcsbank.ru/ubuntu/ focal-updates multiverse main universe restricted" >> /etc/apt/sources.list
 
-ENV PIP_INDEX_URL=https://nexus.tcsbank.ru/repository/pypi-all/simple
+ENV PIP_INDEX_URL=https://artifactory.tcsbank.ru/artifactory/api/pypi/python-all/simple
 ENV TRANSFORMERS_CACHE="/root/huggingface_cache"
 ENV HF_HOME="/root/huggingface_cache"
 ENV IS_METRICS_NEEDED=0
@@ -39,8 +39,14 @@ RUN apt-get update && apt-get install -y \
 RUN pip install --upgrade pip wheel
 
 WORKDIR /root/b-lora-flux
+RUN pip install --no-cache-dir poetry
 COPY pyproject.toml poetry.lock /root/b-lora-flux/
-RUN poetry install --no-root
+RUN poetry config virtualenvs.create false
+RUN poetry lock
+RUN poetry install --no-root -v
+
+ENV PATH="$HOME/.local/bin:$PATH"
+ENV PYTHONPATH="${PYTHONPATH}:/root/"
 
 # WORKDIR /root/
 # RUN pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
