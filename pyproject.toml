@@ -55,6 +55,37 @@ typing-extensions = ">=4.9.0"
 PyYAML = ">=6.0"
 oyaml = ">=1.0"
 
+# ai-toolkit runtime deps (see src/ai-toolkit/requirements.txt; keep in sync)
+torchao = "0.10.0"
+lycoris-lora = "1.8.3"
+flatten-json = "*"
+tensorboard = "*"
+kornia = "*"
+invisible-watermark = "*"
+einops = "*"
+toml = "*"
+albumentations = "1.4.15"
+albucore = "0.0.16"
+pydantic = ">=2.0"
+k-diffusion = "*"
+open-clip-torch = "*"
+timm = "*"
+prodigyopt = "*"
+controlnet-aux = "0.0.10"
+python-dotenv = "*"
+bitsandbytes = "*"
+hf-transfer = "*"
+pytorch-fid = "*"
+optimum-quanto = "0.2.4"
+sentencepiece = "*"
+huggingface-hub = "*"
+gradio = "*"
+python-slugify = "*"
+opencv-python = "*"
+pytorch-wavelets = "1.3.0"
+matplotlib = "3.10.1"
+scipy = "1.12.0"
+
 # Dev tooling
 black = "^24.1.1"
 ruff = "^0.6.9"
@@ -141,6 +172,25 @@ module = [
     "lpips.*",
     "clean_fid.*",
     "cleanfid.*",
+    "einops.*",
+    "kornia.*",
+    "tensorboard.*",
+    "albumentations.*",
+    "k_diffusion.*",
+    "open_clip.*",
+    "timm.*",
+    "controlnet_aux.*",
+    "bitsandbytes.*",
+    "gradio.*",
+    "prodigyopt.*",
+    "lycoris.*",
+    "torchao.*",
+    "optimum.*",
+    "flatten_json.*",
+    "invisible_watermark.*",
+    "pytorch_wavelets.*",
+    "pytorch_fid.*",
+    "hf_transfer.*",
 ]
 ignore_missing_imports = true
 
