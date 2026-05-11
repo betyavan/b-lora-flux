@@ -12,11 +12,8 @@ python = ">=3.10,<3.11"
 
 
 # ML core (run on H100)
-# NOTE: pinned to cu121 wheels — host driver is 535.x (max CUDA 12.2);
-# default PyPI torch wheels (cu13x) are incompatible with this driver.
-torch = { version = "2.5.1+cu121", source = "pytorch-cu121" }
-torchvision = { version = "0.20.1+cu121", source = "pytorch-cu121" }
-torchaudio = { version = "2.5.1+cu121", source = "pytorch-cu121" }
+torch = { version = "2.5.1", source = "tinkoff_pypi" }
+torchvision = { version = "0.20.1", source = "tinkoff_pypi" }
 diffusers = ">=0.30.0"
 transformers = ">=4.44.0"
 accelerate = ">=0.33.0"
@@ -220,10 +217,5 @@ markers = [
 
 [[tool.poetry.source]]
 name = "tinkoff_pypi"
-url = "https://artifactory.tcsbank.ru/artifactory/api/pypi/python-all/simple/"
+url = "https://artifactory.tcsbank.ru/artifactory/api/pypi/python-all/simple"
 priority = "primary"
-
-[[tool.poetry.source]]
-name = "pytorch-cu121"
-url = "https://download.pytorch.org/whl/cu121"
-priority = "explicit"
