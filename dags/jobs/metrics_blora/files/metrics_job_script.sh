@@ -17,18 +17,30 @@ dvc pull data/styles.dvc data/artbench10.dvc data/coco_prompts.txt.dvc
 mkdir -p "results/generated/${EXPERIMENT_NAME}"
 s3cmd sync -v "${GENERATED_OUTPUT_S3_PATH%/}/" "results/generated/${EXPERIMENT_NAME}/"
 
-# 2. Determine style refs dir from experiment name
-if echo "$EXPERIMENT_NAME" | grep -q "van_gogh"; then
-  STYLE_REFS_DIR="data/styles/van_gogh"
-elif echo "$EXPERIMENT_NAME" | grep -q "monet"; then
-  STYLE_REFS_DIR="data/styles/monet"
-elif echo "$EXPERIMENT_NAME" | grep -qE "^[abc][0-9]+_"; then
-  # Ablation groups a/b/c all train on van_gogh/img1 — use full van_gogh dir for eval
-  STYLE_REFS_DIR="data/styles/van_gogh"
+# 2. Determine style refs dir from experiment config YAML (folder_path field)
+STYLE_REFS_DIR="null"
+EXP_CONFIG="/root/b-lora-flux/configs/experiments/${EXPERIMENT_NAME}.yaml"
+
+if [ -f "$EXP_CONFIG" ]; then
+  FOLDER_PATH=$(grep -m1 "folder_path:" "$EXP_CONFIG" | sed 's/.*folder_path: "\(.*\)".*/\1/' | tr -d ' ')
+  if echo "$FOLDER_PATH" | grep -q "van_gogh"; then
+    STYLE_REFS_DIR="data/styles/van_gogh"
+  elif echo "$FOLDER_PATH" | grep -q "monet"; then
+    STYLE_REFS_DIR="data/styles/monet"
+  else
+    # No folder_path (inference-only / no-training baseline) — fall back to name, then default
+    if echo "$EXPERIMENT_NAME" | grep -q "monet"; then
+      STYLE_REFS_DIR="data/styles/monet"
+    else
+      # Covers e00 baseline, g0x alpha ablations, gs0x split-alpha — all use van_gogh refs
+      STYLE_REFS_DIR="data/styles/van_gogh"
+    fi
+  fi
 else
-  echo "WARNING: Cannot determine style from '${EXPERIMENT_NAME}', skipping style metrics"
-  STYLE_REFS_DIR="null"
+  echo "WARNING: Config not found at $EXP_CONFIG, cannot determine style refs"
 fi
+
+echo "Style refs dir: $STYLE_REFS_DIR"
 
 # 3. Compute metrics
 python scripts/eval/compute_metrics.py \
