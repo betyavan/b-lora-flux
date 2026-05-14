@@ -127,15 +127,34 @@ GROUP_EXPERIMENTS = {
     ],
 }
 
-# Per-experiment LORA_SCALE overrides for inference-only groups (Phase 3).
+# Per-experiment LORA_SCALE overrides.
 # The generate step reads LORA_SCALE env var (default 1.0); entries here override it.
+# Phase 3: varied per-experiment. Phase 4+: fixed to 0.7 (G03 winner, Phase 3.1).
 GROUP_LORA_SCALES: dict[str, float] = {
+    # Phase 3.1 — alpha ablation
     "g01_alpha_0.3": 0.3,
     "g02_alpha_0.5": 0.5,
     "g03_alpha_0.7": 0.7,
     "g04_alpha_1.0": 1.0,
     "g05_alpha_1.5": 1.5,
     "g06_alpha_2.0": 2.0,
+    # Phase 4 — method comparison (alpha=0.7, G03 winner)
+    "e01_blora_flux_van_gogh_img1": 0.7,
+    "e01_blora_flux_van_gogh_img2": 0.7,
+    "e01_blora_flux_van_gogh_img3": 0.7,
+    "e01_blora_flux_van_gogh_img4": 0.7,
+    "e01_blora_flux_monet_img1": 0.7,
+    "e01_blora_flux_monet_img2": 0.7,
+    "e01_blora_flux_monet_img3": 0.7,
+    "e01_blora_flux_monet_img4": 0.7,
+    "e02_full_lora_flux_van_gogh_img1": 0.7,
+    "e02_full_lora_flux_van_gogh_img2": 0.7,
+    "e02_full_lora_flux_van_gogh_img3": 0.7,
+    "e02_full_lora_flux_van_gogh_img4": 0.7,
+    "e02_full_lora_flux_monet_img1": 0.7,
+    "e02_full_lora_flux_monet_img2": 0.7,
+    "e02_full_lora_flux_monet_img3": 0.7,
+    "e02_full_lora_flux_monet_img4": 0.7,
 }
 
 
