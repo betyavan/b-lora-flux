@@ -1,0 +1,11 @@
+{
+  "exp_name": "e01_blora_flux_monet_img1",
+  "ai_score": 3.0,
+  "ai_notes": "Inconsistent Monet transfer. Best on natural outdoor subjects (0004,0007,0008). Complete failure on 0003 (grayscale collapse). Partial transfer on modern objects.",
+  "human_score": 3,
+  "style_visible": "частично",
+  "content_preserved": "да",
+  "artifacts": "есть",
+  "comment": "Monet сложнее Van Gogh, но B-LoRA чуть лучше",
+  "reviewed_at": "2026-05-14T22:06:25.522226Z"
+}

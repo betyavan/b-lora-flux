@@ -1,0 +1,11 @@
+{
+  "exp_name": "e02_full_lora_flux_monet_img1",
+  "ai_score": 2.9,
+  "ai_notes": "Borderline ok/poor. Same failure pattern as e01 but style less specific — drifts to generic oil painting rather than Monet impressionism. Single-image full LoRA learns diffuse painterly prior.",
+  "human_score": 3,
+  "style_visible": "частично",
+  "content_preserved": "да",
+  "artifacts": "есть",
+  "comment": "Чуть хуже B-LoRA на Моне, generic oil-paint вместо Моне",
+  "reviewed_at": "2026-05-14T22:06:25.522226Z"
+}

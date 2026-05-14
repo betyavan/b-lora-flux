@@ -1,0 +1,11 @@
+{
+  "exp_name": "e01_blora_flux_van_gogh_img1",
+  "ai_score": 3.9,
+  "ai_notes": "Strong Van Gogh stylization in 7/10 images. Failure modes: style collapse on park bench (0002), color collapse to monochrome (0003). Swirling brushstrokes, yellow-blue palette, impasto texture well reproduced.",
+  "human_score": 4,
+  "style_visible": "да",
+  "content_preserved": "да",
+  "artifacts": "есть",
+  "comment": "Чуть покрасивее full LoRA, провалы на 0002/0003 общие для всех методов",
+  "reviewed_at": "2026-05-14T22:06:25.522226Z"
+}

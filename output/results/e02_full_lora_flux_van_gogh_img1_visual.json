@@ -1,0 +1,11 @@
+{
+  "exp_name": "e02_full_lora_flux_van_gogh_img1",
+  "ai_score": 3.8,
+  "ai_notes": "Comparable to B-LoRA. 7/10 score 4-5. Same failure prompts (0002, 0003). Slightly more variance.",
+  "human_score": 4,
+  "style_visible": "да",
+  "content_preserved": "да",
+  "artifacts": "есть",
+  "comment": "Практически идентично B-LoRA визуально",
+  "reviewed_at": "2026-05-14T22:06:25.522226Z"
+}

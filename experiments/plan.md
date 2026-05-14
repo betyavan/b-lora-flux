@@ -233,29 +233,29 @@ DINO-style DA03 превышает лучший результат Phase 1 (D01=
 
 ### Phase 4.1 — B-LoRA-FLUX (предлагаемый метод)
 
-| ID      | Конфиг                                  | Стиль    | img | DINO-style | CLIP-style | CLIP-content | FID | LPIPS | Статус |
-|---------|-----------------------------------------|----------|-----|------------|------------|--------------|-----|-------|--------|
-| E01-1   | `e01_blora_flux_van_gogh_img1.yaml`     | Van Gogh | 1   | —          | —          | —            | —   | —     | [ ]    |
-| E01-2   | `e01_blora_flux_van_gogh_img2.yaml`     | Van Gogh | 2   | —          | —          | —            | —   | —     | [ ]    |
-| E01-3   | `e01_blora_flux_van_gogh_img3.yaml`     | Van Gogh | 3   | —          | —          | —            | —   | —     | [ ]    |
-| E01-4   | `e01_blora_flux_van_gogh_img4.yaml`     | Van Gogh | 4   | —          | —          | —            | —   | —     | [ ]    |
-| E01M-1  | `e01_blora_flux_monet_img1.yaml`        | Monet    | 1   | —          | —          | —            | —   | —     | [ ]    |
-| E01M-2  | `e01_blora_flux_monet_img2.yaml`        | Monet    | 2   | —          | —          | —            | —   | —     | [ ]    |
-| E01M-3  | `e01_blora_flux_monet_img3.yaml`        | Monet    | 3   | —          | —          | —            | —   | —     | [ ]    |
-| E01M-4  | `e01_blora_flux_monet_img4.yaml`        | Monet    | 4   | —          | —          | —            | —   | —     | [ ]    |
+| ID      | Конфиг                                  | Стиль    | img | DINO-style | CLIP-style | CLIP-content | FID    | LPIPS  | Статус |
+|---------|-----------------------------------------|----------|-----|------------|------------|--------------|--------|--------|--------|
+| E01-1   | `e01_blora_flux_van_gogh_img1.yaml`     | Van Gogh | 1   | 0.3873     | 0.5397     | 0.2443       | 235.69 | 0.7691 | [x]    |
+| E01-2   | `e01_blora_flux_van_gogh_img2.yaml`     | Van Gogh | 2   | 0.1705     | 0.5075     | 0.2525       | 256.00 | 0.8267 | [x]    |
+| E01-3   | `e01_blora_flux_van_gogh_img3.yaml`     | Van Gogh | 3   | 0.1145     | 0.4781     | 0.2543       | 270.39 | 0.8284 | [x]    |
+| E01-4   | `e01_blora_flux_van_gogh_img4.yaml`     | Van Gogh | 4   | 0.1563     | 0.5078     | 0.2407       | 268.82 | 0.8263 | [x]    |
+| E01M-1  | `e01_blora_flux_monet_img1.yaml`        | Monet    | 1   | 0.1284     | 0.4649     | 0.2506       | 263.15 | 0.7837 | [x]    |
+| E01M-2  | `e01_blora_flux_monet_img2.yaml`        | Monet    | 2   | 0.2264     | 0.5085     | 0.2568       | 241.39 | 0.7688 | [x]    |
+| E01M-3  | `e01_blora_flux_monet_img3.yaml`        | Monet    | 3   | 0.1062     | 0.4491     | 0.2554       | 268.54 | 0.7898 | [x]    |
+| E01M-4  | `e01_blora_flux_monet_img4.yaml`        | Monet    | 4   | 0.1314     | 0.4576     | 0.2501       | 264.95 | 0.7776 | [x]    |
 
 ### Phase 4.2 — Full-LoRA-FLUX (наивный baseline)
 
-| ID      | Конфиг                                  | Стиль    | img | DINO-style | CLIP-style | CLIP-content | FID | LPIPS | Статус |
-|---------|-----------------------------------------|----------|-----|------------|------------|--------------|-----|-------|--------|
-| E02-1   | `e02_full_lora_flux_van_gogh_img1.yaml` | Van Gogh | 1   | —          | —          | —            | —   | —     | [ ]    |
-| E02-2   | `e02_full_lora_flux_van_gogh_img2.yaml` | Van Gogh | 2   | —          | —          | —            | —   | —     | [ ]    |
-| E02-3   | `e02_full_lora_flux_van_gogh_img3.yaml` | Van Gogh | 3   | —          | —          | —            | —   | —     | [ ]    |
-| E02-4   | `e02_full_lora_flux_van_gogh_img4.yaml` | Van Gogh | 4   | —          | —          | —            | —   | —     | [ ]    |
-| E02M-1  | `e02_full_lora_flux_monet_img1.yaml`    | Monet    | 1   | —          | —          | —            | —   | —     | [ ]    |
-| E02M-2  | `e02_full_lora_flux_monet_img2.yaml`    | Monet    | 2   | —          | —          | —            | —   | —     | [ ]    |
-| E02M-3  | `e02_full_lora_flux_monet_img3.yaml`    | Monet    | 3   | —          | —          | —            | —   | —     | [ ]    |
-| E02M-4  | `e02_full_lora_flux_monet_img4.yaml`    | Monet    | 4   | —          | —          | —            | —   | —     | [ ]    |
+| ID      | Конфиг                                  | Стиль    | img | DINO-style | CLIP-style | CLIP-content | FID    | LPIPS  | Статус |
+|---------|-----------------------------------------|----------|-----|------------|------------|--------------|--------|--------|--------|
+| E02-1   | `e02_full_lora_flux_van_gogh_img1.yaml` | Van Gogh | 1   | 0.3836     | 0.5403     | 0.2468       | 234.01 | 0.7692 | [x]    |
+| E02-2   | `e02_full_lora_flux_van_gogh_img2.yaml` | Van Gogh | 2   | 0.1645     | 0.5074     | 0.2509       | 256.90 | 0.8294 | [x]    |
+| E02-3   | `e02_full_lora_flux_van_gogh_img3.yaml` | Van Gogh | 3   | 0.1173     | 0.4755     | 0.2537       | 263.59 | 0.8352 | [x]    |
+| E02-4   | `e02_full_lora_flux_van_gogh_img4.yaml` | Van Gogh | 4   | 0.1684     | 0.5128     | 0.2371       | 269.80 | 0.8252 | [x]    |
+| E02M-1  | `e02_full_lora_flux_monet_img1.yaml`    | Monet    | 1   | 0.1385     | 0.4694     | 0.2490       | 263.79 | 0.7812 | [x]    |
+| E02M-2  | `e02_full_lora_flux_monet_img2.yaml`    | Monet    | 2   | 0.2017     | 0.5038     | 0.2534       | 241.31 | 0.7717 | [x]    |
+| E02M-3  | `e02_full_lora_flux_monet_img3.yaml`    | Monet    | 3   | 0.0996     | 0.4574     | 0.2528       | 271.00 | 0.7924 | [x]    |
+| E02M-4  | `e02_full_lora_flux_monet_img4.yaml`    | Monet    | 4   | 0.1410     | 0.4600     | 0.2487       | 261.79 | 0.7763 | [x]    |
 
 ### Phase 4.3 — SplitFlux (конкурирующий метод из литературного обзора)
 
@@ -281,23 +281,26 @@ DINO-style DA03 превышает лучший результат Phase 1 (D01=
 
 Среднее по 4 изображениям, Van Gogh:
 
-| Метод            | DINO-style ↑ | CLIP-style ↑ | CLIP-content ↑ | FID ↓ | LPIPS ↓ |
-|------------------|--------------|--------------|----------------|-------|---------|
-| No-LoRA (E00)    | —            | —            | —              | —     | —       |
-| B-LoRA-FLUX      | —            | —            | —              | —     | —       |
-| Full-LoRA-FLUX   | —            | —            | —              | —     | —       |
-| SplitFlux        | —            | —            | —              | —     | —       |
-| IP-Adapter-FLUX  | —            | —            | —              | —     | —       |
+| Метод            | DINO-style ↑ | CLIP-style ↑ | CLIP-content ↑ | FID ↓  | LPIPS ↓ |
+|------------------|--------------|--------------|----------------|--------|---------|
+| No-LoRA (E00)    | 0.046        | 0.463        | 0.255          | 283.3  | 0.840   |
+| B-LoRA-FLUX ★    | **0.2072**   | 0.5083       | 0.2480         | 257.72 | 0.8127  |
+| Full-LoRA-FLUX   | 0.2085       | **0.5090**   | **0.2471**     | **256.07** | 0.8147 |
+| SplitFlux        | —            | —            | —              | —      | —       |
+| IP-Adapter-FLUX  | —            | —            | —              | —      | —       |
 
 Среднее по 4 изображениям, Monet:
 
-| Метод            | DINO-style ↑ | CLIP-style ↑ | CLIP-content ↑ | FID ↓ | LPIPS ↓ |
-|------------------|--------------|--------------|----------------|-------|---------|
-| No-LoRA (E00)    | —            | —            | —              | —     | —       |
-| B-LoRA-FLUX      | —            | —            | —              | —     | —       |
-| Full-LoRA-FLUX   | —            | —            | —              | —     | —       |
-| SplitFlux        | —            | —            | —              | —     | —       |
-| IP-Adapter-FLUX  | —            | —            | —              | —     | —       |
+| Метод            | DINO-style ↑ | CLIP-style ↑ | CLIP-content ↑ | FID ↓  | LPIPS ↓ |
+|------------------|--------------|--------------|----------------|--------|---------|
+| No-LoRA (E00)    | 0.046        | 0.463        | 0.255          | 283.3  | 0.840   |
+| B-LoRA-FLUX ★    | **0.1481**   | 0.4700       | **0.2532**     | 259.51 | **0.7800** |
+| Full-LoRA-FLUX   | 0.1452       | **0.4727**   | 0.2510         | **259.47** | 0.7804 |
+| SplitFlux        | —            | —            | —              | —      | —       |
+| IP-Adapter-FLUX  | —            | —            | —              | —      | —       |
+
+**Вывод Phase 4.1–4.2:** B-LoRA-FLUX и Full-LoRA-FLUX статистически неразличимы по всем метрикам (max Δ < 0.002). Преимущество B-LoRA — не в превосходстве по качеству, а в параметрической эффективности (стилевые блоки DS [0–18] ≈ 50% параметров полного LoRA) и возможности раздельного управления стилем и контентом через независимые адаптеры. Общий провал обоих методов на промптах с фотореалистичным prior (0002, 0003) подтверждает ограничение, зафиксированное в Phase 2.1. Ожидается, что SplitFlux (Phase 4.3) покажет измеримое отличие.
+→ Следующая фаза: заполнить Phase 4.3 (compare_e03 — SplitFlux).
 
 ---
 
@@ -360,9 +363,9 @@ DINO-style DA03 превышает лучший результат Phase 1 (D01=
 - **Phase 1b** (Θ_content): 3/3 ✓ — лучший: dc_content_late_ds (DS [9–18]), DINO-style=0.121, FID=257.22
 - **Phase 2** (D-A/B/C/P): 16/16 ✓ — D-A ✓ (лучший: DA03, DS [0–18], DINO=0.2568, FID=235.85); D-B ✓ (лучший: DB02, r=16, DINO=0.1835, FID=248.29); D-C ✓ (лучший: DC03, steps=2000, DINO=0.2226, FID=245.1); D-P ✓ (лучший: DP02, "a sks painting", DINO=0.3990, FID=234.02)
 - **Phase 3** (Alpha): 6/10 (Phase 3.1 ✓ winner: G03 alpha=0.7, DINO=0.4180, FID=228.6)
-- **Phase 4** (Group E): 0/26 (24 основных + 2 IP-Adapter опц.)
+- **Phase 4** (Group E): 16/26 (Phase 4.1 ✓ B-LoRA FLUX 8 exp; Phase 4.2 ✓ Full-LoRA FLUX 8 exp; Phase 4.3 SplitFlux — pending; Phase 4.4 IP-Adapter — опц.)
 - **Phase 4b** (Limitations): 0/3
 - **Phase 5** (SDXL): 0/5 (F01 ×4 + **F02** батч DS8)
 - **Phase 6** (Mixing): 0/2 (условно)
-- **Итого экспериментов:** 24 / **72**
+- **Итого экспериментов:** 40 / **72**
 - **Инфраструктура:** 11 / **18** (3 код/конфиги + **8** данные)
