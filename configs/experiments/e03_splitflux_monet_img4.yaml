@@ -1,7 +1,7 @@
 ---
 # E03M-4 — Phase 4.3: SplitFlux baseline, monet style image 4
-# SplitFlux: style LoRA trained on double-stream blocks [0–18] (competing approach to B-LoRA's single-stream).
-# Represents the hypothesis that double-stream blocks, not single-stream, carry style signal.
+# SplitFlux: style LoRA trained on single-stream blocks [0–37] (competing approach to B-LoRA's double-stream).
+# Tests the hypothesis that single-stream blocks can also carry style signal.
 job: extension
 config:
   name: "e03_splitflux_monet_img4"
@@ -15,25 +15,44 @@ config:
         linear_alpha: 16
         network_kwargs:
           only_if_contains:
-            - "transformer_blocks.0"
-            - "transformer_blocks.1"
-            - "transformer_blocks.2"
-            - "transformer_blocks.3"
-            - "transformer_blocks.4"
-            - "transformer_blocks.5"
-            - "transformer_blocks.6"
-            - "transformer_blocks.7"
-            - "transformer_blocks.8"
-            - "transformer_blocks.9"
-            - "transformer_blocks.10"
-            - "transformer_blocks.11"
-            - "transformer_blocks.12"
-            - "transformer_blocks.13"
-            - "transformer_blocks.14"
-            - "transformer_blocks.15"
-            - "transformer_blocks.16"
-            - "transformer_blocks.17"
-            - "transformer_blocks.18"
+            - "single_transformer_blocks.0"
+            - "single_transformer_blocks.1"
+            - "single_transformer_blocks.2"
+            - "single_transformer_blocks.3"
+            - "single_transformer_blocks.4"
+            - "single_transformer_blocks.5"
+            - "single_transformer_blocks.6"
+            - "single_transformer_blocks.7"
+            - "single_transformer_blocks.8"
+            - "single_transformer_blocks.9"
+            - "single_transformer_blocks.10"
+            - "single_transformer_blocks.11"
+            - "single_transformer_blocks.12"
+            - "single_transformer_blocks.13"
+            - "single_transformer_blocks.14"
+            - "single_transformer_blocks.15"
+            - "single_transformer_blocks.16"
+            - "single_transformer_blocks.17"
+            - "single_transformer_blocks.18"
+            - "single_transformer_blocks.19"
+            - "single_transformer_blocks.20"
+            - "single_transformer_blocks.21"
+            - "single_transformer_blocks.22"
+            - "single_transformer_blocks.23"
+            - "single_transformer_blocks.24"
+            - "single_transformer_blocks.25"
+            - "single_transformer_blocks.26"
+            - "single_transformer_blocks.27"
+            - "single_transformer_blocks.28"
+            - "single_transformer_blocks.29"
+            - "single_transformer_blocks.30"
+            - "single_transformer_blocks.31"
+            - "single_transformer_blocks.32"
+            - "single_transformer_blocks.33"
+            - "single_transformer_blocks.34"
+            - "single_transformer_blocks.35"
+            - "single_transformer_blocks.36"
+            - "single_transformer_blocks.37"
       save:
         dtype: float16
         save_every: 250
