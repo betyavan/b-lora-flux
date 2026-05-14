@@ -1,0 +1,11 @@
+{
+  "exp_name": "da04_ds_blocks_6_18",
+  "ai_score": 2,
+  "ai_notes": "No style visible. Without early blocks 0–5, stylization completely fails despite 13 blocks present.",
+  "human_score": 2,
+  "style_visible": "нет",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Поздние блоки 6–18 без ранних не дают стилизации. Блоки 0–5 критически необходимы.",
+  "reviewed_at": "2026-05-14T11:06:11.557355"
+}

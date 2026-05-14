@@ -1,0 +1,11 @@
+{
+  "exp_name": "da01_ds_blocks_0_6",
+  "ai_score": 2,
+  "ai_notes": "No style visible across all images. Strong photorealistic prior dominates. Modern objects (motorcycle, pizza, baseball) fully resist stylization.",
+  "human_score": 2,
+  "style_visible": "нет",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Ранние блоки 0–6 в одиночку недостаточны для переноса стиля. Стиль не проявляется даже на уровне отсылок.",
+  "reviewed_at": "2026-05-14T11:06:11.557355"
+}

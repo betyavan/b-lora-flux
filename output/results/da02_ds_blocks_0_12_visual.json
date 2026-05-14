@@ -1,0 +1,11 @@
+{
+  "exp_name": "da02_ds_blocks_0_12",
+  "ai_score": 3,
+  "ai_notes": "Partial style visible on some images (bench, baseball). Warm tones and painterly texture emerging but inconsistent.",
+  "human_score": 3,
+  "style_visible": "частично",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Стиль начинает проявляться при добавлении блоков 7–12. На современных объектах (мотоцикл, пицца) — по-прежнему только слабые 'отсылки'. На природных/фоновых сценах стиль заметнее.",
+  "reviewed_at": "2026-05-14T11:06:11.557355"
+}

@@ -1,0 +1,11 @@
+{
+  "exp_name": "da03_ds_blocks_0_18",
+  "ai_score": 4,
+  "ai_notes": "Best in group. Strongest stylization especially on baseball (score 5). Bench and backgrounds take style well. Modern foreground objects still resist.",
+  "human_score": 4,
+  "style_visible": "да",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Лучший результат группы. Наблюдается явная зависимость от семантики объекта: современные объекты (мотоцикл, пицца) сопротивляются стилизации — стиль виден только в виде 'отсылок' (экраны, знаки, фоны). Природные сцены и менее семантически нагруженные объекты принимают стиль значительно лучше. Это указывает на конкуренцию между photorealistic prior модели и стилевым сигналом LoRA.",
+  "reviewed_at": "2026-05-14T11:06:11.557355"
+}
