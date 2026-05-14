@@ -180,6 +180,11 @@ with DAG(
             type="string",
             description="(Phase 3 only) Experiment name whose trained LoRA is reused for all alpha variants",
         ),
+        "PHASE3_BASE_RUN_TS": Param(
+            default="",
+            type="string",
+            description="(Phase 3 only) run_ts of the Phase 2 run that produced PHASE3_BASE_EXP's LoRA (e.g. 20260514T131437). Required when PHASE3_BASE_EXP is set.",
+        ),
         "S3_BASE_PATH": Param(
             default=_S3_BASE_PATH_DEFAULT,
             type="string",
@@ -198,13 +203,22 @@ with DAG(
         params = context["params"]
         base = params["S3_BASE_PATH"].rstrip("/")
         run_ts = context["logical_date"].strftime("%Y%m%dT%H%M%S")
-        return [
-            {"env": {
+        phase3_base_exp = params.get("PHASE3_BASE_EXP", "").strip()
+        phase3_base_run_ts = params.get("PHASE3_BASE_RUN_TS", "").strip()
+
+        env_dicts = []
+        for exp in GROUP_EXPERIMENTS[params["GROUP"]]:
+            env: dict[str, str] = {
                 "EXPERIMENT_NAME": exp,
                 "TRAIN_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/loras",
-            }}
-            for exp in GROUP_EXPERIMENTS[params["GROUP"]]
-        ]
+            }
+            # Phase 3: pass base LoRA location so the train script can copy it into place
+            if phase3_base_exp and phase3_base_run_ts:
+                env["PHASE3_BASE_LORA_S3_PATH"] = (
+                    f"{base}/exp_logs/{phase3_base_run_ts}/{phase3_base_exp}/loras"
+                )
+            env_dicts.append({"env": env})
+        return env_dicts
 
     @task
     def prepare_generate_env_dicts(**context):
@@ -212,7 +226,6 @@ with DAG(
         base = params["S3_BASE_PATH"].rstrip("/")
         run_ts = context["logical_date"].strftime("%Y%m%dT%H%M%S")
         group = params["GROUP"]
-        phase3_base = params.get("PHASE3_BASE_EXP", "").strip()
         prompt_suffix = params.get("PROMPT_SUFFIX", "").strip()
 
         env_dicts = []
@@ -224,15 +237,10 @@ with DAG(
             if prompt_suffix:
                 env["PROMPT_SUFFIX"] = prompt_suffix
 
-            # Phase 3: reuse trained LoRA from a base experiment; vary LORA_SCALE per variant.
+            # Phase 3: vary LORA_SCALE per variant; LoRA was copied to per-experiment path by train step.
             if exp in GROUP_LORA_SCALES:
                 env["LORA_SCALE"] = str(GROUP_LORA_SCALES[exp])
-                if phase3_base:
-                    env["TRAIN_OUTPUT_S3_PATH"] = f"{base}/exp_logs/{run_ts}/{phase3_base}/loras"
-                else:
-                    env["TRAIN_OUTPUT_S3_PATH"] = f"{base}/exp_logs/{run_ts}/{exp}/loras"
-            else:
-                env["TRAIN_OUTPUT_S3_PATH"] = f"{base}/exp_logs/{run_ts}/{exp}/loras"
+            env["TRAIN_OUTPUT_S3_PATH"] = f"{base}/exp_logs/{run_ts}/{exp}/loras"
 
             env_dicts.append({"env": env})
         return env_dicts

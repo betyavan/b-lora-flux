@@ -18,8 +18,13 @@ print(len(process))
 ")
 
 if [ "$PROCESS_COUNT" -eq 0 ]; then
-  echo "INFO: ${EXPERIMENT_NAME} has no training process — skipping training (baseline mode)"
   mkdir -p results/loras
+  if [ -n "${PHASE3_BASE_LORA_S3_PATH:-}" ]; then
+    echo "INFO: ${EXPERIMENT_NAME} — Phase 3 mode: copying base LoRA from ${PHASE3_BASE_LORA_S3_PATH}"
+    s3cmd sync -v "${PHASE3_BASE_LORA_S3_PATH%/}/" results/loras/
+  else
+    echo "INFO: ${EXPERIMENT_NAME} has no training process — skipping training (baseline mode)"
+  fi
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) baseline_no_training" > results/loras/train_done.txt
   s3cmd sync -v --follow-symlinks results/loras/ "${TRAIN_OUTPUT_S3_PATH%/}/"
   exit 0
