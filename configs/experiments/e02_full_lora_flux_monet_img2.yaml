@@ -27,14 +27,14 @@ config:
           resolution: [512, 768, 1024]
       train:
         batch_size: 1
-        steps: 500
+        steps: 2000
         gradient_accumulation_steps: 1
         train_unet: true
         train_text_encoder: false
         gradient_checkpointing: true
         noise_scheduler: "flowmatch"
         optimizer: "adamw8bit"
-        lr: 1e-4
+        lr: 5e-5
         ema_config:
           use_ema: true
           ema_decay: 0.99

@@ -13,14 +13,25 @@ config:
         linear_alpha: 16
         network_kwargs:
           only_if_contains:
-            - "single_transformer_blocks.30"
-            - "single_transformer_blocks.31"
-            - "single_transformer_blocks.32"
-            - "single_transformer_blocks.33"
-            - "single_transformer_blocks.34"
-            - "single_transformer_blocks.35"
-            - "single_transformer_blocks.36"
-            - "single_transformer_blocks.37"
+            - "transformer_blocks.0"
+            - "transformer_blocks.1"
+            - "transformer_blocks.2"
+            - "transformer_blocks.3"
+            - "transformer_blocks.4"
+            - "transformer_blocks.5"
+            - "transformer_blocks.6"
+            - "transformer_blocks.7"
+            - "transformer_blocks.8"
+            - "transformer_blocks.9"
+            - "transformer_blocks.10"
+            - "transformer_blocks.11"
+            - "transformer_blocks.12"
+            - "transformer_blocks.13"
+            - "transformer_blocks.14"
+            - "transformer_blocks.15"
+            - "transformer_blocks.16"
+            - "transformer_blocks.17"
+            - "transformer_blocks.18"
       save:
         dtype: float16
         save_every: 250
@@ -35,14 +46,14 @@ config:
           resolution: [512, 768, 1024]
       train:
         batch_size: 1
-        steps: 500
+        steps: 2000
         gradient_accumulation_steps: 1
         train_unet: true
         train_text_encoder: false
         gradient_checkpointing: true
         noise_scheduler: "flowmatch"
         optimizer: "adamw8bit"
-        lr: 1e-4
+        lr: 5e-5
         ema_config:
           use_ema: true
           ema_decay: 0.99
