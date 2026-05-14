@@ -11,5 +11,5 @@ meta:
   alpha_style: 0.5
   alpha_content: 1.0
   phase: "3.2"
-  style_lora: "PHASE2_BEST"
-  content_lora: "DC_CONTENT_BEST"
+  style_lora: "dp02_prompt_sks_class"
+  content_lora: "dc_content_late_ds"

@@ -1,0 +1,37 @@
+{
+  "exp_name": "g03_alpha_0.7",
+  "ai_score": 5,
+  "ai_notes": "Эталонный баланс: вихревое небо, охра+синий, объекты детальны и читаемы во всех сценах",
+  "human_score": 5,
+  "style_visible": "да",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Winner phase3_alpha. alpha=0.7 — оптимум по FID (228.6) и балансу стиль/контент",
+  "reviewed_at": "2026-05-14T23:03:01.717278",
+  "group_summary": {
+    "g01_alpha_0.3": {
+      "human_score": 2,
+      "note": "Стиль отсутствует"
+    },
+    "g02_alpha_0.5": {
+      "human_score": 3,
+      "note": "Частичная стилизация"
+    },
+    "g03_alpha_0.7": {
+      "human_score": 5,
+      "note": "WINNER"
+    },
+    "g04_alpha_1.0": {
+      "human_score": 4,
+      "note": "Сильный стиль, нестабилен на сложных объектах"
+    },
+    "g05_alpha_1.5": {
+      "human_score": 3,
+      "note": "Деградация контента"
+    },
+    "g06_alpha_2.0": {
+      "human_score": 1,
+      "note": "Полный коллапс"
+    }
+  }
+}
