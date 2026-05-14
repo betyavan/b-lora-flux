@@ -1,0 +1,11 @@
+{
+  "exp_name": "dc03_steps_2000",
+  "ai_score": 3,
+  "ai_notes": "Стиль убедительно виден на пейзажных и городских сценах. Начинается content drift (река и пр. элементы из обучающего распределения).",
+  "human_score": 3,
+  "style_visible": "да",
+  "content_preserved": "частично",
+  "artifacts": "есть",
+  "comment": "Winner Phase 2.3. Лучший баланс стиля и контента, хотя overfit уже начинается.",
+  "reviewed_at": "2026-05-14T13:05:14Z"
+}

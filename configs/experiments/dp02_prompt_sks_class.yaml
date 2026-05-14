@@ -2,7 +2,6 @@
 # DP02 — Phase 2.4: training prompt "a sks painting"
 # Caption files at data/styles/van_gogh/img1_sks_class/*.txt must contain: "a sks painting"
 # Data prep: copy img1 images to img1_sks_class/ and write "a sks painting" to each .txt file.
-# PLACEHOLDER: update only_if_contains/linear after Phase 2.1–2.3 results.
 job: extension
 config:
   name: "dp02_prompt_sks_class"
@@ -50,7 +49,7 @@ config:
           resolution: [512, 768, 1024]
       train:
         batch_size: 1
-        steps: 1000
+        steps: 2000
         gradient_accumulation_steps: 1
         train_unet: true
         train_text_encoder: false

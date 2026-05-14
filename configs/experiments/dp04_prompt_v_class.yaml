@@ -3,7 +3,6 @@
 # Caption files at data/styles/van_gogh/img1_v_class/*.txt must contain:
 #   "a [v] painting in [s] style"
 # Data prep: copy img1 images to img1_v_class/ and write that prompt to each .txt file.
-# PLACEHOLDER: update only_if_contains/linear after Phase 2.1–2.3 results.
 job: extension
 config:
   name: "dp04_prompt_v_class"
@@ -51,7 +50,7 @@ config:
           resolution: [512, 768, 1024]
       train:
         batch_size: 1
-        steps: 1000
+        steps: 2000
         gradient_accumulation_steps: 1
         train_unet: true
         train_text_encoder: false

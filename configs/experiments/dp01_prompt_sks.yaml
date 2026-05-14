@@ -1,7 +1,6 @@
 ---
-# DP01 — Phase 2.4: training prompt "a sks", best config from DA+DB+DC (placeholder: DS[0–18], r=16, 1000 steps)
+# DP01 — Phase 2.4: training prompt "a sks", best config from DA+DB+DC (DS[0–18], r=16, 2000 steps)
 # Caption files at data/styles/van_gogh/img1/*.txt must contain: "a sks"
-# PLACEHOLDER: update only_if_contains/linear after Phase 2.1–2.3 results.
 job: extension
 config:
   name: "dp01_prompt_sks"
@@ -49,7 +48,7 @@ config:
           resolution: [512, 768, 1024]
       train:
         batch_size: 1
-        steps: 1000
+        steps: 2000
         gradient_accumulation_steps: 1
         train_unet: true
         train_text_encoder: false
