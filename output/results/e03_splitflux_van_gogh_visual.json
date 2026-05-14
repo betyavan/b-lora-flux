@@ -1,0 +1,11 @@
+{
+  "exp_name": "e03_splitflux_van_gogh_img1",
+  "ai_score": 4,
+  "ai_notes": "Strong van Gogh transfer in 3/5 images (swirling brushwork, vivid palette). 2 images show prompt-sensitivity issues: one collapses to decal rather than global style, one loses color saturation. Content well-preserved across all 5.",
+  "human_score": 4,
+  "style_visible": "да",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Согласен с AI. SplitFlux хорошо работает для текстурных стилей типа ван Гог.",
+  "reviewed_at": "2026-05-15T00:00:00"
+}

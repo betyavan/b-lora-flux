@@ -1,0 +1,11 @@
+{
+  "exp_name": "e03_splitflux_monet_img1",
+  "ai_score": 2,
+  "ai_notes": "Poor Monet transfer: 3/5 images show no impressionist characteristics (photorealistic or monochromatic). 2 partial successes achieve warm palette shift only, without broken-color brushwork. Block partition insufficient for color-harmony styles.",
+  "human_score": 2,
+  "style_visible": "нет",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Согласен с AI. Моне не работает — SplitFlux не захватывает атмосферные/цветовые стили.",
+  "reviewed_at": "2026-05-15T00:00:00"
+}
