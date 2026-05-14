@@ -1,0 +1,11 @@
+{
+  "exp_name": "db04_rank_64",
+  "ai_score": 4,
+  "ai_notes": "Сильная стилизация, близка к rank_32, нет заметного улучшения vs rank_16",
+  "human_score": 4,
+  "style_visible": "да",
+  "content_preserved": "да",
+  "artifacts": "незначительные",
+  "comment": "Стиль виден только на пейзажах и игрушках.",
+  "reviewed_at": "2026-05-14T12:35:06.275431"
+}
