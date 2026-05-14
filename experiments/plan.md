@@ -180,12 +180,18 @@ DINO-style DA03 превышает лучший результат Phase 1 (D01=
 
 Блоки = DS [0–18] (DA03), r = 16 (DB02, winner Phase 2.2), steps = 2000 (DC03, winner Phase 2.3).
 
-| ID   | Конфиг                         | Training prompt                | DINO-style | CLIP-content | Статус |
-|------|--------------------------------|--------------------------------|------------|--------------|--------|
-| DP01 | `dp01_prompt_sks.yaml`         | "a sks"                        | —          | —            | [ ]    |
-| DP02 | `dp02_prompt_sks_class.yaml`   | "a sks painting"               | —          | —            | [ ]    |
-| DP03 | `dp03_prompt_v.yaml`           | "a [v]"                        | —          | —            | [ ]    |
-| DP04 | `dp04_prompt_v_class.yaml`     | "a [v] painting in [s] style"  | —          | —            | [ ]    |
+| ID   | Конфиг                         | Training prompt                | DINO-style | CLIP-style | CLIP-content | FID    | LPIPS  | Статус |
+|------|--------------------------------|--------------------------------|------------|------------|--------------|--------|--------|--------|
+| DP01 | `dp01_prompt_sks.yaml`         | "a sks"                        | 0.3149     | 0.5582     | 0.2281       | 241.34 | 0.7735 | [x]    |
+| DP02 | `dp02_prompt_sks_class.yaml`   | "a sks painting"               | **0.3990** | **0.6023** | 0.2144       | 234.02 | **0.7457** | [x] ★  |
+| DP03 | `dp03_prompt_v.yaml`           | "a [v]"                        | 0.2004     | 0.4946     | **0.2466**   | 250.77 | 0.7906 | [x]    |
+| DP04 | `dp04_prompt_v_class.yaml`     | "a [v] painting in [s] style"  | 0.3935     | 0.6016     | 0.2194       | **233.01** | 0.7476 | [x]    |
+
+★ winner Phase 2.4 — "a sks painting" оптимально (лучший DINO-style и CLIP-style при разумном FID)
+
+**Вывод Phase 2.4:** добавление class word "painting" — ключевой фактор. С ним (DP02, DP04) стилевые метрики существенно выше: сравнение DP01 vs DP02: +0.084 DINO-style, +7.3 FID, -0.028 LPIPS. Токен `[v]` без class word (DP03) — худший результат серии (DINO=0.2004, FID=250.77): DiT не связывает безсемантический токен с доменом живописи. DP02 и DP04 практически равны по метрикам; DP02 выбран winner как более простой формат промпта.
+
+→ Следующая фаза (Phase 3): зафиксировать лучший `lora_scale` при `base_exp = dp02_prompt_sks_class`.
 
 ---
 
@@ -346,11 +352,11 @@ DINO-style DA03 превышает лучший результат Phase 1 (D01=
 - **Phase 0** (Block analysis): 3/3 ✓
 - **Phase 1** (diag_d): 4/4 ✓ — лучший: d01 (r=16, 1000 steps), DINO-style=0.191, FID=246.3
 - **Phase 1b** (Θ_content): 3/3 ✓ — лучший: dc_content_late_ds (DS [9–18]), DINO-style=0.121, FID=257.22
-- **Phase 2** (D-A/B/C/P): 12/16 — D-A ✓ (лучший: DA03, DS [0–18], DINO=0.2568, FID=235.85); D-B ✓ (лучший: DB02, r=16, DINO=0.1835, FID=248.29); D-C ✓ (лучший: DC03, steps=2000, DINO=0.2226, FID=245.1)
+- **Phase 2** (D-A/B/C/P): 16/16 ✓ — D-A ✓ (лучший: DA03, DS [0–18], DINO=0.2568, FID=235.85); D-B ✓ (лучший: DB02, r=16, DINO=0.1835, FID=248.29); D-C ✓ (лучший: DC03, steps=2000, DINO=0.2226, FID=245.1); D-P ✓ (лучший: DP02, "a sks painting", DINO=0.3990, FID=234.02)
 - **Phase 3** (Alpha): 0/10 (6 + 4 условно)
 - **Phase 4** (Group E): 0/26 (24 основных + 2 IP-Adapter опц.)
 - **Phase 4b** (Limitations): 0/3
 - **Phase 5** (SDXL): 0/5 (F01 ×4 + **F02** батч DS8)
 - **Phase 6** (Mixing): 0/2 (условно)
-- **Итого экспериментов:** 14 / **72**
+- **Итого экспериментов:** 18 / **72**
 - **Инфраструктура:** 11 / **18** (3 код/конфиги + **8** данные)

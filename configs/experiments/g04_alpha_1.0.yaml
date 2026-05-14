@@ -11,4 +11,4 @@ meta:
   version: '1.0'
   lora_scale: 1.0
   phase: "3.1"
-  base_exp: "PHASE2_BEST"
+  base_exp: "dp02_prompt_sks_class"
