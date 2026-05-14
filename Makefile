@@ -1,6 +1,6 @@
 .PHONY: export infer train docker docker-push check refactor lint show install isort black mdformat yamlfix mypy pylint mdlint test clean docs docs-serve \
         run run-group status update-plan pull-results configure install-hooks \
-        check-infra smoke-run prepare-environment dvc-init dvc-setup-s3
+        check-infra smoke-run prepare-environment dvc-init dvc-setup-s3 dvc-push
 
 tag ?= latest
 image ?= docker-hosted.artifactory.tcsbank.ru/tfusion-ml/$(notdir $(shell pwd))
@@ -55,6 +55,12 @@ prepare-environment:
 
 dvc-init:
 	dvc init
+
+## Push DVC-tracked data to S3.  Sources infra.env to apply the boto3
+## checksum workaround required by the corporate S3 endpoint.
+dvc-push:
+	@test -f infra.env || { echo "ERROR: infra.env not found."; exit 1; }
+	bash -c 'set -a && source infra.env && set +a && dvc push $(DVC_TARGET)'
 
 ## Write S3 credentials into .dvc/config.local (gitignored).
 ## Requires AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY to be exported.

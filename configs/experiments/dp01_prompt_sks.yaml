@@ -39,8 +39,8 @@ config:
         max_step_saves_to_keep: 2
         push_to_hub: false
       datasets:
-        # Caption txt files must contain: "a sks"  (same as base I08 captions)
-        - folder_path: "data/styles/van_gogh/img1"
+        # Caption txt files must contain: "a sks"
+        - folder_path: "data/styles/van_gogh/img1_sks"
           caption_ext: "txt"
           caption_dropout_rate: 0.05
           shuffle_tokens: false
