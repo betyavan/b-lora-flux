@@ -1,6 +1,6 @@
 ---
 # DC02 — Phase 2.3: 1000 steps, best blocks from DA (placeholder: DS [0–18]), r=16, Van Gogh img1
-# PLACEHOLDER: update only_if_contains and linear/linear_alpha after Phase 2.1/2.2 results.
+# Confirmed: DS [0-18] (DA03 winner) + r=16 (DB02 winner). Steps = 1000.
 job: extension
 config:
   name: "dc02_steps_1000"
