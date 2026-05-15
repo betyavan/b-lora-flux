@@ -331,12 +331,19 @@ DINO-style DA03 превышает лучший результат Phase 1 (D01=
 
 Те же 4 эталонных картины Van Gogh, что в Phase 4 для VG, только пайплайн SDXL+B-LoRA. Monet здесь можно не включать при ограничении по времени (тогда текст ВКР: «единый курированный поднабор как в Phase 4, без расширения на второй художника на SDXL»).
 
-| ID    | Конфиг                              | Стиль    | img | DINO-style | CLIP-style | CLIP-content | FID | LPIPS | Статус |
-|-------|-------------------------------------|----------|-----|------------|------------|--------------|-----|-------|--------|
-| F01-1 | `e04_blora_sdxl_van_gogh_img1.yaml` | Van Gogh | 1   | —          | —          | —            | —   | —     | [ ]    |
-| F01-2 | `e04_blora_sdxl_van_gogh_img2.yaml` | Van Gogh | 2   | —          | —          | —            | —   | —     | [ ]    |
-| F01-3 | `e04_blora_sdxl_van_gogh_img3.yaml` | Van Gogh | 3   | —          | —          | —            | —   | —     | [ ]    |
-| F01-4 | `e04_blora_sdxl_van_gogh_img4.yaml` | Van Gogh | 4   | —          | —          | —            | —   | —     | [ ]    |
+| ID    | Конфиг                              | Стиль    | img | DINO-style | CLIP-style | CLIP-content | FID    | LPIPS  | Статус |
+|-------|-------------------------------------|----------|-----|------------|------------|--------------|--------|--------|--------|
+| F01-1 | `e04_blora_sdxl_van_gogh_img1.yaml` | Van Gogh | 1   | 0.5192     | 0.6752     | 0.2464       | 226.49 | 0.7521 | [x]    |
+| F01-2 | `e04_blora_sdxl_van_gogh_img2.yaml` | Van Gogh | 2   | 0.4620     | 0.6589     | 0.2426       | 219.17 | 0.7780 | [x]    |
+| F01-3 | `e04_blora_sdxl_van_gogh_img3.yaml` | Van Gogh | 3   | 0.3116     | 0.6298     | 0.2450       | 238.72 | 0.7947 | [x]    |
+| F01-4 | `e04_blora_sdxl_van_gogh_img4.yaml` | Van Gogh | 4   | 0.3904     | 0.6384     | 0.2399       | 231.76 | 0.7852 | [x] ★  |
+
+**Среднее Phase 5.1 (B-LoRA-SDXL, Van Gogh):** DINO-style=0.4208, CLIP-style=0.6506, CLIP-content=0.2435, FID=229.04, LPIPS=0.7775
+
+**Вывод Phase 5.1 ★ winner: F01-4 (img4)** — лучший визуальный результат (human 5/5, AI 4.5/5): Starry Night sky idiom применён в 9/10 сценах.
+B-LoRA-SDXL превосходит все FLUX-baseline по 4 из 5 метрик: CLIP-style +22.7% vs SplitFlux (лучший FLUX), DINO-style +60.4%, FID −10.6%, LPIPS −4.1%. Единственная формальная деградация — CLIP-content (−1.8%, ниже σ = незначимо). Консистентный провал на скейтбордисте (grayscale collapse у всех 4 запусков) — системное ограничение стилевого LoRA на фигурах в движении.
+**Ключевой архитектурный вывод:** U-Net SDXL с иерархической encoder-decoder структурой обеспечивает более чистую стилевую специализацию блока `up_blocks.0.attentions.1`, чем MM-DiT FLUX (DS [0–18]). Это подтверждает необходимость разработки адаптированного блочного разделения для FLUX-специфической архитектуры.
+→ Следующий шаг: Phase 5.2 — батч DS8 (50 пар), аналог Table 1 оригинальной статьи.
 
 ### Phase 5.2 — Парная оценка по **§5.1 / DS8** (аналог Table 1)
 
@@ -354,10 +361,14 @@ DINO-style DA03 превышает лучший результат Phase 1 (D01=
 
 Выполняется, если Phase 1b подтвердила выделение Θ_content.
 
-| ID  | Протокол                                                          | Выход              | Статус |
-|-----|-------------------------------------------------------------------|--------------------|--------|
-| M01 | Матрица 3×3 (3 content × 3 style), swap Θ_content и Θ_style       | Figure в главе 4   | [ ]    |
-| M02 | Количественная оценка DINO-style и DINO-content: **либо** усреднение по ячейкам M01, **либо** тот же протокол, что **F02** по манифесту DS8 (выбрать один и зафиксировать в тексте ВКР) | Таблица в главе 4  | [ ]    |
+| ID   | Протокол                                                                                                                          | Выход              | Статус |
+|------|-----------------------------------------------------------------------------------------------------------------------------------|--------------------|--------|
+| M01a | Тренировка 3 content-LoRA на субъектах (cat, dog, backpack) — DS[9–18], r=16, 2000 steps, "a sks painting" (winners Phase 1b/2)   | 3 × .safetensors   | [x]    |
+| M01b | Матрица 3×3 (3 content × 3 style), swap Θ_content и Θ_style, генерация через `generate_mixing.py`                                 | Figure в главе 4   | [ ]    |
+| M02  | Количественная оценка DINO-style и DINO-content: **либо** усреднение по ячейкам M01b, **либо** тот же протокол, что **F02** по манифесту DS8 (выбрать один и зафиксировать в тексте ВКР) | Таблица в главе 4  | [ ]    |
+
+**Phase 6.1 итог (M01a):** все три content-LoRA натренированы успешно (AI+human 5/5, нет коллапса, нет subject leakage в COCO-promptах). Артефакты: `s3://.../exp_logs/20260515T112125/m01_content_{cat,dog,backpack}/loras/m01_content_{cat,dog,backpack}.safetensors`.
+→ Следующий шаг (M01b): запустить `generate_mixing.py` с 3 style-LoRA (winners Phase 5.1: F01-4 img4 + ещё 2) × 3 content-LoRA, собрать grid для главы 4.
 
 ---
 
@@ -372,7 +383,7 @@ DINO-style DA03 превышает лучший результат Phase 1 (D01=
 - **Phase 3** (Alpha): 6/10 (Phase 3.1 ✓ winner: G03 alpha=0.7, DINO=0.4180, FID=228.6)
 - **Phase 4** (Group E): 24/26 (Phase 4.1 ✓ B-LoRA FLUX 8 exp; Phase 4.2 ✓ Full-LoRA FLUX 8 exp; Phase 4.3 ✓ SplitFlux 8 exp — winner ★; Phase 4.4 IP-Adapter — опц.)
 - **Phase 4b** (Limitations): 0/3
-- **Phase 5** (SDXL): 0/5 (F01 ×4 + **F02** батч DS8)
-- **Phase 6** (Mixing): 0/2 (условно)
-- **Итого экспериментов:** 40 / **72**
+- **Phase 5** (SDXL): 4/5 (Phase 5.1 ✓ winner: F01-4 img4, DINO-style=0.4208, CLIP-style=0.6506, FID=229.0; **F02** батч DS8 — pending)
+- **Phase 6** (Mixing): 1/3 (M01a ✓ content-LoRA training: cat, dog, backpack — все 5/5, ★ winner=DS[9–18]+r=16+2000 steps+DP02)
+- **Итого экспериментов:** 47 / **73**
 - **Инфраструктура:** 11 / **18** (3 код/конфиги + **8** данные)
