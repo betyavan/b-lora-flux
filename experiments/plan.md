@@ -351,7 +351,16 @@ B-LoRA-SDXL превосходит все FLUX-baseline по 4 из 5 метри
 
 | ID   | Описание | Метрики | Статус |
 |------|----------|---------|--------|
-| F02  | Батч-прогон по 50 парам DS8: B-LoRA-SDXL (+ baselines по возможности) | Table 1–style (DINO-style sim), Table 1–content (DINO-content sim); опц. поднабор **30** пар для user study | [ ]    |
+| F02  | Батч-прогон по 50 парам DS8: B-LoRA-SDXL (+ baselines по возможности) | Table 1–style (DINO-style sim), Table 1–content (DINO-content sim); опц. поднабор **30** пар для user study | ⏳ инфра готова, ждёт launch |
+
+**F02 готовность (2026-05-15):**
+- 4 Monet style configs `configs/experiments/e04_blora_sdxl_monet_img[1-4].yaml` (r=16, 500 steps, paritet с Phase 5.1)
+- 8 content configs `configs/experiments/m02_content_sdxl_{backpack,bear,bowl,can,cat,clock,dog,vase}.yaml` (block `up_blocks.0.attentions.0`)
+- `scripts/eval/generate_mixing_sdxl.py` + `configs/eval/mixing_sdxl.yaml` — pair-driver, генерирует одно изображение на пару
+- `scripts/eval/compute_f02_metrics.py` + `configs/eval/f02_metrics.yaml` — DINO-style/DINO-content по парам + Table 1 JSON
+- DAG: `GROUP_EXPERIMENTS["phase_5_2_f02"]` (12 trainings) + `_BATCH_INFERENCE_GROUPS` гасит per-experiment generate/metrics + новый job `dags/jobs/mixing_sdxl_f02/` (mlc preset + shell + s3cfg)
+- 4 van_gogh-SDXL LoRA из Phase 4.4 (run_ts `20260515T083526`) переиспользуются через Airflow Param `STYLE_VG_RUN_TS`
+- Запуск: `make run-group GROUP=phase_5_2_f02`; subset `PAIR_SUBSET=user_study` для 30 пар
 
 **Зависимости:** D08, I01 (две косинусные метрики по референс-картинкам), I10.
 
@@ -361,14 +370,30 @@ B-LoRA-SDXL превосходит все FLUX-baseline по 4 из 5 метри
 
 Выполняется, если Phase 1b подтвердила выделение Θ_content.
 
-| ID   | Протокол                                                                                                                          | Выход              | Статус |
-|------|-----------------------------------------------------------------------------------------------------------------------------------|--------------------|--------|
-| M01a | Тренировка 3 content-LoRA на субъектах (cat, dog, backpack) — DS[9–18], r=16, 2000 steps, "a sks painting" (winners Phase 1b/2)   | 3 × .safetensors   | [x]    |
-| M01b | Матрица 3×3 (3 content × 3 style), swap Θ_content и Θ_style, генерация через `generate_mixing.py`                                 | Figure в главе 4   | [ ]    |
-| M02  | Количественная оценка DINO-style и DINO-content: **либо** усреднение по ячейкам M01b, **либо** тот же протокол, что **F02** по манифесту DS8 (выбрать один и зафиксировать в тексте ВКР) | Таблица в главе 4  | [ ]    |
+| ID    | Протокол                                                                                                                                              | Выход              | Статус   |
+|-------|-------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|----------|
+| M01a  | Тренировка 3 content-LoRA на субъектах (cat, dog, backpack) — DS[9–18], r=16, 2000 steps, "a sks painting" (winners Phase 1b/2)                       | 3 × .safetensors   | [x]      |
+| M01b1 | Матрица 3×3 mixing, split: style=[0–8] / content=[9–18] (naive port B-LoRA SDXL recipe), `lora_scale=0.7`, prompts без стилевого suffix               | Figure (negative)  | [x] ❌   |
+| M01b2 | Матрица 3×3 mixing, split: style=[0–12] / content=[13–18] (wider style range), prompts без стилевого suffix                                            | Figure (negative)  | [x] ❌   |
+| M01b3 | Матрица 3×3 mixing, split: style=[0–8] / content=[9–18] (вернулись к эталону B-LoRA), **per-row style suffix добавлен** ("painted in the style of Van Gogh/Monet"), `lora_scale=0.7` | Figure в главе 4   | [x] ★    |
+| M02   | Количественная оценка DINO-style и DINO-content (per-cell на 9 ячейках M01b3 winner) — grand mean DINO-style=0,099; grand mean DINO-content=0,562; STI=0,463 (content-dominant); таблица + текст в `chapters/snippets/phase6_m01b3.tex` | Таблица в главе 4  | [x]      |
 
 **Phase 6.1 итог (M01a):** все три content-LoRA натренированы успешно (AI+human 5/5, нет коллапса, нет subject leakage в COCO-promptах). Артефакты: `s3://.../exp_logs/20260515T112125/m01_content_{cat,dog,backpack}/loras/m01_content_{cat,dog,backpack}.safetensors`.
-→ Следующий шаг (M01b): запустить `generate_mixing.py` с 3 style-LoRA (winners Phase 5.1: F01-4 img4 + ещё 2) × 3 content-LoRA, собрать grid для главы 4.
+
+**Phase 6.2 итог (M01b1) — ❌ FAIL.** Все 9 ячеек фотореалистичны, стилевой канал молчит (AI 2/5, human 2/5). Гипотеза при ревью v1: style-LoRA натренирован на 0–18, а merge оставил только keys для 0–8 → потеря 53% стилевой ёмкости. → См. M01b3 — гипотеза оказалась НЕВЕРНОЙ.
+→ Артефакты v1: `s3://.../20260515T112125/m01_mixing_grid_v1/grid.png`.
+
+**Phase 6.3 итог (M01b2) — ❌ FAIL.** Расширение style-range с [0–8] до [0–12] визуально ничего не изменило (AI 2/5). Это **исключило block-split как корневую причину** и потребовало sanity check'а.
+
+**Sanity check (M01b ROOT CAUSE):** загрузили e01_blora_flux_van_gogh_img1 / img4 / monet_img1 **по отдельности** на FLUX-dev при `lora_scale=0.7` (Phase 4.1 PROMPT_SUFFIX="painted in the style of Van Gogh") — стиль ярко виден (импасто, painterly composition). LoRAs работают. Различие с mixing: в Phase 4.1 generate_job.sh добавляет PROMPT_SUFFIX, а `generate_mixing.py` подавал голые промпты ("a cat sitting on a chair") без какого-либо стилевого triggera. FLUX style-LoRAs не имеют trigger-токена — стиль активируется через natural-language подсказку. **Root cause v1+v2: missing prompt-side style invocation**, не block split.
+
+→ Fix (применён): добавлено поле `mixing.style_suffixes: [3 str]` в `configs/eval/mixing.yaml` и `scripts/eval/generate_mixing.py` (~20 LOC patch). Per-row suffix приклеивается к каждому prompt'у внутри ряда.
+
+**Phase 6.4 итог (M01b3) — ★ WINNER (AI 4/5, human 4/5).** Стилевой канал активирован: 6/9 ячеек со стилем (0/9 в v1+v2). Row 2 (Monet) — чистая демонстрация disentanglement; row 0 (van_gogh_starry_road) — 2/3 ОК + 1 memorization leak в (0,2) (Starry Night буквально как постер на стене); row 1 (van_gogh_starry_night) — слабая активация (style почти не виден на 3 ячейках, FLUX игнорирует известный van_gogh-промпт без сильного LoRA-форсинга). Артефакты: `s3://.../20260515T112125/m01_mixing_grid_v3_with_suffix/grid.png`.
+
+**★ Ключевое методологическое наблюдение Phase 6 для главы 4 ВКР:** B-LoRA recipe на FLUX работает **тогда и только тогда**, когда стилевое invocation присутствует в промпте как natural-language подсказка ("painted in the style of X"). В отличие от SDXL-варианта B-LoRA (Rinon Gal et al.), где стиль может активироваться через trigger-токен / "[v]" placeholder, FLUX-style LoRAs опираются на text encoder и требуют семантически информативного style cue. v1+v2 (без suffix) дали 0/9 ячеек, v3 (со suffix, тот же split) — 6/9. Также наблюдается известная LoRA-патология memorization leak (ячейка 0,2) — Style-LoRA рендерит свою training-картину буквально, а не абстрагирует стиль; ограничение упомянуть в caption.
+
+→ Следующий шаг (M02): количественная оценка DINO-style и DINO-content на 9 ячейках v3.
 
 ---
 
@@ -384,6 +409,6 @@ B-LoRA-SDXL превосходит все FLUX-baseline по 4 из 5 метри
 - **Phase 4** (Group E): 24/26 (Phase 4.1 ✓ B-LoRA FLUX 8 exp; Phase 4.2 ✓ Full-LoRA FLUX 8 exp; Phase 4.3 ✓ SplitFlux 8 exp — winner ★; Phase 4.4 IP-Adapter — опц.)
 - **Phase 4b** (Limitations): 0/3
 - **Phase 5** (SDXL): 4/5 (Phase 5.1 ✓ winner: F01-4 img4, DINO-style=0.4208, CLIP-style=0.6506, FID=229.0; **F02** батч DS8 — pending)
-- **Phase 6** (Mixing): 1/3 (M01a ✓ content-LoRA training: cat, dog, backpack — все 5/5, ★ winner=DS[9–18]+r=16+2000 steps+DP02)
-- **Итого экспериментов:** 47 / **73**
+- **Phase 6** (Mixing): 5/5 ✅ (M01a content-LoRA cat/dog/backpack 5/5; M01b1 ❌ no suffix; M01b2 ❌ wide split no suffix; **M01b3 ★ winner — 6/9 ячеек со стилем, AI+human 4/5**; M02 ✓ DINO-style/content grand=0,099/0,562, STI=0,463, snippet `chapters/snippets/phase6_m01b3.tex`)
+- **Итого экспериментов:** 51 / **75**
 - **Инфраструктура:** 11 / **18** (3 код/конфиги + **8** данные)
