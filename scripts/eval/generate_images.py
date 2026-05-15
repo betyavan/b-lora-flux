@@ -40,7 +40,7 @@ def _build_pipeline(cfg: DictConfig):
         log.info("Loading SDXL pipeline: %s", cfg.model.name_or_path)
         pipe = StableDiffusionXLPipeline.from_pretrained(
             cfg.model.name_or_path,
-            torch_dtype=torch.float16,
+            torch_dtype=torch.bfloat16,
         )
     else:
         from diffusers import FluxPipeline  # type: ignore[import]
@@ -94,11 +94,6 @@ def main(cfg: DictConfig) -> None:
 
     base_seed = int(cfg.sampling.seed)
     pipeline_type = cfg.model.get("pipeline_type", "flux")
-
-    # SDXL VAE has fp16 numerical instability; upcast_vae() forces the decoder to run in float32.
-    # autocast alone is insufficient because it doesn't promote the entire VAE to float32.
-    if pipeline_type == "sdxl":
-        pipe.upcast_vae()
 
     log.info("Generating %d images -> %s", len(prompts), out_dir)
     for idx, prompt in enumerate(prompts):
