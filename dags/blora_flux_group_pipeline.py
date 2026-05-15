@@ -134,7 +134,36 @@ GROUP_EXPERIMENTS = {
         "m01_content_dog",
         "m01_content_backpack",
     ],
+
+    # ---- Phase 5.2 (F02) — SDXL batch pair-driver evaluation ----
+    # Trains 4 Monet-style SDXL LoRAs + 8 content SDXL LoRAs (12 total).
+    # The 4 van_gogh SDXL LoRAs come from Phase 4.4 (STYLE_VG_RUN_TS Param).
+    # Per-experiment generate/metrics are SKIPPED for this group — inference is
+    # done by a single downstream mixing-batch job (mixing_sdxl_f02) that walks
+    # the 50-pair DS8 manifest and produces metrics.json.
+    "phase_5_2_f02": [
+        "e04_blora_sdxl_monet_img1",
+        "e04_blora_sdxl_monet_img2",
+        "e04_blora_sdxl_monet_img3",
+        "e04_blora_sdxl_monet_img4",
+        "m02_content_sdxl_backpack",
+        "m02_content_sdxl_bear",
+        "m02_content_sdxl_bowl",
+        "m02_content_sdxl_can",
+        "m02_content_sdxl_cat",
+        "m02_content_sdxl_clock",
+        "m02_content_sdxl_dog",
+        "m02_content_sdxl_vase",
+    ],
 }
+
+# Groups whose per-experiment inference (generate + metrics) is replaced by a
+# downstream batch job. The expand()'d generate_all / metrics_all operators
+# receive an empty list, so they no-op for these groups.
+_BATCH_INFERENCE_GROUPS = {"phase_5_2_f02"}
+
+# Default Phase 4.4 run_ts that produced the SDXL Van Gogh LoRAs reused by F02.
+_DEFAULT_STYLE_VG_RUN_TS = "20260515T083526"
 
 # Per-experiment LORA_SCALE overrides.
 # The generate step reads LORA_SCALE env var (default 1.0); entries here override it.
@@ -202,6 +231,8 @@ with DAG(
                 "compare_e", "compare_e03",
                 # Phase 5
                 "compare_f",
+                # Phase 5.2 — SDXL F02 pair-driver batch evaluation
+                "phase_5_2_f02",
                 # Phase 6
                 "phase_6_content",
                 # Legacy proto ablations
@@ -228,6 +259,16 @@ with DAG(
             default="painted in the style of Van Gogh",
             type="string",
             description="Suffix appended to every COCO eval prompt (e.g. 'painted in the style of Van Gogh'). Set to empty string to disable.",
+        ),
+        "STYLE_VG_RUN_TS": Param(
+            default=_DEFAULT_STYLE_VG_RUN_TS,
+            type="string",
+            description="(phase_5_2_f02 only) run_ts of the Phase 4.4 run that produced e04_blora_sdxl_van_gogh_img[1-4] LoRAs reused by the F02 mixing-batch.",
+        ),
+        "PAIR_SUBSET": Param(
+            default="",
+            type="string",
+            description="(phase_5_2_f02 only) Pair subset for the F02 mixing-batch. Empty string = all 50 pairs; 'user_study' = 30-pair user-study subset.",
         ),
     },
 ) as dag:
@@ -262,6 +303,12 @@ with DAG(
         group = params["GROUP"]
         prompt_suffix = params.get("PROMPT_SUFFIX", "").strip()
 
+        # Batch-inference groups (e.g. phase_5_2_f02) replace per-experiment
+        # generate with a single downstream mixing-batch job — emit empty list
+        # so .expand() no-ops.
+        if group in _BATCH_INFERENCE_GROUPS:
+            return []
+
         env_dicts = []
         for exp in GROUP_EXPERIMENTS[group]:
             env: dict[str, str] = {
@@ -284,18 +331,55 @@ with DAG(
         params = context["params"]
         base = params["S3_BASE_PATH"].rstrip("/")
         run_ts = context["logical_date"].strftime("%Y%m%dT%H%M%S")
+        group = params["GROUP"]
+
+        # Batch-inference groups skip per-experiment metrics — the mixing-batch
+        # job emits its own f02_metrics.json directly.
+        if group in _BATCH_INFERENCE_GROUPS:
+            return []
+
         return [
             {"env": {
                 "EXPERIMENT_NAME": exp,
                 "GENERATED_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/generated",
                 "METRICS_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp}/metrics",
             }}
-            for exp in GROUP_EXPERIMENTS[params["GROUP"]]
+            for exp in GROUP_EXPERIMENTS[group]
         ]
+
+    @task
+    def prepare_mixing_f02_env_dicts(**context):
+        """Single-element list (or empty) for the F02 mixing-batch job.
+
+        Emits exactly one env dict only when GROUP == phase_5_2_f02, so the
+        downstream expand()'d operator runs once for F02 and no-ops otherwise.
+        """
+        params = context["params"]
+        group = params["GROUP"]
+        if group != "phase_5_2_f02":
+            return []
+
+        base = params["S3_BASE_PATH"].rstrip("/")
+        run_ts = context["logical_date"].strftime("%Y%m%dT%H%M%S")
+        style_vg_run_ts = params.get("STYLE_VG_RUN_TS", "").strip() or _DEFAULT_STYLE_VG_RUN_TS
+        pair_subset = params.get("PAIR_SUBSET", "").strip()
+        exp_name = "f02_blora_sdxl_pairs"
+
+        return [{"env": {
+            "RUN_TS": run_ts,
+            "STYLE_VG_RUN_TS": style_vg_run_ts,
+            "STYLE_MONET_RUN_TS": run_ts,
+            "CONTENT_RUN_TS": run_ts,
+            "S3_BASE_PATH": base,
+            "MIXING_OUTPUT_S3_PATH": f"{base}/exp_logs/{run_ts}/{exp_name}",
+            "PAIR_SUBSET": pair_subset,
+            "EXP_NAME": exp_name,
+        }}]
 
     train_env_dicts = prepare_train_env_dicts()
     generate_env_dicts = prepare_generate_env_dicts()
     metrics_env_dicts = prepare_metrics_env_dicts()
+    mixing_f02_env_dicts = prepare_mixing_f02_env_dicts()
 
     train_all = JobSubmitDictOperator.partial(
         task_id="remote-train-blora-group",
@@ -327,11 +411,33 @@ with DAG(
         base_env={},
     )
 
+    # Phase 5.2 F02 mixing-batch — runs exactly once (mapped over 0 or 1 element).
+    # Single-element mapped expand() is used (instead of a plain operator) so
+    # other GROUPs map over an empty list and silently skip this task.
+    mixing_f02 = JobSubmitDictOperator.partial(
+        task_id="remote-mixing-sdxl-f02",
+        dp_conn_id=_AIRFLOW_CONN_ID,
+        autosensor=True,
+        runner_job_path=str(JOBS_DIR / "mixing_sdxl_f02"),
+        runner_preset_file="mixing_sdxl_f02_preset.yml",
+        executor_config={},
+        base_env={},
+    )
+
+    train_mapped = train_all.expand(job_env_dict=train_env_dicts)
+    generate_mapped = generate_all.expand(job_env_dict=generate_env_dicts)
+    metrics_mapped = metrics_all.expand(job_env_dict=metrics_env_dicts)
+    mixing_f02_mapped = mixing_f02.expand(job_env_dict=mixing_f02_env_dicts)
+
     (
         train_env_dicts
-        >> train_all.expand(job_env_dict=train_env_dicts)
+        >> train_mapped
         >> generate_env_dicts
-        >> generate_all.expand(job_env_dict=generate_env_dicts)
+        >> generate_mapped
         >> metrics_env_dicts
-        >> metrics_all.expand(job_env_dict=metrics_env_dicts)
+        >> metrics_mapped
     )
+
+    # Mixing-batch waits for ALL trainings to finish (it stages all 12 LoRAs)
+    # but is independent of per-experiment generate/metrics (which no-op for F02).
+    train_mapped >> mixing_f02_env_dicts >> mixing_f02_mapped

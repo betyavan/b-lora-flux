@@ -1,0 +1,63 @@
+job:
+  generate_name: b-lora-mixing-f02
+  description: 'B-LoRA SDXL F02 pair-driver mixing-batch job (50 pairs)'
+  time_limit: 6h
+
+  jobtracker:
+    print_timestamps: true
+
+  flavor: h100-1x
+  region: ${CORP_RUNNER_REGION}
+  image: ${CORP_DOCKER_IMAGE}
+
+  env:
+    AWS_ACCESS_KEY_ID: ${CORP_VAULT_PATH}#access_key
+    AWS_SECRET_ACCESS_KEY: ${CORP_VAULT_PATH}#secret_key
+    PIP_INDEX_URL: ${CORP_PIP_INDEX_URL}
+    HF_HOME: /models
+    CLEARML_ENABLED: "1"
+    REPO_BRANCH: "master"
+    # RUN_TS, STYLE_VG_RUN_TS, STYLE_MONET_RUN_TS, CONTENT_RUN_TS,
+    # S3_BASE_PATH, MIXING_OUTPUT_S3_PATH, PAIR_SUBSET — injected by Airflow
+
+  entrypoint: /bin/sh
+  args:
+    - -c
+    - >-
+      pip install -q poetry;
+      git clone --recurse-submodules --branch ${REPO_BRANCH} ${CORP_GITHUB_REPO} /root/b-lora-flux;
+      git -C /root/b-lora-flux/src/ai-toolkit fetch origin 8c40b97afb840627c90bffe6c1bd6a5f6015d1cb && git -C /root/b-lora-flux/src/ai-toolkit checkout 8c40b97afb840627c90bffe6c1bd6a5f6015d1cb;
+      cd /root/b-lora-flux && poetry lock && poetry install --no-root;
+      bash /root/mixing_sdxl_f02_job_script.sh;
+  work_dir: /root
+
+  input:
+    - name: S3_Input_dataset
+      type: s3msk
+      bucket: ${CORP_S3_BUCKET_DATA}
+      src: ${CORP_S3_DATA_PATH}
+      dst: /my_datasets
+
+    - type: model_registry
+      name: S3_Input_sdxl_model
+      src: ${CORP_SDXL_MODEL_SRC}
+      version: ${CORP_SDXL_MODEL_VERSION}
+      dst: /models/sdxl
+
+    - type: files
+      name: script
+      src: ./files/mixing_sdxl_f02_job_script.sh
+      dst: /root/mixing_sdxl_f02_job_script.sh
+
+    - type: files
+      name: s3cfg
+      src: ./files/s3cfg
+      dst: /root/.s3cfg
+
+  container_ports:
+    - name: http
+      port: 8000
+    - name: grpc
+      port: 8001
+    - name: prometheus
+      port: 8002

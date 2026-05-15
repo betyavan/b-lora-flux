@@ -20,7 +20,8 @@ configure:
 	@bash -c 'set -a && source infra.env && set +a && \
 		envsubst < dags/jobs/train_blora/train_blora_preset.yml.template > dags/jobs/train_blora/train_blora_preset.yml && \
 		envsubst < dags/jobs/generate_blora/generate_blora_preset.yml.template > dags/jobs/generate_blora/generate_blora_preset.yml && \
-		envsubst < dags/jobs/metrics_blora/metrics_blora_preset.yml.template > dags/jobs/metrics_blora/metrics_blora_preset.yml'
+		envsubst < dags/jobs/metrics_blora/metrics_blora_preset.yml.template > dags/jobs/metrics_blora/metrics_blora_preset.yml && \
+		envsubst < dags/jobs/mixing_sdxl_f02/mixing_sdxl_f02_preset.yml.template > dags/jobs/mixing_sdxl_f02/mixing_sdxl_f02_preset.yml'
 	@echo "Preset files rendered from templates."
 
 ## Install pre-commit hooks (run once after clone)
