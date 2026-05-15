@@ -1,0 +1,25 @@
+{
+  "exp_name": "m01_mixing_grid_v3_with_suffix",
+  "phase": "Phase 6 — Style-content mixing, M01b3 ★ WINNER",
+  "split": {
+    "style_only_blocks": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    "content_blocks": [9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+  },
+  "lora_scale": 0.7,
+  "style_loras": ["e01_blora_flux_van_gogh_img1", "e01_blora_flux_van_gogh_img4", "e01_blora_flux_monet_img1"],
+  "content_loras": ["m01_content_cat", "m01_content_dog", "m01_content_backpack"],
+  "style_suffixes": [
+    "painted in the style of Van Gogh",
+    "painted in the style of Van Gogh",
+    "painted in the style of Claude Monet"
+  ],
+  "ai_score": 4,
+  "ai_notes": "6/9 cells show genuine stylization (vs 0/9 in v1/v2). Row 0 (van_gogh_starry_road): 2/3 good, cell (0,2) has memorization leak (Starry Night literally rendered as poster). Row 1 (van_gogh_starry_night): all 3 weak/photoreal — style barely activates despite same scale. Row 2 (monet_garden): all 3 clean; cell (2,1) is textbook Monet impressionism. Disentanglement empirically demonstrated for the [0-8]/[9-18] split when combined with natural-language style invocation.",
+  "human_score": 4,
+  "style_visible": "да (6/9 ячеек, 1 memorization leak, 3 слабых)",
+  "content_preserved": "да (9/9)",
+  "artifacts": "memorization leak в (0,2): van_gogh_starry_road LoRA рендерит свою training-картину как постер на стене",
+  "comment": "★ WINNER Phase 6. Ключевое методологическое наблюдение: B-LoRA recipe работает на FLUX если и только если в промпт добавлено естественно-языковое стилевое invocation ('painted in the style of X'). FLUX style-LoRAs не имеют trigger-токена и опираются на text encoder для активации. Для главы 4 ВКР это — content-rich finding отличающий B-LoRA на FLUX от B-LoRA на SDXL. Limitations для caption: (1) memorization leak в (0,2), (2) row 1 слабая активация starry_night reference.",
+  "verdict": "PASS — winner Phase 6, переходим к M02",
+  "reviewed_at": "2026-05-15T14:45:00Z"
+}

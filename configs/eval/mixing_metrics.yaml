@@ -1,0 +1,12 @@
+# Hydra config for compute_mixing_metrics.py (Phase 6, M02)
+# Per-cell DINO-style and DINO-content over a 3×3 mixing grid.
+
+mixing_metrics:
+  grid_dir: ???                         # required: folder with style_i_<sname>__content_j_<cname>.png cells
+  exp_name: "m01_mixing_grid"
+  style_refs: []                        # 3 paths to single-image style references
+  content_refs_dirs: []                 # 3 dirs with content-subject images (training folder is fine)
+  style_names: []                       # 3 row labels (must match cell filenames)
+  content_names: []                     # 3 col labels (must match cell filenames)
+  dino_model: "facebook/dino-vitb8"     # same as compute_metrics.py
+  batch_size: 8

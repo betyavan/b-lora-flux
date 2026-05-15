@@ -1,0 +1,11 @@
+{
+  "exp_name": "m01_content_cat",
+  "ai_score": 5,
+  "ai_notes": "All 10 COCO-prompt outputs coherent and artifact-free. Cat prompts (0006, 0007) render cats correctly (prompt-driven). No cat leakage into the 8 non-cat prompts. No color collapse or NaN-like degradation.",
+  "human_score": 5,
+  "style_visible": "n/a",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Phase 6 content LoRA — style transfer не оценивается. Subject leakage отсутствует. Готов к Phase 7 mixing.",
+  "reviewed_at": "2026-05-15T13:00:00Z"
+}

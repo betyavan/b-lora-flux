@@ -1,0 +1,11 @@
+{
+  "exp_name": "m01_content_backpack",
+  "ai_score": 5,
+  "ai_notes": "Same 10 COCO prompts, same compositional structure. All coherent and artifact-free. Cat prompts produce cats (one black cat variant — normal seed variation). No backpacks injected into non-backpack scenes.",
+  "human_score": 5,
+  "style_visible": "n/a",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Phase 6 content LoRA — healthy, no leakage, готов к Phase 7 mixing.",
+  "reviewed_at": "2026-05-15T13:00:00Z"
+}

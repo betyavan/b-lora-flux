@@ -1,0 +1,11 @@
+{
+  "exp_name": "m01_content_dog",
+  "ai_score": 5,
+  "ai_notes": "Same 10 COCO prompts, near-identical compositions to cat run. All coherent and artifact-free. Cat prompts still render cats (prompt wins), no dog injected — correct behavior, no subject leakage.",
+  "human_score": 5,
+  "style_visible": "n/a",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Phase 6 content LoRA — healthy, no leakage, готов к Phase 7 mixing.",
+  "reviewed_at": "2026-05-15T13:00:00Z"
+}

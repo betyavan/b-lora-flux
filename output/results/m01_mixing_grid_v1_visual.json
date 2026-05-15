@@ -1,0 +1,20 @@
+{
+  "exp_name": "m01_mixing_grid_v1",
+  "phase": "Phase 6 — Style-content mixing, M01b1 (naive split)",
+  "split": {
+    "style_only_blocks": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    "content_blocks": [9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+  },
+  "lora_scale": 0.7,
+  "style_loras": ["e01_blora_flux_van_gogh_img1", "e01_blora_flux_van_gogh_img4", "e01_blora_flux_monet_img1"],
+  "content_loras": ["m01_content_cat", "m01_content_dog", "m01_content_backpack"],
+  "ai_score": 2,
+  "ai_notes": "All 9 cells photorealistic. Style channel silent across all 3 rows — van Gogh diagonal brushwork, Starry Night idiom, Monet impressionism all absent. Content channel strong (cat/dog/backpack render cleanly). Style and content NOT disentangled: content-LoRA dominates the merged adapter. Rows visually indistinguishable.",
+  "human_score": 2,
+  "style_visible": "нет",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Negative result — valuable for thesis chapter 4 limitations. Naive port of B-LoRA SDXL split [0-8]/[9-18] does NOT work on FLUX double-stream: style information learned at blocks 0-18 has significant mass in blocks 9-18 (which the merge hands to content-LoRA). Will be referenced as evidence that block split must be empirically calibrated per architecture. Next: M01b2 with split [0-12]/[13-18].",
+  "verdict": "FAIL — но содержательно полезен как negative result",
+  "reviewed_at": "2026-05-15T14:00:00Z"
+}

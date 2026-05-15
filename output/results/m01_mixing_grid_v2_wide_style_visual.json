@@ -1,0 +1,20 @@
+{
+  "exp_name": "m01_mixing_grid_v2_wide_style",
+  "phase": "Phase 6 — Style-content mixing, M01b2 (wide style range)",
+  "split": {
+    "style_only_blocks": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    "content_blocks": [13, 14, 15, 16, 17, 18]
+  },
+  "lora_scale": 0.7,
+  "style_loras": ["e01_blora_flux_van_gogh_img1", "e01_blora_flux_van_gogh_img4", "e01_blora_flux_monet_img1"],
+  "content_loras": ["m01_content_cat", "m01_content_dog", "m01_content_backpack"],
+  "ai_score": 2,
+  "ai_notes": "Same uniform photoreal output as v1 across all 9 cells; rows visually indistinguishable. Widening style range from [0..8] to [0..12] produced only mild compositional jitter, no painterly conversion.",
+  "human_score": 2,
+  "style_visible": "нет",
+  "content_preserved": "да",
+  "artifacts": "нет",
+  "comment": "Negative result — но НЕ из-за split'а. Sanity check показал что FLUX style-LoRAs (e01) РАБОТАЮТ в изоляции при scale=0.7 — но требуют natural-language style cue в промпте (Phase 4.1 использовала PROMPT_SUFFIX='painted in the style of Van Gogh'). В generate_mixing.py промпты подавались голыми, без trigger-suffix → стиль не активировался. Root cause: missing prompt-side style invocation, not block split. Fix: добавлен mixing.style_suffixes (per-row suffix) в generate_mixing.py + configs/eval/mixing.yaml.",
+  "verdict": "FAIL — root cause diagnosed (prompt suffix missing); см. v3",
+  "reviewed_at": "2026-05-15T14:30:00Z"
+}
