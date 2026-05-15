@@ -1,0 +1,67 @@
+---
+# M02 — Content LoRA on SDXL, subject "clock"
+# Phase 5.2 (F02): paritetный с e04 style LoRA (r=16, 500 steps, lr=1e-4).
+# Content block: up_blocks.0.attentions.0 (B-LoRA SDXL paper convention — complement to style block).
+job: extension
+config:
+  name: "m02_content_sdxl_clock"
+  process:
+    - type: 'sd_trainer'
+      training_folder: "output"
+      device: cuda:0
+      network:
+        type: "lora"
+        linear: 16
+        linear_alpha: 16
+        network_kwargs:
+          only_if_contains:
+            - "up_blocks.0.attentions.0"
+      save:
+        dtype: float16
+        save_every: 250
+        max_step_saves_to_keep: 4
+        push_to_hub: false
+      datasets:
+        - folder_path: "data/eval_content/clock"
+          caption_ext: "txt"
+          caption_dropout_rate: 0.05
+          shuffle_tokens: false
+          cache_latents_to_disk: true
+          resolution: [512, 768, 1024]
+      train:
+        batch_size: 1
+        steps: 500
+        gradient_accumulation_steps: 1
+        train_unet: true
+        train_text_encoder: false
+        gradient_checkpointing: true
+        noise_scheduler: "ddpm"
+        optimizer: "adamw8bit"
+        lr: 1e-4
+        ema_config:
+          use_ema: true
+          ema_decay: 0.99
+        dtype: bf16
+      model:
+        name_or_path: "/models/sdxl"
+        is_flux: false
+        is_xl: true
+        quantize: false
+      sample:
+        sampler: "ddpm"
+        sample_every: 250
+        width: 1024
+        height: 1024
+        prompts:
+          - "a sks clock"
+          - "a sks clock on a wall"
+          - "a sks clock on a desk"
+        neg: ""
+        seed: 42
+        walk_seed: false
+        guidance_scale: 7.5
+        sample_steps: 20
+
+meta:
+  name: "[name]"
+  version: '1.0'

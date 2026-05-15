@@ -1,0 +1,67 @@
+---
+# E04 — B-LoRA-SDXL, Monet style image 4
+# Phase 5.2 (F02): batch DS8 evaluation, paritetный с Phase 5.1 van_gogh (r=16, 500 steps).
+# Style block: up_blocks.0.attentions.1 (B-LoRA SDXL paper convention).
+job: extension
+config:
+  name: "e04_blora_sdxl_monet_img4"
+  process:
+    - type: 'sd_trainer'
+      training_folder: "output"
+      device: cuda:0
+      network:
+        type: "lora"
+        linear: 16
+        linear_alpha: 16
+        network_kwargs:
+          only_if_contains:
+            - "up_blocks.0.attentions.1"
+      save:
+        dtype: float16
+        save_every: 250
+        max_step_saves_to_keep: 4
+        push_to_hub: false
+      datasets:
+        - folder_path: "data/styles/monet/img4"
+          caption_ext: "txt"
+          caption_dropout_rate: 0.05
+          shuffle_tokens: false
+          cache_latents_to_disk: true
+          resolution: [512, 768, 1024]
+      train:
+        batch_size: 1
+        steps: 500
+        gradient_accumulation_steps: 1
+        train_unet: true
+        train_text_encoder: false
+        gradient_checkpointing: true
+        noise_scheduler: "ddpm"
+        optimizer: "adamw8bit"
+        lr: 1e-4
+        ema_config:
+          use_ema: true
+          ema_decay: 0.99
+        dtype: bf16
+      model:
+        name_or_path: "/models/sdxl"
+        is_flux: false
+        is_xl: true
+        quantize: false
+      sample:
+        sampler: "ddpm"
+        sample_every: 250
+        width: 1024
+        height: 1024
+        prompts:
+          - "a cat sitting on a chair"
+          - "a landscape with mountains and a river"
+          - "a person reading a book in a park"
+        neg: ""
+        seed: 42
+        walk_seed: false
+        guidance_scale: 7.5
+        sample_steps: 20
+
+meta:
+  name: "[name]"
+  version: '1.0'
