@@ -8,7 +8,6 @@ Usage:
 
 from __future__ import annotations
 
-import contextlib
 import logging
 import sys
 from pathlib import Path
@@ -96,25 +95,23 @@ def main(cfg: DictConfig) -> None:
     base_seed = int(cfg.sampling.seed)
     pipeline_type = cfg.model.get("pipeline_type", "flux")
 
+    # SDXL VAE has fp16 numerical instability; upcast_vae() forces the decoder to run in float32.
+    # autocast alone is insufficient because it doesn't promote the entire VAE to float32.
+    if pipeline_type == "sdxl":
+        pipe.upcast_vae()
+
     log.info("Generating %d images -> %s", len(prompts), out_dir)
     for idx, prompt in enumerate(prompts):
         # Fresh generator per image: seed+idx gives deterministic, non-coupled outputs.
         generator = torch.Generator("cpu").manual_seed(base_seed + idx)
-        # SDXL scheduler returns float32 latents; autocast resolves the dtype mismatch with fp16 VAE.
-        autocast_ctx = (
-            torch.autocast("cuda", dtype=torch.float16)
-            if pipeline_type == "sdxl"
-            else contextlib.nullcontext()
+        result = pipe(
+            prompt=prompt,
+            num_inference_steps=int(cfg.sampling.steps),
+            guidance_scale=float(cfg.sampling.guidance_scale),
+            width=int(cfg.sampling.width),
+            height=int(cfg.sampling.height),
+            generator=generator,
         )
-        with autocast_ctx:
-            result = pipe(
-                prompt=prompt,
-                num_inference_steps=int(cfg.sampling.steps),
-                guidance_scale=float(cfg.sampling.guidance_scale),
-                width=int(cfg.sampling.width),
-                height=int(cfg.sampling.height),
-                generator=generator,
-            )
         image: Image.Image = result.images[0]
         out_path = out_dir / f"{idx:04d}.png"
         image.save(out_path)
