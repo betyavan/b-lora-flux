@@ -32,13 +32,25 @@ def _load_prompts(prompt_file: str, suffix: str = "") -> list[str]:
 
 
 def _build_pipeline(cfg: DictConfig):
-    from diffusers import FluxPipeline  # type: ignore[import]
+    pipeline_type = cfg.model.get("pipeline_type", "flux")
 
-    log.info("Loading FLUX pipeline: %s", cfg.model.name_or_path)
-    pipe = FluxPipeline.from_pretrained(
-        cfg.model.name_or_path,
-        torch_dtype=torch.bfloat16,
-    )
+    if pipeline_type == "sdxl":
+        from diffusers import StableDiffusionXLPipeline  # type: ignore[import]
+
+        log.info("Loading SDXL pipeline: %s", cfg.model.name_or_path)
+        pipe = StableDiffusionXLPipeline.from_pretrained(
+            cfg.model.name_or_path,
+            torch_dtype=torch.float16,
+        )
+    else:
+        from diffusers import FluxPipeline  # type: ignore[import]
+
+        log.info("Loading FLUX pipeline: %s", cfg.model.name_or_path)
+        pipe = FluxPipeline.from_pretrained(
+            cfg.model.name_or_path,
+            torch_dtype=torch.bfloat16,
+        )
+
     pipe = pipe.to("cuda")
 
     lora_path = cfg.generate.lora_path
@@ -47,7 +59,7 @@ def _build_pipeline(cfg: DictConfig):
         pipe.load_lora_weights(str(lora_path))
         pipe.fuse_lora(lora_scale=float(cfg.model.lora_scale))
     else:
-        log.info("No LoRA specified — running baseline (pure FLUX)")
+        log.info("No LoRA specified — running baseline (no LoRA)")
 
     return pipe
 

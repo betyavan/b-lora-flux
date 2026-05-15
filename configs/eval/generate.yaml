@@ -11,6 +11,7 @@ generate:
 model:
   name_or_path: "/models/flux-dev"
   lora_scale: 1.0                         # LoRA weight α/r applied at inference; try 3.0–5.0 to amplify weak LoRA
+  pipeline_type: "flux"                   # "flux" or "sdxl" — controls which diffusers pipeline is loaded
 
 sampling:
   seed: 42
