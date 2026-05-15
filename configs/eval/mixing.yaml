@@ -1,0 +1,38 @@
+# Hydra config for generate_mixing.py (Phase 6, M01)
+# Produces a 3×3 style×content mixing grid.
+#
+# style_loras / content_loras: paths to .safetensors files (3 each)
+# style_names / content_names: short labels for output filenames and the grid figure
+# prompts: one prompt per content subject (3 prompts matching the 3 content LoRAs)
+
+mixing:
+  style_loras: []           # list of 3 style .safetensors paths
+  content_loras: []         # list of 3 content .safetensors paths
+  style_names: []           # short labels, e.g. [van_gogh_img1, van_gogh_img4, monet_img1]
+  content_names: []         # short labels, e.g. [cat, dog, backpack]
+  prompts: []               # 3 prompts matching content subjects, e.g. ["a cat", "a dog", "a backpack"]
+  lora_scale: 0.7           # applied to both style and content adapter
+  output_dir: "output/mixing"
+  exp_name: "m01_mixing_grid"
+  save_grid: true           # also save a single composite 3x3 PNG
+
+  # Block ranges for FLUX double-stream transformer:
+  # style_only_blocks  — blocks used ONLY from the style LoRA (no overlap with content)
+  # content_blocks     — blocks used from the content LoRA (9–18, Phase 1b winner)
+  style_only_blocks: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+  content_blocks:    [9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+
+model:
+  name_or_path: "/models/flux-dev"
+
+sampling:
+  seed: 42
+  steps: 28
+  guidance_scale: 3.5
+  width: 1024
+  height: 1024
+
+clearml:
+  enabled: true
+  project: "blora-flux-eval"
+  task_prefix: "mixing"

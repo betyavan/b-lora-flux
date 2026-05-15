@@ -1,0 +1,75 @@
+---
+# M01 — Phase 6 content LoRA: cat subject
+# Trains on transformer_blocks.9–18 (Θ_content, Phase 1b winner: DC-02)
+# Subject: cat images from eval_content/cat/
+# Hyperparameters: r=16 (DB02), steps=2000 (DC03), lr=5e-5, prompt="a sks painting" (DP02)
+job: extension
+config:
+  name: "m01_content_cat"
+  process:
+    - type: 'sd_trainer'
+      training_folder: "output"
+      device: cuda:0
+      network:
+        type: "lora"
+        linear: 16
+        linear_alpha: 16
+        network_kwargs:
+          only_if_contains:
+            - "transformer_blocks.9"
+            - "transformer_blocks.10"
+            - "transformer_blocks.11"
+            - "transformer_blocks.12"
+            - "transformer_blocks.13"
+            - "transformer_blocks.14"
+            - "transformer_blocks.15"
+            - "transformer_blocks.16"
+            - "transformer_blocks.17"
+            - "transformer_blocks.18"
+      save:
+        dtype: float16
+        save_every: 500
+        max_step_saves_to_keep: 2
+        push_to_hub: false
+      datasets:
+        - folder_path: "data/eval_content/cat"
+          caption_ext: "txt"
+          caption_dropout_rate: 0.05
+          shuffle_tokens: false
+          cache_latents_to_disk: true
+          resolution: [512, 768, 1024]
+      train:
+        batch_size: 1
+        steps: 2000
+        gradient_accumulation_steps: 1
+        train_unet: true
+        train_text_encoder: false
+        gradient_checkpointing: true
+        noise_scheduler: "flowmatch"
+        optimizer: "adamw8bit"
+        lr: 5e-5
+        ema_config:
+          use_ema: false
+        dtype: bf16
+      model:
+        name_or_path: "/models/flux-dev"
+        is_flux: true
+        quantize: true
+      sample:
+        sampler: "flowmatch"
+        sample_every: 500
+        width: 1024
+        height: 1024
+        prompts:
+          - "a sks painting of a cat"
+          - "a sks painting of a cat sitting on a chair"
+          - "a sks painting of a cat in a garden"
+        neg: ""
+        seed: 42
+        walk_seed: false
+        guidance_scale: 3.5
+        sample_steps: 28
+
+meta:
+  name: "[name]"
+  version: '1.0'
