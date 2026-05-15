@@ -351,7 +351,7 @@ B-LoRA-SDXL превосходит все FLUX-baseline по 4 из 5 метри
 
 | ID   | Описание | Метрики | Статус |
 |------|----------|---------|--------|
-| F02  | Батч-прогон по 50 парам DS8: B-LoRA-SDXL (+ baselines по возможности) | Table 1–style (DINO-style sim), Table 1–content (DINO-content sim); опц. поднабор **30** пар для user study | ⏳ инфра готова, ждёт launch |
+| F02  | Батч-прогон по 50 парам DS8: B-LoRA-SDXL (+ baselines по возможности) | Table 1–style (DINO-style sim), Table 1–content (DINO-content sim); опц. поднабор **30** пар для user study | [x] ★ — DINO-style=0,3954, DINO-content=0,2777, STI=−0,118; VG (n=26): 0,421/0,297; Monet (n=24): 0,367/0,257 |
 
 **F02 готовность (2026-05-15):**
 - 4 Monet style configs `configs/experiments/e04_blora_sdxl_monet_img[1-4].yaml` (r=16, 500 steps, paritet с Phase 5.1)
@@ -361,6 +361,13 @@ B-LoRA-SDXL превосходит все FLUX-baseline по 4 из 5 метри
 - DAG: `GROUP_EXPERIMENTS["phase_5_2_f02"]` (12 trainings) + `_BATCH_INFERENCE_GROUPS` гасит per-experiment generate/metrics + новый job `dags/jobs/mixing_sdxl_f02/` (mlc preset + shell + s3cfg)
 - 4 van_gogh-SDXL LoRA из Phase 4.4 (run_ts `20260515T083526`) переиспользуются через Airflow Param `STYLE_VG_RUN_TS`
 - Запуск: `make run-group GROUP=phase_5_2_f02`; subset `PAIR_SUBSET=user_study` для 30 пар
+
+**Phase 5.2 итог F02 ★ (run_ts `20260515T152734`, 2026-05-15):** 12 LoRA натренированы (4 Monet + 8 content), 50 пар сгенерированы и измерены по B-LoRA Tab. 1 protocol.
+DINO-style grand mean = **0,3954**, DINO-content grand mean = **0,2777**, STI = **−0,118** (контент чуть сильнее стиля — ожидаемо для SDXL B-LoRA на DS8).
+Per-artist: Van Gogh (n=26) 0,421/0,297 > Claude Monet (n=24) 0,367/0,257 — Van Gogh LoRA из Phase 4.4 даёт более чистый стилевой отпечаток.
+Визуальный sign-off (AI 4/5, human 4/5): 7/10 пар batch выборки показали корректное разделение style/content; 2 Monet-пары — «style-on-canvas» (стиль внутри предмета, не глобально); pair_004 (`wikimo_02`×clock, dino_content=−0,013) — единственный полный content-collapse, сохранён как иллюстрация failure-mode «style-LoRA over-dominance» для главы результатов.
+Артефакты: `s3://.../exp_logs/20260515T152734/{e04_blora_sdxl_monet_img[1-4], m02_content_sdxl_*}/loras/` + `s3://.../exp_logs/20260515T152734/f02_blora_sdxl_pairs/{generated/*.png, f02_blora_sdxl_pairs_f02_metrics.json}`.
+→ Следующий шаг: `/analyze-results phase_5_2_f02` — Table 1 (DINO-style/DINO-content) против опубликованных значений B-LoRA Tab. 1 и оформление per-artist сводки в `chapters/snippets/phase5_2_f02.tex`.
 
 **Зависимости:** D08, I01 (две косинусные метрики по референс-картинкам), I10.
 
@@ -408,7 +415,7 @@ B-LoRA-SDXL превосходит все FLUX-baseline по 4 из 5 метри
 - **Phase 3** (Alpha): 6/10 (Phase 3.1 ✓ winner: G03 alpha=0.7, DINO=0.4180, FID=228.6)
 - **Phase 4** (Group E): 24/26 (Phase 4.1 ✓ B-LoRA FLUX 8 exp; Phase 4.2 ✓ Full-LoRA FLUX 8 exp; Phase 4.3 ✓ SplitFlux 8 exp — winner ★; Phase 4.4 IP-Adapter — опц.)
 - **Phase 4b** (Limitations): 0/3
-- **Phase 5** (SDXL): 4/5 (Phase 5.1 ✓ winner: F01-4 img4, DINO-style=0.4208, CLIP-style=0.6506, FID=229.0; **F02** батч DS8 — pending)
+- **Phase 5** (SDXL): 5/5 ✅ (Phase 5.1 ✓ winner: F01-4 img4, DINO-style=0.4208, CLIP-style=0.6506, FID=229.0; **F02 ✓** батч DS8 50 пар: DINO-style=0.3954, DINO-content=0.2777, STI=−0.118; VG > Monet; AI+human 4/5)
 - **Phase 6** (Mixing): 5/5 ✅ (M01a content-LoRA cat/dog/backpack 5/5; M01b1 ❌ no suffix; M01b2 ❌ wide split no suffix; **M01b3 ★ winner — 6/9 ячеек со стилем, AI+human 4/5**; M02 ✓ DINO-style/content grand=0,099/0,562, STI=0,463, snippet `chapters/snippets/phase6_m01b3.tex`)
-- **Итого экспериментов:** 51 / **75**
+- **Итого экспериментов:** 52 / **75**
 - **Инфраструктура:** 11 / **18** (3 код/конфиги + **8** данные)

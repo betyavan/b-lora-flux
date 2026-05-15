@@ -1,0 +1,373 @@
+{
+  "exp_name": "f02_blora_sdxl_pairs",
+  "protocol": "b_lora_tab1_style_transfer",
+  "n_pairs_evaluated": 50,
+  "pair_subset": null,
+  "per_pair": [
+    {
+      "pair_id": 0,
+      "style_id": "wikimo_04",
+      "content_subject_id": "backpack",
+      "dino_style": 0.2590370178222656,
+      "dino_content": 0.3504781126976013
+    },
+    {
+      "pair_id": 1,
+      "style_id": "wikivg_02",
+      "content_subject_id": "bowl",
+      "dino_style": 0.5830328464508057,
+      "dino_content": 0.11534257233142853
+    },
+    {
+      "pair_id": 2,
+      "style_id": "wikimo_04",
+      "content_subject_id": "dog",
+      "dino_style": 0.22910627722740173,
+      "dino_content": 0.1531050056219101
+    },
+    {
+      "pair_id": 3,
+      "style_id": "wikimo_03",
+      "content_subject_id": "backpack",
+      "dino_style": 0.29582202434539795,
+      "dino_content": 0.3130778968334198
+    },
+    {
+      "pair_id": 4,
+      "style_id": "wikimo_02",
+      "content_subject_id": "clock",
+      "dino_style": 0.48894959688186646,
+      "dino_content": -0.012897077947854996
+    },
+    {
+      "pair_id": 5,
+      "style_id": "wikivg_02",
+      "content_subject_id": "can",
+      "dino_style": 0.5225011110305786,
+      "dino_content": 0.3733659088611603
+    },
+    {
+      "pair_id": 6,
+      "style_id": "wikivg_04",
+      "content_subject_id": "backpack",
+      "dino_style": 0.5538519620895386,
+      "dino_content": 0.319297194480896
+    },
+    {
+      "pair_id": 7,
+      "style_id": "wikivg_04",
+      "content_subject_id": "bear",
+      "dino_style": 0.43855831027030945,
+      "dino_content": 0.17356371879577637
+    },
+    {
+      "pair_id": 8,
+      "style_id": "wikimo_03",
+      "content_subject_id": "clock",
+      "dino_style": 0.17184612154960632,
+      "dino_content": 0.3557245135307312
+    },
+    {
+      "pair_id": 9,
+      "style_id": "wikivg_02",
+      "content_subject_id": "cat",
+      "dino_style": 0.5223343372344971,
+      "dino_content": 0.4980032742023468
+    },
+    {
+      "pair_id": 10,
+      "style_id": "wikivg_01",
+      "content_subject_id": "clock",
+      "dino_style": 0.4164227843284607,
+      "dino_content": 0.2857767939567566
+    },
+    {
+      "pair_id": 11,
+      "style_id": "wikivg_03",
+      "content_subject_id": "backpack",
+      "dino_style": 0.2102314531803131,
+      "dino_content": 0.296513170003891
+    },
+    {
+      "pair_id": 12,
+      "style_id": "wikivg_03",
+      "content_subject_id": "clock",
+      "dino_style": 0.3064844608306885,
+      "dino_content": 0.39690327644348145
+    },
+    {
+      "pair_id": 13,
+      "style_id": "wikimo_04",
+      "content_subject_id": "bowl",
+      "dino_style": 0.2526237964630127,
+      "dino_content": 0.1820892095565796
+    },
+    {
+      "pair_id": 14,
+      "style_id": "wikivg_01",
+      "content_subject_id": "backpack",
+      "dino_style": 0.33463454246520996,
+      "dino_content": 0.2935570776462555
+    },
+    {
+      "pair_id": 15,
+      "style_id": "wikimo_02",
+      "content_subject_id": "backpack",
+      "dino_style": 0.4021601378917694,
+      "dino_content": 0.3687831163406372
+    },
+    {
+      "pair_id": 16,
+      "style_id": "wikimo_01",
+      "content_subject_id": "can",
+      "dino_style": 0.371969997882843,
+      "dino_content": 0.49678418040275574
+    },
+    {
+      "pair_id": 17,
+      "style_id": "wikivg_02",
+      "content_subject_id": "clock",
+      "dino_style": 0.3110393285751343,
+      "dino_content": 0.33179473876953125
+    },
+    {
+      "pair_id": 18,
+      "style_id": "wikimo_02",
+      "content_subject_id": "bowl",
+      "dino_style": 0.5641342401504517,
+      "dino_content": 0.08123546093702316
+    },
+    {
+      "pair_id": 19,
+      "style_id": "wikimo_01",
+      "content_subject_id": "backpack",
+      "dino_style": 0.30156514048576355,
+      "dino_content": 0.2777143716812134
+    },
+    {
+      "pair_id": 20,
+      "style_id": "wikivg_04",
+      "content_subject_id": "cat",
+      "dino_style": 0.5619915127754211,
+      "dino_content": 0.4411012530326843
+    },
+    {
+      "pair_id": 21,
+      "style_id": "wikivg_03",
+      "content_subject_id": "vase",
+      "dino_style": 0.6976768970489502,
+      "dino_content": 0.2621230483055115
+    },
+    {
+      "pair_id": 22,
+      "style_id": "wikimo_04",
+      "content_subject_id": "can",
+      "dino_style": 0.5049375891685486,
+      "dino_content": 0.1586538553237915
+    },
+    {
+      "pair_id": 23,
+      "style_id": "wikivg_01",
+      "content_subject_id": "vase",
+      "dino_style": 0.5145135521888733,
+      "dino_content": 0.2538853585720062
+    },
+    {
+      "pair_id": 24,
+      "style_id": "wikivg_04",
+      "content_subject_id": "dog",
+      "dino_style": 0.19717353582382202,
+      "dino_content": 0.3123011291027069
+    },
+    {
+      "pair_id": 25,
+      "style_id": "wikimo_03",
+      "content_subject_id": "bowl",
+      "dino_style": 0.4228566586971283,
+      "dino_content": 0.18512003123760223
+    },
+    {
+      "pair_id": 26,
+      "style_id": "wikivg_01",
+      "content_subject_id": "bowl",
+      "dino_style": 0.5659905672073364,
+      "dino_content": 0.11698208749294281
+    },
+    {
+      "pair_id": 27,
+      "style_id": "wikimo_04",
+      "content_subject_id": "vase",
+      "dino_style": 0.4127628207206726,
+      "dino_content": 0.28606200218200684
+    },
+    {
+      "pair_id": 28,
+      "style_id": "wikimo_01",
+      "content_subject_id": "dog",
+      "dino_style": 0.21708497405052185,
+      "dino_content": 0.1627572476863861
+    },
+    {
+      "pair_id": 29,
+      "style_id": "wikivg_02",
+      "content_subject_id": "bear",
+      "dino_style": 0.5529575943946838,
+      "dino_content": 0.1361813247203827
+    },
+    {
+      "pair_id": 30,
+      "style_id": "wikimo_03",
+      "content_subject_id": "vase",
+      "dino_style": 0.5162285566329956,
+      "dino_content": 0.2578693926334381
+    },
+    {
+      "pair_id": 31,
+      "style_id": "wikivg_02",
+      "content_subject_id": "vase",
+      "dino_style": 0.5470728874206543,
+      "dino_content": 0.2798956036567688
+    },
+    {
+      "pair_id": 32,
+      "style_id": "wikivg_03",
+      "content_subject_id": "cat",
+      "dino_style": 0.23509350419044495,
+      "dino_content": 0.4140581786632538
+    },
+    {
+      "pair_id": 33,
+      "style_id": "wikivg_01",
+      "content_subject_id": "dog",
+      "dino_style": 0.2731594443321228,
+      "dino_content": 0.31664836406707764
+    },
+    {
+      "pair_id": 34,
+      "style_id": "wikimo_01",
+      "content_subject_id": "bear",
+      "dino_style": 0.28662365674972534,
+      "dino_content": 0.10193609446287155
+    },
+    {
+      "pair_id": 35,
+      "style_id": "wikimo_01",
+      "content_subject_id": "bowl",
+      "dino_style": 0.37825947999954224,
+      "dino_content": 0.18716159462928772
+    },
+    {
+      "pair_id": 36,
+      "style_id": "wikimo_01",
+      "content_subject_id": "clock",
+      "dino_style": 0.18461698293685913,
+      "dino_content": 0.35883769392967224
+    },
+    {
+      "pair_id": 37,
+      "style_id": "wikivg_03",
+      "content_subject_id": "bowl",
+      "dino_style": 0.3969480097293854,
+      "dino_content": 0.11015196144580841
+    },
+    {
+      "pair_id": 38,
+      "style_id": "wikimo_01",
+      "content_subject_id": "vase",
+      "dino_style": 0.3841055631637573,
+      "dino_content": 0.32270193099975586
+    },
+    {
+      "pair_id": 39,
+      "style_id": "wikimo_01",
+      "content_subject_id": "cat",
+      "dino_style": 0.45299971103668213,
+      "dino_content": 0.4965219497680664
+    },
+    {
+      "pair_id": 40,
+      "style_id": "wikivg_04",
+      "content_subject_id": "can",
+      "dino_style": 0.292191743850708,
+      "dino_content": 0.5641739368438721
+    },
+    {
+      "pair_id": 41,
+      "style_id": "wikimo_02",
+      "content_subject_id": "vase",
+      "dino_style": 0.6261692047119141,
+      "dino_content": 0.15630124509334564
+    },
+    {
+      "pair_id": 42,
+      "style_id": "wikimo_03",
+      "content_subject_id": "can",
+      "dino_style": 0.4159850776195526,
+      "dino_content": 0.39115458726882935
+    },
+    {
+      "pair_id": 43,
+      "style_id": "wikivg_01",
+      "content_subject_id": "can",
+      "dino_style": 0.5361643433570862,
+      "dino_content": 0.3558802008628845
+    },
+    {
+      "pair_id": 44,
+      "style_id": "wikivg_03",
+      "content_subject_id": "bear",
+      "dino_style": 0.2255832552909851,
+      "dino_content": 0.2788028120994568
+    },
+    {
+      "pair_id": 45,
+      "style_id": "wikimo_02",
+      "content_subject_id": "cat",
+      "dino_style": 0.5082589387893677,
+      "dino_content": 0.4421042203903198
+    },
+    {
+      "pair_id": 46,
+      "style_id": "wikivg_04",
+      "content_subject_id": "vase",
+      "dino_style": 0.49745646119117737,
+      "dino_content": 0.20676401257514954
+    },
+    {
+      "pair_id": 47,
+      "style_id": "wikimo_03",
+      "content_subject_id": "bear",
+      "dino_style": 0.1620943397283554,
+      "dino_content": 0.1012423187494278
+    },
+    {
+      "pair_id": 48,
+      "style_id": "wikivg_03",
+      "content_subject_id": "dog",
+      "dino_style": 0.21251153945922852,
+      "dino_content": 0.31912946701049805
+    },
+    {
+      "pair_id": 49,
+      "style_id": "wikivg_04",
+      "content_subject_id": "bowl",
+      "dino_style": 0.45326679944992065,
+      "dino_content": 0.25972920656204224
+    }
+  ],
+  "dino_style_grand_mean": 0.39538081377744677,
+  "dino_content_grand_mean": 0.2777288924902678,
+  "sti": -0.117651921287179,
+  "by_artist": {
+    "Claude Monet": {
+      "n_pairs": 24,
+      "dino_style_mean": 0.36709157936275005,
+      "dino_content_mean": 0.2572716230837007
+    },
+    "Van Gogh": {
+      "n_pairs": 26,
+      "dino_style_mean": 0.42149395323716676,
+      "dino_content_mean": 0.2966125257886373
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "exp_name": "f02_blora_sdxl_pairs",
+  "group": "phase_5_2_f02",
+  "run_ts": "20260515T152734",
+  "ai_score": 4,
+  "ai_notes": "7/10 pairs show clean style+content separation; 2 Monet pairings (000, 008) render style as content-on-canvas; pair 004 is a true content-collapse case (clock missing). Visual evidence agrees with the numeric metrics, including the low-end outliers.",
+  "human_score": 4,
+  "style_visible": "да",
+  "content_preserved": "частично",
+  "artifacts": "есть",
+  "comment": "Согласен с AI-оценкой. pair 004 (clock x wikimo_02) сохранить как иллюстрацию failure-mode (style-LoRA over-dominance) в главе результатов.",
+  "reviewed_at": "2026-05-15T18:00:00Z"
+}
