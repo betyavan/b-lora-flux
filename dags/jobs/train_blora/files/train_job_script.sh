@@ -7,6 +7,7 @@ python scripts/check_env.py --strict
 
 # 1a. Pull training data via DVC
 dvc pull data/styles.dvc
+dvc pull data/eval_content.dvc
 
 # 1. Check if experiment has a training process (baseline configs have process: [])
 PROCESS_COUNT=$(python3 -c "
