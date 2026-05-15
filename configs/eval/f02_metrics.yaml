@@ -1,0 +1,30 @@
+# Hydra config for compute_f02_metrics.py (Phase 5.2 / F02, SDXL B-LoRA Table-1 protocol)
+#
+# Computes per-pair DINO-style and DINO-content over the manifest pairs,
+# aggregated as grand means, STI (content - style), and per-artist breakdowns.
+#
+# Style ref resolution:    style_refs_dir_base / {monet|van_gogh} / img<N> / *.jpg  (first image)
+# Content ref resolution:  content_refs_dir_base / <subject_id> / *.{jpg,png,...}
+# Generated images:        generated_dir / pair_{pair_id:03d}_{style_id}__{subject_id}.png
+
+f02_metrics:
+  manifest_path: "experiments/data/b_lora_eval_pairs.json"
+  generated_dir: ???                              # required: folder from generate_mixing_sdxl.py
+  exp_name: "f02_blora_sdxl_pairs"
+
+  style_refs_dir_base:   "data/styles"            # has subdirs monet/, van_gogh/ with img1..imgN
+  content_refs_dir_base: "data/eval_content"      # has subdirs per subject_id (cat/, dog/, ...)
+
+  # Subset filter — must match the subset used in generate_mixing_sdxl.py
+  pair_subset: null
+
+  # DINO encoder (same as compute_metrics.py / compute_mixing_metrics.py)
+  dino_model: "facebook/dino-vitb8"
+  batch_size: 8
+
+  # Used only for the by_artist aggregation block in the output JSON
+  artist_from_style_id:
+    wikivg_*: "Van Gogh"
+    wikimo_*: "Claude Monet"
+
+  log_every: 10

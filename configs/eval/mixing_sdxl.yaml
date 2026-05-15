@@ -1,0 +1,70 @@
+# Hydra config for generate_mixing_sdxl.py (Phase 5.2 / F02 pair-driver, SDXL)
+#
+# For each (content_subject_id, style_id) pair in the manifest, this script:
+#   1. Resolves style-LoRA via style_id_to_path[style_id] (anchored at style_lora_dir)
+#   2. Resolves content-LoRA via content_lora_template (anchored at content_lora_dir)
+#   3. Merges the two state-dicts (plain union — SDXL B-LoRA block ranges
+#      DO NOT overlap, so no filtering is needed)
+#   4. Generates one image with an SDXL pipeline
+#   5. Saves pair_{pair_id:03d}_{style_id}__{subject_id}.png
+#
+# Block recap (SDXL B-LoRA):
+#   style block:   up_blocks.0.attentions.1
+#   content block: up_blocks.0.attentions.0
+
+mixing_sdxl:
+  manifest_path: "experiments/data/b_lora_eval_pairs.json"
+  exp_name: "f02_blora_sdxl_pairs"
+
+  # LoRA directories ---------------------------------------------------------
+  style_lora_dir:   "/models/sdxl_loras/style"     # contains e04_blora_sdxl_<art>_img<i>.safetensors
+  content_lora_dir: "/models/sdxl_loras/content"   # contains m02_content_sdxl_<subject>.safetensors
+
+  # style_id -> style LoRA filename inside style_lora_dir (absolute paths also allowed)
+  style_id_to_path:
+    wikivg_01: "e04_blora_sdxl_van_gogh_img1.safetensors"
+    wikivg_02: "e04_blora_sdxl_van_gogh_img2.safetensors"
+    wikivg_03: "e04_blora_sdxl_van_gogh_img3.safetensors"
+    wikivg_04: "e04_blora_sdxl_van_gogh_img4.safetensors"
+    wikimo_01: "e04_blora_sdxl_monet_img1.safetensors"
+    wikimo_02: "e04_blora_sdxl_monet_img2.safetensors"
+    wikimo_03: "e04_blora_sdxl_monet_img3.safetensors"
+    wikimo_04: "e04_blora_sdxl_monet_img4.safetensors"
+
+  # Used with .format(subject=<content_subject_id>) to find the content LoRA filename
+  content_lora_template: "m02_content_sdxl_{subject}.safetensors"
+
+  # Prompt construction ------------------------------------------------------
+  # Phase 6 showed FLUX needs a natural-language style cue; we keep the same
+  # convention for SDXL for symmetry and reproducibility. Final prompt:
+  #     f"a {content_subject_id}{style_suffix_template.format(artist=...)}"
+  style_suffix_template: ", painted in the style of {artist}"
+  artist_from_style_id:
+    wikivg_*: "Van Gogh"
+    wikimo_*: "Claude Monet"
+
+  # LoRA application scale (Phase 6 winner; can be overridden from CLI)
+  lora_scale: 0.7
+
+  # Output -------------------------------------------------------------------
+  output_dir: "output/mixing_sdxl"
+
+  # Subset filter: null -> all 50 pairs;  "user_study" -> use manifest.user_study_pair_ids
+  pair_subset: null
+
+  log_every: 10
+
+model:
+  name_or_path: "/models/sdxl"
+
+sampling:
+  seed_base: 42                # per-image seed = seed_base + pair_id
+  steps: 20
+  guidance_scale: 7.5
+  width: 1024
+  height: 1024
+
+clearml:
+  enabled: true
+  project: "blora-flux-eval"
+  task_prefix: "mixing_sdxl"
