@@ -15,6 +15,7 @@ job:
     AWS_SECRET_ACCESS_KEY: ${CORP_VAULT_PATH}#secret_key
     PIP_INDEX_URL: ${CORP_PIP_INDEX_URL}
     CLEARML_ENABLED: "1"
+    REPO_BRANCH: "master"
     # EXPERIMENT_NAME, GENERATED_OUTPUT_S3_PATH, METRICS_OUTPUT_S3_PATH — injected by Airflow
 
   entrypoint: /bin/sh
@@ -22,7 +23,7 @@ job:
     - -c
     - >-
       pip install -q poetry;
-      git clone --recurse-submodules ${CORP_GITHUB_REPO} /root/b-lora-flux;
+      git clone --recurse-submodules --branch ${REPO_BRANCH} ${CORP_GITHUB_REPO} /root/b-lora-flux;
       git -C /root/b-lora-flux/src/ai-toolkit fetch origin 8c40b97afb840627c90bffe6c1bd6a5f6015d1cb && git -C /root/b-lora-flux/src/ai-toolkit checkout 8c40b97afb840627c90bffe6c1bd6a5f6015d1cb;
       cd /root/b-lora-flux && poetry lock && poetry install --no-root;
       bash /root/metrics_job_script.sh;

@@ -125,6 +125,15 @@ GROUP_EXPERIMENTS = {
         "e04_blora_sdxl_van_gogh_img3",
         "e04_blora_sdxl_van_gogh_img4",
     ],
+
+    # ---- Phase 6 — Style-content mixing (M01 content LoRA training) ----
+    # Train Θ_content on 3 subjects (cat, dog, backpack) using DS[9–18] (DC-02 winner).
+    # After training, run generate_mixing.py separately to produce the 3×3 grid.
+    "phase_6_content": [
+        "m01_content_cat",
+        "m01_content_dog",
+        "m01_content_backpack",
+    ],
 }
 
 # Per-experiment LORA_SCALE overrides.
@@ -155,6 +164,10 @@ GROUP_LORA_SCALES: dict[str, float] = {
     "e02_full_lora_flux_monet_img2": 0.7,
     "e02_full_lora_flux_monet_img3": 0.7,
     "e02_full_lora_flux_monet_img4": 0.7,
+    # Phase 6 — content LoRA training (alpha=0.7, consistent with Phase 4+)
+    "m01_content_cat": 0.7,
+    "m01_content_dog": 0.7,
+    "m01_content_backpack": 0.7,
 }
 
 
@@ -189,6 +202,8 @@ with DAG(
                 "compare_e", "compare_e03",
                 # Phase 5
                 "compare_f",
+                # Phase 6
+                "phase_6_content",
                 # Legacy proto ablations
                 "ablation_a", "ablation_b", "ablation_c",
             ],
