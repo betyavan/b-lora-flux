@@ -15,7 +15,12 @@ Usage:
         "mixing.content_loras=[/path/m01_cat.safetensors,/path/m01_dog.safetensors,/path/m01_backpack.safetensors]" \\
         "mixing.style_names=[van_gogh_img1,van_gogh_img4,monet_img1]" \\
         "mixing.content_names=[cat,dog,backpack]" \\
-        "mixing.prompts=[a cat sitting on a chair,a dog running in a park,a backpack on a table]"
+        "mixing.prompts=[a cat sitting on a chair,a dog running in a park,a backpack on a table]" \\
+        "mixing.style_suffixes=[painted in the style of Van Gogh,painted in the style of Van Gogh,painted in the style of Claude Monet]"
+
+`style_suffixes` is optional (default empty). When provided, must have the same length as
+`style_loras`; the row-i suffix is appended to every content prompt in that row to invoke
+the style (FLUX style-LoRAs rely on natural-language style cues, not trigger tokens).
 """
 
 from __future__ import annotations
@@ -217,6 +222,14 @@ def main(cfg: DictConfig) -> None:
     assert len(m.content_loras) == len(m.content_names) == len(m.prompts) == 3, \
         "content_loras, content_names, and prompts must each have exactly 3 entries"
 
+    style_suffixes = list(m.get("style_suffixes", []) or [])
+    if style_suffixes and len(style_suffixes) != 3:
+        raise ValueError(
+            f"style_suffixes must have exactly 3 entries (one per style row), got {len(style_suffixes)}"
+        )
+    if not style_suffixes:
+        style_suffixes = ["", "", ""]
+
     for p in list(m.style_loras) + list(m.content_loras):
         if not Path(p).exists():
             raise FileNotFoundError(f"LoRA file not found: {p}")
@@ -232,9 +245,11 @@ def main(cfg: DictConfig) -> None:
 
     for i, (s_path, s_name) in enumerate(zip(m.style_loras, m.style_names)):
         row: list[Image.Image] = []
-        for j, (c_path, c_name, prompt) in enumerate(
+        row_suffix = style_suffixes[i]
+        for j, (c_path, c_name, base_prompt) in enumerate(
             zip(m.content_loras, m.content_names, m.prompts)
         ):
+            prompt = f"{base_prompt}, {row_suffix}" if row_suffix else base_prompt
             log.info("Cell (%d,%d): style=%s  content=%s  prompt=%r", i, j, s_name, c_name, prompt)
 
             merged_path = _merge_loras(

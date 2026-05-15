@@ -11,6 +11,9 @@ mixing:
   style_names: []           # short labels, e.g. [van_gogh_img1, van_gogh_img4, monet_img1]
   content_names: []         # short labels, e.g. [cat, dog, backpack]
   prompts: []               # 3 prompts matching content subjects, e.g. ["a cat", "a dog", "a backpack"]
+  style_suffixes: []        # optional 3-entry list; if set, row-i suffix is appended to every prompt
+                            # in row i to invoke style (e.g. "painted in the style of Van Gogh").
+                            # Required because FLUX style-LoRAs use natural-language cues, not trigger tokens.
   lora_scale: 0.7           # applied to both style and content adapter
   output_dir: "output/mixing"
   exp_name: "m01_mixing_grid"
