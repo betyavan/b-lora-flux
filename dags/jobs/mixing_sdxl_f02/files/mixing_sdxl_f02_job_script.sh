@@ -71,13 +71,18 @@ done
 echo "Staged LoRAs:"
 ls -lh input_loras/style input_loras/content
 
-# 4. Build pair_subset override (empty -> null)
-if [ -z "${PAIR_SUBSET:-}" ]; then
+# 4. Build pair_subset override (empty / literal '""' -> null)
+# Airflow may serialize an empty string param as the 2-char literal '""',
+# so strip surrounding quotes before checking emptiness.
+_PS="${PAIR_SUBSET:-}"
+_PS="${_PS#\"}"; _PS="${_PS%\"}"
+_PS="${_PS#\'}"; _PS="${_PS%\'}"
+if [ -z "${_PS}" ]; then
   PAIR_SUBSET_OVR="mixing_sdxl.pair_subset=null"
   METRICS_PAIR_SUBSET_OVR="f02_metrics.pair_subset=null"
 else
-  PAIR_SUBSET_OVR="mixing_sdxl.pair_subset=${PAIR_SUBSET}"
-  METRICS_PAIR_SUBSET_OVR="f02_metrics.pair_subset=${PAIR_SUBSET}"
+  PAIR_SUBSET_OVR="mixing_sdxl.pair_subset=${_PS}"
+  METRICS_PAIR_SUBSET_OVR="f02_metrics.pair_subset=${_PS}"
 fi
 
 # 5. Generate 50 (or 30) pair images

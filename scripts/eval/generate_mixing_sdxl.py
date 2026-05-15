@@ -65,6 +65,9 @@ def _load_manifest(path: Path) -> dict[str, Any]:
 
 def _select_pairs(manifest: dict[str, Any], subset: str | None) -> list[dict[str, Any]]:
     pairs: list[dict[str, Any]] = list(manifest["pairs"])
+    if subset is not None:
+        s = str(subset).strip().strip('"').strip("'")
+        subset = s if s else None
     if subset is None:
         return pairs
     if subset == "user_study":
