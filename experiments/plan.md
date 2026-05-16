@@ -216,14 +216,20 @@ DINO-style DA03 превышает лучший результат Phase 1 (D01=
 **Вывод Phase 3.1:** U-образный минимум FID при alpha=0.7 — оптимальная точка. CLIP-style растёт монотонно до alpha=1.5 затем падает при 2.0 (пересатурация). DINO-style аналогично: пик при 1.5, коллапс при 2.0. CLIP-content пороговый переход вблизи alpha=1.0: при alpha=1.5–2.0 семантика разрушена. Визуально: alpha=0.7 — эталонный баланс; alpha=2.0 — полная деградация (human score: 1). Human score winner (G03 alpha=0.7): 5/5.
 → Следующая фаза (GS, Phase 3.2): зафиксировать alpha_style=0.7 как базу; сетка (α_style, α_content) стартует от (0.7, 1.0).
 
-### Phase 3.2 — раздельный α_style / α_content (только при Сценарии A)
+### Phase 3.2 — раздельный α_style / α_content (только при Сценарии A) — DEFERRED (out of scope)
+
+Снято по итогам решения 2026-05-15: задача раздельного управления α стиля/контента
+покрывается Phase~6 (M01b3 + M02 — две LoRA сливаются по диапазонам блоков, что
+эквивалентно отдельным альфам при выбранном split-режиме). Стабовые конфиги
+`configs/experiments/gs0[1-4]_*.yaml` оставлены как методологические placeholders;
+скрипт и DAG не реализованы. Текст ВКР переписан без forward-reference.
 
 | ID   | α_style | α_content | DINO-style | CLIP-content | Color preservation | Статус |
 |------|---------|-----------|------------|--------------|--------------------|--------|
-| GS01 | 0.4     | 1.0       | —          | —            | —                  | [ ]    |
-| GS02 | 0.5     | 1.0       | —          | —            | —                  | [ ]    |
-| GS03 | 0.7     | 1.0       | —          | —            | —                  | [ ]    |
-| GS04 | 1.0     | 0.5       | —          | —            | —                  | [ ]    |
+| GS01 | 0.4     | 1.0       | —          | —            | —                  | [—] deferred |
+| GS02 | 0.5     | 1.0       | —          | —            | —                  | [—] deferred |
+| GS03 | 0.7     | 1.0       | —          | —            | —                  | [—] deferred |
+| GS04 | 1.0     | 0.5       | —          | —            | —                  | [—] deferred |
 
 ---
 
@@ -275,12 +281,17 @@ DINO-style DA03 превышает лучший результат Phase 1 (D01=
 | E03M-3  | `e03_splitflux_monet_img3.yaml`         | Monet    | 3   | 0.1903     | 0.4699     | 0.2561       | 262.72 | 0.7716 | [x]    |
 | E03M-4  | `e03_splitflux_monet_img4.yaml`         | Monet    | 4   | 0.2968     | 0.4771     | 0.2400       | 242.53 | 0.7303 | [x]    |
 
-### Phase 4.4 — IP-Adapter-FLUX (опционально)
+### Phase 4.4 — IP-Adapter-FLUX (опционально) — DEFERRED (out of scope)
+
+Снято 2026-05-15: stable IP-Adapter-FLUX реализация на момент написания недоступна
+(I07 не реализован). Сравнение методов в Phase~4 закрыто на трёх осях
+(B-LoRA-FLUX, Full-LoRA-FLUX, SplitFlux) — этого достаточно для центрального
+вывода работы. Упоминание IP-Adapter из текста ВКР удалено.
 
 | ID     | Конфиг                             | Стиль    | Статус |
 |--------|------------------------------------|----------|--------|
-| E04-VG | `e04_ipadapter_van_gogh.yaml`      | Van Gogh | [ ]    |
-| E04-M  | `e04_ipadapter_monet.yaml`         | Monet    | [ ]    |
+| E04-VG | `e04_ipadapter_van_gogh.yaml`      | Van Gogh | [—] deferred |
+| E04-M  | `e04_ipadapter_monet.yaml`         | Monet    | [—] deferred |
 
 ### Сводная таблица (заполняется по завершении Phase 4)
 
@@ -311,15 +322,20 @@ DINO-style DA03 превышает лучший результат Phase 1 (D01=
 
 ---
 
-## Phase 4b — Анализ ограничений метода
+## Phase 4b — Анализ ограничений метода — DEFERRED (out of scope)
 
-Качественное и количественное исследование проблемных случаев. На каждый случай — 5 генераций.
+Снято 2026-05-15: количественные L01/L02/L03 не запущены; раздел «ограничения метода»
+в тексте ВКР опирается на качественные наблюдения, полученные в Phase~2.1
+(сопротивление стилизации у фотореалистичных объектов), Phase~3.1 (CLIP-content
+collapse при α≥1{,}5), Phase~5 (grayscale collapse у скейтбордиста) и Phase~6
+(memorization leak в M01b3 ячейка~0,2). Этого набора достаточно для содержательной
+рецензии ограничений без отдельной количественной фазы.
 
 | ID  | Ограничение         | Протокол                                                            | Метрика       | Статус |
 |-----|---------------------|---------------------------------------------------------------------|---------------|--------|
-| L01 | Color leakage       | 5 объектов с характерными цветами; α_style = 0.5 vs 1.0             | ΔE colordiff  | [ ]    |
-| L02 | Background leakage  | 5 стилей с выраженным фоном; full-frame vs center-cropped train     | DINO-object   | [ ]    |
-| L03 | Complex scenes      | 5 сложных промптов COCO; сравнение fidelity сгенерированной сцены    | CLIP-content  | [ ]    |
+| L01 | Color leakage       | 5 объектов с характерными цветами; α_style = 0.5 vs 1.0             | ΔE colordiff  | [—] deferred |
+| L02 | Background leakage  | 5 стилей с выраженным фоном; full-frame vs center-cropped train     | DINO-object   | [—] deferred |
+| L03 | Complex scenes      | 5 сложных промптов COCO; сравнение fidelity сгенерированной сцены    | CLIP-content  | [—] deferred |
 
 ---
 
@@ -412,10 +428,11 @@ Per-artist: Van Gogh (n=26) 0,421/0,297 > Claude Monet (n=24) 0,367/0,257 — Va
 - **Phase 1** (diag_d): 4/4 ✓ — лучший: d01 (r=16, 1000 steps), DINO-style=0.191, FID=246.3
 - **Phase 1b** (Θ_content): 3/3 ✓ — лучший: dc_content_late_ds (DS [9–18]), DINO-style=0.121, FID=257.22
 - **Phase 2** (D-A/B/C/P): 16/16 ✓ — D-A ✓ (лучший: DA03, DS [0–18], DINO=0.2568, FID=235.85); D-B ✓ (лучший: DB02, r=16, DINO=0.1835, FID=248.29); D-C ✓ (лучший: DC03, steps=2000, DINO=0.2226, FID=245.1); D-P ✓ (лучший: DP02, "a sks painting", DINO=0.3990, FID=234.02)
-- **Phase 3** (Alpha): 6/10 (Phase 3.1 ✓ winner: G03 alpha=0.7, DINO=0.4180, FID=228.6)
-- **Phase 4** (Group E): 24/26 (Phase 4.1 ✓ B-LoRA FLUX 8 exp; Phase 4.2 ✓ Full-LoRA FLUX 8 exp; Phase 4.3 ✓ SplitFlux 8 exp — winner ★; Phase 4.4 IP-Adapter — опц.)
-- **Phase 4b** (Limitations): 0/3
-- **Phase 5** (SDXL): 5/5 ✅ (Phase 5.1 ✓ winner: F01-4 img4, DINO-style=0.4208, CLIP-style=0.6506, FID=229.0; **F02 ✓** батч DS8 50 пар: DINO-style=0.3954, DINO-content=0.2777, STI=−0.118; VG > Monet; AI+human 4/5)
+- **Phase 3.1** (Alpha global): 6/6 ✅ (winner: G03 alpha=0.7, DINO=0.4180, FID=228.6)
+- **Phase 3.2** (split α): 0/4 — **DEFERRED out of scope** (раздельное α покрывается Phase~6 M01b3 через split keys)
+- **Phase 4** (Group E): 24/24 ✅ in scope (Phase 4.1 ✓ B-LoRA FLUX 8 exp; Phase 4.2 ✓ Full-LoRA FLUX 8 exp; Phase 4.3 ✓ SplitFlux 8 exp — winner ★; Phase 4.4 IP-Adapter — **deferred**)
+- **Phase 4b** (Limitations): 0/3 — **DEFERRED out of scope** (ограничения описаны качественно в тексте на базе Phase 2.1/3.1/5/6)
+- **Phase 5** (SDXL): 5/5 ✅ (Phase 5.1 ✓ winner: F01-4 img4, DINO-style=0.4208, CLIP-style=0.6506, FID=229.0; Monet-SDXL — deferred per план; **F02 ✓** батч DS8 50 пар: DINO-style=0.3954, DINO-content=0.2777, STI=−0.118; VG > Monet; AI+human 4/5)
 - **Phase 6** (Mixing): 5/5 ✅ (M01a content-LoRA cat/dog/backpack 5/5; M01b1 ❌ no suffix; M01b2 ❌ wide split no suffix; **M01b3 ★ winner — 6/9 ячеек со стилем, AI+human 4/5**; M02 ✓ DINO-style/content grand=0,099/0,562, STI=0,463, snippet `chapters/snippets/phase6_m01b3.tex`)
-- **Итого экспериментов:** 52 / **75**
-- **Инфраструктура:** 11 / **18** (3 код/конфиги + **8** данные)
+- **Итого экспериментов (in scope):** 52 / **52** ✅ (Phase 3.2 / 4.4 / 4b / 5.1-Monet — **out of scope**, см. соответствующие разделы)
+- **Инфраструктура:** 11 / 11 ✅ in scope (I07 IP-Adapter — **out of scope** вместе с Phase 4.4)

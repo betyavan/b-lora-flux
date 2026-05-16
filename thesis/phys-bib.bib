@@ -53,8 +53,7 @@
   title     = {Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow},
   author    = {Liu, Xingchao and Gong, Chengyue and Liu, Qiang},
   booktitle = {International Conference on Learning Representations},
-  year      = {2023},
-  note      = {arXiv preprint arXiv:2209.03003, 2022}
+  year      = {2023}
 }
 
 @inproceedings{esser2024sd3,
@@ -169,13 +168,6 @@
   year      = {2021}
 }
 
-@inproceedings{zhang2023controlnet,
-  title     = {Adding Conditional Control to Text-to-Image Diffusion Models},
-  author    = {Zhang, Lvmin and Rao, Anyi and Agrawala, Maneesh},
-  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision},
-  year      = {2023}
-}
-
 @inproceedings{qi2024deadiff,
   title     = {{DEADiff}: An Efficient Stylization Diffusion Model with Disentangled Representations},
   author    = {Qi, Tianhao and Fang, Shancheng and Wu, Yanze and Xie, Hongtao
@@ -258,7 +250,7 @@
 
 % --- Software stack entries (Appendix A) ---
 
-@incollection{paszke2019pytorch,
+@inproceedings{paszke2019pytorch,
   title     = {{PyTorch}: An Imperative Style, High-Performance Deep Learning Library},
   author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam
                and Bradbury, James and Chanan, Gregory and Killeen, Trevor
@@ -288,11 +280,10 @@
   year      = {2020}
 }
 
-@inproceedings{von2022hydra,
-  title     = {Hydra -- A Framework for Elegantly Configuring Complex Applications},
-  author    = {Yadan, Omry},
-  booktitle = {GitHub},
-  year      = {2019},
+@misc{von2022hydra,
+  title        = {Hydra -- A Framework for Elegantly Configuring Complex Applications},
+  author       = {Yadan, Omry},
+  year         = {2019},
   howpublished = {\url{https://github.com/facebookresearch/hydra}}
 }
 
@@ -312,4 +303,83 @@
                   and others},
   year         = {2020},
   howpublished = {\url{https://dvc.org}}
+}
+
+@inproceedings{caron2021dino,
+  title     = {Emerging Properties in Self-Supervised Vision Transformers},
+  author    = {Caron, Mathilde and Touvron, Hugo and Misra, Ishan and J{\'e}gou, Herv{\'e} and Mairal, Julien and Bojanowski, Piotr and Joulin, Armand},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
+  pages     = {9650--9660},
+  year      = {2021}
+}
+
+% --- Additional citations introduced during final revision ---
+
+@article{raffel2020t5,
+  title   = {Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer},
+  author  = {Raffel, Colin and Shazeer, Noam and Roberts, Adam and Lee, Katherine
+             and Narang, Sharan and Matena, Michael and Zhou, Yanqi and Li, Wei
+             and Liu, Peter J.},
+  journal = {Journal of Machine Learning Research},
+  volume  = {21},
+  number  = {140},
+  pages   = {1--67},
+  year    = {2020}
+}
+
+@inproceedings{loshchilov2019adamw,
+  title     = {Decoupled Weight Decay Regularization},
+  author    = {Loshchilov, Ilya and Hutter, Frank},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2019}
+}
+
+@inproceedings{ho2022cfg,
+  title     = {Classifier-Free Diffusion Guidance},
+  author    = {Ho, Jonathan and Salimans, Tim},
+  booktitle = {NeurIPS Workshop on Deep Generative Models and Downstream Applications},
+  year      = {2021}
+}
+
+@inproceedings{dhariwal2021diffbeatgans,
+  title     = {Diffusion Models Beat {GANs} on Image Synthesis},
+  author    = {Dhariwal, Prafulla and Nichol, Alexander},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {34},
+  pages     = {8780--8794},
+  year      = {2021}
+}
+
+@inproceedings{song2021scoresde,
+  title     = {Score-Based Generative Modeling through Stochastic Differential Equations},
+  author    = {Song, Yang and Sohl-Dickstein, Jascha and Kingma, Diederik P.
+               and Kumar, Abhishek and Ermon, Stefano and Poole, Ben},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2021}
+}
+
+@inproceedings{huang2017adain,
+  title     = {Arbitrary Style Transfer in Real-Time with Adaptive Instance Normalization},
+  author    = {Huang, Xun and Belongie, Serge},
+  booktitle = {Proceedings of the IEEE International Conference on Computer Vision (ICCV)},
+  pages     = {1501--1510},
+  year      = {2017}
+}
+
+@inproceedings{zhang2018lpips,
+  title     = {The Unreasonable Effectiveness of Deep Features as a Perceptual Metric},
+  author    = {Zhang, Richard and Isola, Phillip and Efros, Alexei A.
+               and Shechtman, Eli and Wang, Oliver},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {586--595},
+  year      = {2018}
+}
+
+@misc{accelerate2022,
+  title        = {Accelerate: Training and Inference at Scale Made Simple, Efficient and Adaptable},
+  author       = {Gugger, Sylvain and Debut, Lysandre and Wolf, Thomas
+                  and Schmid, Philipp and Mueller, Zachary and Mangrulkar, Sourab
+                  and Sun, Marc and Bossan, Benjamin},
+  year         = {2022},
+  howpublished = {\url{https://github.com/huggingface/accelerate}}
 }

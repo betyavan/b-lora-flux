@@ -1,0 +1,11 @@
+{
+  "exp_name": "e04_blora_sdxl_van_gogh_img2",
+  "ai_score": 3.7,
+  "ai_notes": "Moderate stylisation. Weaker on skateboarder and pizza. Watermark artifact in 0000.png.",
+  "human_score": 4,
+  "style_visible": "частично",
+  "content_preserved": "да",
+  "artifacts": "есть",
+  "comment": "Согласен с AI-оценкой. Watermark в 0000.png",
+  "reviewed_at": "2026-05-15T13:33:51.643143"
+}
