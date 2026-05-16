@@ -41,7 +41,8 @@
     Path = /usr/local/texlive/2026/texmf-dist/fonts/opentype/adobe/sourcecodepro/,
     BoldFont = SourceCodePro-Bold.otf,
     ItalicFont = SourceCodePro-RegularIt.otf,
-    BoldItalicFont = SourceCodePro-BoldIt.otf
+    BoldItalicFont = SourceCodePro-BoldIt.otf,
+    Scale = MatchLowercase
 ]
 
 % оформления подписи рисунка
@@ -49,7 +50,17 @@
 
 % подпись таблицы
 \DeclareCaptionFormat{hfillstart}{\hfill#1#2#3\par}
-\captionsetup[table]{format=hfillstart,labelsep=newline,justification=centering,skip=-10pt,textfont=bf}
+\captionsetup[table]{format=hfillstart,labelsep=newline,justification=centering,skip=4pt,textfont=bf}
+
+% компактные таблицы, чтобы не вылезали за поля
+\usepackage{etoolbox}
+\setlength{\tabcolsep}{4pt}
+
+% разрешаем переносы внутри \texttt-токенов (длинные пути / имена файлов)
+\usepackage{xurl}
+\renewcommand{\UrlBreaks}{\do\/\do\-\do\_\do\.\do\:\do\=\do\?\do\&}
+\sloppy
+\emergencystretch=3em
 
 % путь к каталогу с рисунками
 \graphicspath{{fig/}{../figures/}}
