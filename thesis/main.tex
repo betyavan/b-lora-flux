@@ -5,31 +5,89 @@
 
 \begin{document}
 
-% ---- Титульная страница (заглушка — заполнить перед финальной сдачей) ----
+% ---- Титульная страница ----
 \begin{titlepage}
     \begin{center}
         \large
-        Министерство науки и высшего образования Российской Федерации\\[0.5em]
-        \textbf{[Название университета]}\\[2em]
-        Кафедра [название кафедры]\\[4em]
+        Министерство науки и высшего образования\\
+        Российской Федерации\\[0.5em]
+        Федеральное государственное автономное образовательное\\
+        учреждение высшего образования\\[0.5em]
+        \textbf{«Национальный исследовательский университет\\
+        \mbox{«Высшая школа экономики»}»}\\[1.5em]
 
-        \LARGE\textbf{Применение метода B-LoRA для повышения качества переноса стиля\\
-        в генеративных моделях на основе DiT — FLUX}\\[2em]
+        \normalsize
+        Московский институт электроники и математики\\
+        им.~А.Н.~Тихонова\\[0.3em]
+        Департамент прикладной математики\\[3em]
 
         \large
-        Выпускная квалификационная работа\\[4em]
+        Образовательная программа «Прикладная математика»\\
+        направление подготовки 01.03.04~«Прикладная математика»\\[3em]
 
+        \textbf{ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА}\\[1.5em]
+
+        на тему\\[0.5em]
+        \Large\textbf{«Применение метода B-LoRA для повышения\\
+        качества переноса стиля в генеративных\\
+        моделях на основе DiT~--- FLUX»}\\[3em]
+
+        \large
         \begin{flushright}
-            Выполнил: студент группы [номер]\\{}
-            [Фамилия И.О.]\\[1em]
-            Научный руководитель:\\{}
-            [Звание, Фамилия И.О.]
+            Выполнил студент группы БПМ223:\\
+            Бетев Иван Алексеевич\\[1.5em]
+            Научный руководитель:\\
+            Сластников Сергей Александрович\\
         \end{flushright}
 
         \vfill
         Москва, 2026
     \end{center}
 \end{titlepage}
+
+% ---- Аннотация (русск.) ----
+\section*{Аннотация}
+\addcontentsline{toc}{section}{Аннотация}
+
+Данная работа посвящена исследованию применимости принципа блочной
+декомпозиции LoRA-адаптеров (метод B-LoRA) к диффузионному трансформеру
+FLUX.1 семейства MM-DiT для задачи переноса художественного стиля.
+Разработан метод поблочного обучения стилевого адаптера на double-stream
+блоках FLUX.1 и предложена методология эмпирической проверки функциональной
+специализации блоков на основе техники \textit{prompt injection}. Найдена
+оптимальная конфигурация адаптера; проведено сравнение с базовыми подходами
+Full-LoRA, SplitFlux и оригинальным B-LoRA-SDXL по метрикам DINO ViT-B/8,
+CLIP, FID и LPIPS на наборах стилей Ван~Гога и Моне с использованием
+промптов MS-COCO и изображений ArtBench-10.
+
+Полученные результаты подтвердили работоспособность блочной адаптации
+в архитектуре MM-DiT и выявили функциональные различия между double-stream
+и single-stream блоками FLUX.1, перспективные для дальнейших исследований
+эффективного дообучения генеративных моделей.
+\newpage
+
+% ---- Abstract (англ.) ----
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+\begin{otherlanguage}{english}
+This work is devoted to the study of applicability of the block-wise LoRA
+decomposition principle (the B-LoRA method) to the FLUX.1 diffusion
+transformer of the MM-DiT family for the task of artistic style transfer.
+A block-wise training procedure for a style adapter on the double-stream
+blocks of FLUX.1 is developed, and a methodology for empirical verification
+of the functional specialization of blocks based on the \textit{prompt
+injection} technique is proposed. The optimal configuration of the adapter
+is established; the proposed method is compared with the baseline approaches
+Full-LoRA, SplitFlux and the original B-LoRA-SDXL by DINO ViT-B/8, CLIP,
+FID and LPIPS metrics on Van~Gogh and Monet style sets using MS-COCO prompts
+and ArtBench-10 images.
+
+The obtained results confirm the feasibility of block-wise adaptation in the
+MM-DiT architecture and reveal functional differences between double-stream
+and single-stream blocks of FLUX.1, promising for further research on
+efficient fine-tuning of generative models.
+\end{otherlanguage}
+\newpage
 
 % ---- Содержание ----
 \tableofcontents

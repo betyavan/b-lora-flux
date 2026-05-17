@@ -10,13 +10,8 @@
   \renewcommand{\listingscaption}{Листинг}
 }
 
-% основной шрифт документа
-\setmainfont{cmunrm.otf}[
-    Path = /usr/local/texlive/2026/texmf-dist/fonts/opentype/public/cm-unicode/,
-    BoldFont = cmunbx.otf,
-    ItalicFont = cmunti.otf,
-    BoldItalicFont = cmunbi.otf
-]
+% основной шрифт документа — Times New Roman 14 pt (требование НИУ ВШЭ / МИЭМ)
+\setmainfont{Times New Roman}
 
 % перечень использованных источников
 
@@ -72,8 +67,9 @@
 }
 \makeatother
 
-\counterwithin{figure}{section}
-\counterwithin{table}{section}
+% сквозная нумерация рисунков и таблиц (требование ВШЭ §4: «Рисунок 1, 2, …»)
+% \counterwithin{figure}{section}
+% \counterwithin{table}{section}
 
 \titlelabel{\thetitle.\quad}
 
