@@ -1,0 +1,23 @@
+% Самостоятельная компиляция Приложения А (отдельный PDF)
+% Сборка: xelatex appendix_only && bibtex appendix_only && xelatex appendix_only && xelatex appendix_only
+
+\documentclass[14pt,a4paper]{extarticle}
+
+\input{packages}
+\input{preferences}
+
+% PDF-метаданные для отдельного файла приложения
+\hypersetup{
+    pdftitle={Приложение А. Описание используемого программного стека},
+    pdfauthor={Бетев Иван Алексеевич},
+    pdfsubject={ВКР: Применение B–LoRA для повышения качества передачи стиля в DiT–FLUX}
+}
+
+\begin{document}
+
+\input{appendix_a_stack}
+
+\newpage
+\printbibliography[title={Список использованных источников}]
+
+\end{document}
